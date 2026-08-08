@@ -2,6 +2,7 @@ import { MiddlewareClient, MiddlewareError } from "./mcp-client.js";
 import { createSpeechController } from "./speech.js";
 import { createVoiceCapture } from "./voice-capture.js";
 import { createVoiceExceptions } from "./voice-exceptions.js";
+import { createDemoConsole } from "./demo-console.js";
 
 function makeSessionId() {
   return `S-${Date.now().toString(36)}`;
@@ -141,7 +142,7 @@ const DISPLAY_COPY = {
 
 export function startPonteApp() {
   const client = new MiddlewareClient();
-  const sessionId = makeSessionId();
+  let sessionId = makeSessionId();
   const ponteButton = byId("ponte-button");
   const avatar = byId("ponte-avatar");
   const voiceState = byId("voice-state");
@@ -166,7 +167,9 @@ export function startPonteApp() {
   let currentState = "ready";
   let currentCaption = null;
   let captionTimer = null;
-  let healthSnapshot = { reachable: null, voiceReady: null };
+  let healthSnapshot = { reachable: null, voiceReady: null, demoMode: "off" };
+  let lastResponse = null;
+  let resetPrompt = null;
 
   function copy() {
     return DISPLAY_COPY[displayLocale];
@@ -219,6 +222,11 @@ export function startPonteApp() {
     health.textContent = reachable === null
       ? system.healthChecking
       : (reachable ? system.healthOnline : system.healthOffline);
+    if (reachable && healthSnapshot.demoMode === "scripted") {
+      health.textContent += displayLocale === "en" ? " · Scripted demo" : " · 腳本模型示範";
+    } else if (reachable && healthSnapshot.demoMode === "real") {
+      health.textContent += displayLocale === "en" ? " · Live model demo" : " · 即時模型示範";
+    }
     health.classList.toggle("is-offline", reachable === false);
     connection.textContent = reachable === null
       ? system.connectionChecking
@@ -230,6 +238,11 @@ export function startPonteApp() {
     serviceStatusValue.textContent = reachable === null
       ? system.serviceChecking
       : (reachable ? system.serviceOnline : system.serviceOffline);
+    if (reachable && healthSnapshot.demoMode === "scripted") {
+      serviceStatusValue.textContent += displayLocale === "en" ? " · Scripted demo" : " · 腳本模型示範";
+    } else if (reachable && healthSnapshot.demoMode === "real") {
+      serviceStatusValue.textContent += displayLocale === "en" ? " · Live model demo" : " · 即時模型示範";
+    }
     voicePathLabel.textContent = system.voiceLabel;
     voicePathValue.textContent = reachable === null
       ? system.voiceChecking
@@ -268,6 +281,8 @@ export function startPonteApp() {
     setState(currentState);
     renderSystemStatus();
     renderCaption();
+    consoleView.setLocale(locale);
+    if (lastResponse) exceptions.renderResponse(lastResponse);
   }
 
   function stopPlayback() {
@@ -291,6 +306,11 @@ export function startPonteApp() {
     const displayText = typeof response.display_text === "string" ? response.display_text.trim() : "";
     const speechText = typeof response.speech_text === "string" ? response.speech_text.trim() : "";
     showPonteReply(displayText);
+    consoleView.appendMessage("assistant", displayText);
+    if (consoleView.muted || !speechText) {
+      setState("ready");
+      return;
+    }
     const audioUrl = responseAudioUrl(payload);
     if (audioUrl) {
       const audio = new Audio(client.absoluteUrl(audioUrl));
@@ -303,7 +323,7 @@ export function startPonteApp() {
         }
       }, { once: true });
       const fallbackToBrowserSpeech = () => {
-        if (browserFallbackStarted || turn !== latestTurn) return;
+        if (browserFallbackStarted || turn !== latestTurn || consoleView.muted || activeAudio !== audio) return;
         browserFallbackStarted = true;
         if (activeAudio === audio) activeAudio = null;
         activeSpeechTurn = turn;
@@ -326,7 +346,7 @@ export function startPonteApp() {
       audio.addEventListener("error", fallbackToBrowserSpeech, { once: true });
       try {
         await audio.play();
-        if (turn === latestTurn) setState("speaking-response");
+        if (turn === latestTurn && activeAudio === audio && !consoleView.muted) setState("speaking-response");
         return;
       } catch {
         fallbackToBrowserSpeech();
@@ -346,8 +366,8 @@ export function startPonteApp() {
     }
     activeSpeechTurn = 0;
     if (turn === latestTurn) {
-      exceptions.renderError({ message: "未能播放 Ponte 的聲音。請檢查瀏覽器音訊權限與系統輸出裝置。" });
-      setState("audio-error");
+      // Text delivery remains usable when this browser has no speech output.
+      setState("ready");
     }
   }
 
@@ -357,6 +377,7 @@ export function startPonteApp() {
     const controller = new AbortController();
     activeRequest = controller;
     exceptions.clearError();
+    consoleView.setBusy(true);
     setState("processing");
     showUserSpeech(transcript);
     try {
@@ -367,7 +388,8 @@ export function startPonteApp() {
         signal: controller.signal,
       });
       if (turn !== latestTurn) return;
-      exceptions.renderResponse(interactionPayload(payload));
+      consoleView.appendMessage("user", transcript || (displayLocale === "en" ? "Voice request sent" : "已送出語音需求"));
+      renderDelivery(payload);
       await playResponse(payload, turn);
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
@@ -381,59 +403,81 @@ export function startPonteApp() {
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "語音傳送未完成，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
     }
   }
 
   async function submitTranscript(text) {
     const transcript = String(text || "").trim();
     if (!transcript) return;
+    recognitionOnly = false;
+    capture.cancel();
+    speech.stop();
+    stopPlayback();
     const turn = ++latestTurn;
     activeRequest?.abort();
     const controller = new AbortController();
     activeRequest = controller;
     exceptions.clearError();
+    consoleView.setBusy(true);
     setState("processing");
     showUserSpeech(transcript);
+    consoleView.appendMessage("user", transcript);
     try {
       const payload = await client.sendInteraction({
         routing: { interaction_id: makeInteractionId(), session_id: sessionId },
         event: { type: "user_utterance", task_id: null, content: transcript },
       }, { signal: controller.signal });
       if (turn !== latestTurn) return;
-      exceptions.renderResponse(interactionPayload(payload));
+      renderDelivery(payload);
+      byId("message-input").value = "";
       await playResponse(payload, turn);
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
-      exceptions.renderError(error instanceof MiddlewareError ? error : { message: "語音辨識後未能送出，請再試一次。" });
+      exceptions.renderError(error instanceof MiddlewareError ? error : { message: "未能送出這次需求，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
     }
   }
 
   async function handleAction(event) {
     if (!event || typeof event !== "object" || Array.isArray(event)) return;
+    if (activeRequest) return;
+    recognitionOnly = false;
+    capture.cancel();
+    speech.stop();
     interruptCurrentTurn();
     const turn = ++latestTurn;
     const controller = new AbortController();
     activeRequest = controller;
     exceptions.clearError();
+    consoleView.setBusy(true);
     setState("processing");
+    const clicked = document.activeElement;
+    const choice = clicked?.closest?.(".action-button, .workspace-field-action");
+    const label = choice?.classList.contains("workspace-field-action")
+      ? Array.from(choice.querySelectorAll(".workspace-field-label, .workspace-field-value")).map((node) => node.textContent.trim()).filter(Boolean).join(" · ")
+      : choice?.textContent?.trim();
+    if (label) consoleView.appendMessage("user", label);
     try {
       const payload = await client.sendInteraction({
         routing: { interaction_id: makeInteractionId(), session_id: sessionId },
         event,
       }, { signal: controller.signal });
       if (turn !== latestTurn) return;
-      exceptions.renderResponse(interactionPayload(payload));
+      renderDelivery(payload);
       await playResponse(payload, turn);
+      if (turn === latestTurn && choice && !choice.isConnected) {
+        const title = byId("approval-region").querySelector(".workspace-title");
+        if (title) { title.tabIndex = -1; title.focus(); }
+      }
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "暫時未能完成這項服務，請重試。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
     }
   }
 
@@ -462,6 +506,47 @@ export function startPonteApp() {
   });
 
   const capture = createVoiceCapture();
+
+  function renderDelivery(payload) {
+    lastResponse = interactionPayload(payload);
+    exceptions.renderResponse(lastResponse);
+    consoleView.updateWorkspace(lastResponse);
+    consoleView.setBusy(true);
+    healthSnapshot.reachable = true;
+    renderSystemStatus();
+  }
+
+  function requestNewSession(prompt = null) {
+    if (activeRequest) return;
+    resetPrompt = typeof prompt === "string" ? prompt : null;
+    byId("reset-dialog").showModal();
+  }
+
+  const consoleView = createDemoConsole({
+    onSubmit: submitTranscript,
+    onMute(muted) {
+      if (muted) { stopPlayback(); if (currentState === "speaking-response") setState("ready"); }
+    },
+    onReset: requestNewSession,
+  });
+  byId("reset-cancel").addEventListener("click", () => { resetPrompt = null; byId("reset-dialog").close(); });
+  byId("reset-confirm").addEventListener("click", () => {
+    latestTurn += 1;
+    recognitionOnly = false;
+    capture.cancel();
+    speech.stop();
+    interruptCurrentTurn();
+    sessionId = makeSessionId();
+    lastResponse = null;
+    exceptions.reset();
+    consoleView.reset();
+    setCaption(null, "");
+    setState("ready");
+    byId("reset-dialog").close();
+    if (resetPrompt) consoleView.preview(resetPrompt);
+    resetPrompt = null;
+  });
+  byId("last-receipt").addEventListener("click", () => exceptions.openArtifact());
 
   async function startVoiceTurn() {
     interruptCurrentTurn();
@@ -508,6 +593,7 @@ export function startPonteApp() {
   }
 
   ponteButton.addEventListener("click", () => {
+    if (activeRequest) return;
     // A user gesture is required before some browsers allow speech/audio output.
     speech.unlock?.();
     const state = document.body.dataset.voiceState;
@@ -533,7 +619,7 @@ export function startPonteApp() {
     .then((payload) => {
       const reachable = payload.backend_reachable !== false;
       backendVoiceReady = payload.voice_ready !== false;
-      healthSnapshot = { reachable, voiceReady: backendVoiceReady };
+      healthSnapshot = { reachable, voiceReady: backendVoiceReady, demoMode: payload.demo_agent_mode || "off" };
       renderSystemStatus();
     })
     .catch(() => {
@@ -543,7 +629,7 @@ export function startPonteApp() {
     });
 
   setDisplayLocale("zh-Hant");
-  return { client, sessionId, capture, speech, submitVoice, handleAction, interruptCurrentTurn };
+  return { client, get sessionId() { return sessionId; }, capture, speech, consoleView, submitTranscript, submitVoice, handleAction, interruptCurrentTurn };
 }
 
 if (typeof document !== "undefined") {

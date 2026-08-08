@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc"><title id="title">Ponte — Medical Execution Sequence</title><desc id="desc">Final planned cardiology appointment sequence. On 13 October 2026 the requested next Tuesday is 20 October in Asia/Macau. P1 for 14:00 is invalidated on intent change; P2 for 15:30 is approved explicitly. Atomic admission precedes MCP registration and atomic backend booking. Receipt verification precedes confirmed completion.</desc><defs><marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#3768C2"/></marker><marker id="arrow-amber" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#B66B0D"/></marker><marker id="arrow-teal" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#0B8071"/></marker></defs><rect width="1920" height="1080" fill="#F6F8FC"/>
+<text x="48" y="62" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" text-anchor="start">
+<tspan x="48" dy="0">Ponte — Intent Change During Approval</tspan>
+</text>
+<text x="50" y="104" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="400" text-anchor="start">
+<tspan x="50" dy="0">Medical registration • 13 Oct 2026 → Tue 20 Oct 2026 • Asia/Macau • final planned execution</tspan>
+</text>
+<circle cx="50" cy="139" r="6" fill="#3768C2"/>
+<text x="67" y="147" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="67" dy="0">Reasoning</tspan>
+</text>
+<circle cx="250" cy="139" r="6" fill="#B66B0D"/>
+<text x="267" y="147" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="267" dy="0">Authorization / durable state</tspan>
+</text>
+<circle cx="720" cy="139" r="6" fill="#0B8071"/>
+<text x="737" y="147" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="737" dy="0">Execution / verified outcome</tspan>
+</text>
+<rect x="50" y="175" width="330" height="70" rx="12" fill="#EAF0FC" stroke="#3768C2" stroke-width="2"/>
+<text x="215.0" y="203" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">
+<tspan x="215.0" dy="0">UI / user (untrusted)</tspan>
+</text>
+<text x="215.0" y="230" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="215.0" dy="0">frontend/app.js</tspan>
+</text>
+<path d="M215,248 L215,1020" fill="none" stroke="#3768C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 9"/>
+<rect x="425" y="175" width="450" height="70" rx="12" fill="#EAF0FC" stroke="#3768C2" stroke-width="2"/>
+<text x="650.0" y="203" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">
+<tspan x="650.0" dy="0">AgentRuntime (trusted)</tspan>
+</text>
+<text x="650.0" y="230" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="650.0" dy="0">RegistryDrivenAgent: advisory LLM</tspan>
+</text>
+<path d="M650,248 L650,1020" fill="none" stroke="#3768C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 9"/>
+<rect x="935" y="175" width="470" height="70" rx="12" fill="#FFF2DA" stroke="#B66B0D" stroke-width="2"/>
+<text x="1170.0" y="203" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">
+<tspan x="1170.0" dy="0">Trusted state + execution</tspan>
+</text>
+<text x="1170.0" y="230" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="1170.0" dy="0">SQLiteTaskStore • ExecutionPipeline</tspan>
+</text>
+<path d="M1170,248 L1170,1020" fill="none" stroke="#B66B0D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 9"/>
+<rect x="1465" y="175" width="405" height="70" rx="12" fill="#E3F5EF" stroke="#0B8071" stroke-width="2"/>
+<text x="1667.5" y="203" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">
+<tspan x="1667.5" dy="0">MCP + medical backend</tspan>
+</text>
+<text x="1667.5" y="230" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="1667.5" dy="0">MCP/server.py • MedicalStore</tspan>
+</text>
+<path d="M1668,248 L1668,1020" fill="none" stroke="#0B8071" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 9"/>
+<text x="233" y="275" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="233" dy="0">1  Cardiology • next Tuesday afternoon</tspan>
+</text>
+<path d="M215,285 L650,285" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="670" y="319" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="670" dy="0">2  LLM selects medical.list_departments</tspan>
+</text>
+<path d="M650,329 L1668,329" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="1225" y="346" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="1225" dy="0">DEPT-CARDIO</tspan>
+</text>
+<path d="M1668,356 L650,356" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-teal)"/>
+<text x="670" y="387" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="500" text-anchor="start">
+<tspan x="670" dy="0">3  medical.search_registration_slots  {department_id, date, session:"afternoon"}</tspan>
+</text>
+<path d="M650,397 L1668,397" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="1178" y="414" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="1178" dy="0">20 Oct: 14:00 and 15:30</tspan>
+</text>
+<path d="M1668,424 L650,424" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-teal)"/>
+<text x="670" y="458" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="670" dy="0">4  Choose 14:00 → P1 PENDING • intent rev1</tspan>
+</text>
+<path d="M650,468 L1170,468" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<rect x="50" y="480" width="1820" height="38" rx="8" fill="#FFF2DA" stroke="#FFF2DA" stroke-width="2"/>
+<text x="75" y="509" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" text-anchor="start">
+<tspan x="75" dy="0">PAUSE: AWAITING_APPROVAL • unresolved assistant tool call persisted • no booking</tspan>
+</text>
+<text x="233" y="541" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="233" dy="0">5  “Actually, make it after 3 PM.”</tspan>
+</text>
+<path d="M215,551 L650,551" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="445" y="585" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="500" text-anchor="start">
+<tspan x="445" dy="0">6  P1 INVALIDATED • rev2; close call with SUPERSEDED result</tspan>
+</text>
+<path d="M650,595 L1170,595" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<rect x="425" y="609" width="450" height="44" rx="10" fill="#EAF0FC" stroke="#3768C2" stroke-width="2"/><text x="650" y="638" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" text-anchor="middle">7  LLM re-evaluates slots → 15:30</text>
+<text x="670" y="672" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="670" dy="0">8  P2 PENDING • 15:30 • frozen rev2</tspan>
+</text>
+<path d="M650,682 L1170,682" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<text x="235" y="715" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="235" dy="0">9  Explicit confirmation_decision: P2 + server action_id</tspan>
+</text>
+<path d="M215,725 L1170,725" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<rect x="945" y="739" width="450" height="36" rx="8" fill="#FFF2DA" stroke="#FFF2DA" stroke-width="2"/>
+<text x="1169" y="765" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="middle">
+<tspan x="1169" dy="0">10  P2 APPROVED + operation PREPARED</tspan>
+</text>
+<rect x="945" y="781" width="450" height="58" rx="8" fill="#FFF2DA" stroke="#B66B0D" stroke-width="2"/>
+<text x="1170" y="806" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="middle">
+<tspan x="1170" dy="0">11  Atomic admission: DISPATCHED</tspan>
+<tspan x="1170" dy="27">Task EXECUTING • freeze rev2</tspan>
+</text>
+<text x="1200" y="860" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="1200" dy="0">12  medical.create_registration</tspan>
+</text>
+<path d="M1170,870 L1668,870" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-teal)"/>
+<rect x="425" y="849" width="450" height="119" rx="10" fill="#E3F5EF" stroke="#0B8071" stroke-width="2"/><text x="445" y="878" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23"><tspan x="445">Step 12 input: patient_id, department_id,</tspan><tspan x="445" dy="29">slot_id (15:30), consent:true</tspan><tspan x="445" dy="29">Context: operation_id + idempotency_key</tspan></text>
+<rect x="1465" y="907" width="405" height="62" rx="10" fill="#E3F5EF" stroke="#0B8071" stroke-width="2"/>
+<text x="1667" y="933" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="middle">
+<tspan x="1667" dy="0">13  book_with_authorization()</tspan>
+<tspan x="1667" dy="28">validate P2 / rev2 → atomic booking</tspan>
+</text>
+<text x="674" y="984" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="500" text-anchor="start">
+<tspan x="674" dy="0">14  booked + MED-REG-* receipt → verify / persist → COMPLETED</tspan>
+</text>
+<path d="M1668,994 L650,994" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 5" marker-end="url(#arrow-teal)"/>
+<text x="235" y="1023" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="500" text-anchor="start">
+<tspan x="235" dy="0">15  Confirmed: Tue 20 Oct, 15:30</tspan>
+</text>
+<path d="M650,1033 L215,1033" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+
+<text x="1870" y="1067" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="end">
+<tspan x="1870" dy="0">All tools via ExecutionPipeline. Before admission: edits invalidate. After admission: queue edits until reconciliation.</tspan>
+</text>
+</svg>

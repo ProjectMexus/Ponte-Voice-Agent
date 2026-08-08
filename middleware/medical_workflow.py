@@ -527,8 +527,11 @@ def _date_plus(days: int) -> str:
 
 def _demo_now() -> datetime:
     if ZoneInfo is not None:
-        return datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Macau"))
-    return datetime.now(timezone.utc)
+        try:
+            return datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Macau"))
+        except (KeyError, ValueError):
+            pass  # Windows/minimal Python may not ship an IANA timezone database.
+    return datetime.now(timezone(timedelta(hours=8)))
 
 
 def _data_list(result: ToolExecutionResult, noun: str) -> list[dict[str, Any]]:
@@ -541,6 +544,7 @@ def _safe_mapping(value: Mapping[str, Any]) -> dict[str, Any]:
     allowed = {
         "id", "name", "name_en", "active", "type", "duration_minutes", "location_id",
         "service_id", "start", "end", "remaining", "status", "requires_referral",
+        "service", "location",
     }
     return {key: deepcopy(item) for key, item in value.items() if key in allowed}
 
@@ -549,7 +553,7 @@ def _safe_service(value: Mapping[str, Any]) -> dict[str, Any]:
     return {
         key: deepcopy(value[key])
         for key in (
-            "id", "name", "name_en", "type", "duration_minutes", "location_id", "requires_referral"
+            "id", "name", "name_en", "type", "duration_minutes", "location_id", "location", "requires_referral"
         )
         if key in value
     }
@@ -558,7 +562,7 @@ def _safe_service(value: Mapping[str, Any]) -> dict[str, Any]:
 def _safe_slot(value: Mapping[str, Any]) -> dict[str, Any]:
     return {
         key: deepcopy(value[key])
-        for key in ("id", "service_id", "start", "end", "location_id", "status")
+        for key in ("id", "service_id", "start", "end", "location_id", "location", "status")
         if key in value
     }
 

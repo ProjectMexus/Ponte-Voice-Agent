@@ -88,6 +88,7 @@ database/
 ├── medical/
 │   ├── appointments.txt
 │   ├── tasks.txt
+│   ├── slot_seed.txt
 │   └── idempotency.txt
 └── social_welfare/
     ├── referrals.txt
@@ -98,6 +99,8 @@ database/
 ```
 
 這是 Demo 的簡化持久化媒介，不適合生產環境；更換為 SQL 或真正外部 API 時，只需替換 repository／client wiring，domain service 和 MCP tool contract 可以保留。完整 stack runner 和 standalone backend 預設都使用 repository root 下的 `database/`；可用 `--data-dir /tmp/ponte-mock-data` 明確指定 temporary directory。`id_sequences.txt` 保存跨重啟仍有效的 readable mock ID counters。
+
+新建的醫療 Demo 資料目錄會以啟動當日的翌日作為檢查／治療時段的起始日期，提供連續三日的選項。`medical/slot_seed.txt` 保存這個日期，重啟時沿用，確保已預約的日期與剩餘名額保持一致；時段 ID 是固定的 fixture 識別碼。已有預約的舊目錄不會自動改期。若要在另一日重新演示，請以新的 `--data-dir` 啟動，保留原有資料目錄。測試注入固定 clock 時，新目錄沿用固定 fixture 日期。
 
 ## 測試
 

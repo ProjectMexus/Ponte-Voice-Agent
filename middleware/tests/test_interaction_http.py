@@ -60,15 +60,15 @@ class InteractionHttpTests(unittest.TestCase):
         self.assertNotIn("assistant_message", first)
         self.assertNotIn("task_state", first)
         self.assertEqual(first["workspace"]["view"], "service_selection")
-        self.assertTrue(first["workspace"]["actions"])
+        self.assertTrue(first["workspace"]["fields"][0]["action"]["event"])
         task_id = first["task"]["task_id"]
-        service_event = first["workspace"]["actions"][0]["event"]
+        service_event = first["workspace"]["fields"][0]["action"]["event"]
         self.assertTrue(service_event["action_id"])
         self.assertEqual(service_event["task_id"], task_id)
 
         second = post_json(self.opener, self.url + "/api/interactions", self.event("INT-2", service_event))
         self.assertEqual(second["workspace"]["view"], "slot_selection")
-        slot_event = second["workspace"]["actions"][0]["event"]
+        slot_event = second["workspace"]["fields"][0]["action"]["event"]
         third = post_json(self.opener, self.url + "/api/interactions", self.event("INT-3", slot_event))
         self.assertEqual(third["workspace"]["view"], "appointment_confirmation")
         approve_event = next(item["event"] for item in third["workspace"]["actions"] if item["event"].get("decision") == "approve")

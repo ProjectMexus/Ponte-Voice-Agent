@@ -1,9 +1,25 @@
+import re
 import threading
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.request import ProxyHandler, build_opener
 
 from frontend.server import create_http_server
+
+
+class PageElements(HTMLParser):
+    def __init__(self, html):
+        super().__init__()
+        self.elements = []
+        self.feed(html)
+
+    def handle_starttag(self, tag, attrs):
+        self.elements.append((tag, dict(attrs)))
+
+    def by_id(self, element_id):
+        return next(attrs for _, attrs in self.elements if attrs.get("id") == element_id)
 
 
 class FrontendStaticTests(unittest.TestCase):
@@ -20,25 +36,33 @@ class FrontendStaticTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
 
-    def test_index_is_avatar_first_and_removes_text_workspace(self):
+    def test_index_has_voice_text_and_persistent_service_surfaces(self):
         html = Path("frontend/index.html").read_text(encoding="utf-8")
+        page = PageElements(html)
         for marker in (
             "ponte-button",
             "ponte-avatar",
-            "voice-status-panel",
             "operational-status",
             "language-toggle",
             "voice-exceptions",
             "artifact-drawer",
+            "message-input",
+            "message-form",
+            "conversation-log",
+            "service-workspace",
+            "workflow-progress",
+            "activity-log",
         ):
-            self.assertIn(marker, html)
-        for removed in ("message-input", "task-list", "conversation-panel", "workspace-panel"):
-            self.assertNotIn(removed, html)
-        self.assertIn('id="conversation-caption"', html)
-        self.assertIn('id="caption-line"', html)
-        self.assertNotIn("sound-check-button", html)
-        self.assertNotIn("stop-audio-button", html)
-        self.assertNotIn("Stop reply", html)
+            self.assertIsNotNone(page.by_id(marker))
+        self.assertTrue(any("voice-status-panel" in attrs.get("class", "").split() for _, attrs in page.elements))
+        ids = [attrs["id"] for _, attrs in page.elements if "id" in attrs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate IDs break labels and app routing")
+        self.assertEqual(page.by_id("conversation-log")["role"], "log")
+        self.assertEqual(page.by_id("conversation-log")["aria-relevant"], "additions")
+        self.assertEqual(page.by_id("send-button")["type"], "submit")
+        self.assertTrue(any(tag == "label" and attrs.get("for") == "message-input" for tag, attrs in page.elements))
+        self.assertTrue(any(tag == "a" and attrs.get("href") == "#message-input" for tag, attrs in page.elements))
+        self.assertTrue(all(attrs.get("type") == "button" for tag, attrs in page.elements if "data-prompt" in attrs))
 
     def test_display_language_is_traditional_chinese_first_and_state_only(self):
         html = Path("frontend/index.html").read_text(encoding="utf-8")
@@ -75,13 +99,14 @@ class FrontendStaticTests(unittest.TestCase):
             self.assertIn(marker, source)
 
     def test_required_voice_assets_are_served_without_a_cache(self):
-        for path in ("app.js", "voice-capture.js", "voice-exceptions.js", "mcp-client.js", "ponte2.jpg"):
+        for path in ("app.js", "demo-console.js", "interaction-view.js", "styles.css", "voice-capture.js", "voice-exceptions.js", "mcp-client.js", "ponte2.jpg"):
             with self.opener.open(self.base_url + "/" + path) as response:
                 self.assertEqual(response.headers.get("Cache-Control"), "no-store")
 
     def test_path_traversal_is_not_served(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(HTTPError) as context:
             self.opener.open(self.base_url + "/../docs/PonteArch.md")
+        self.assertEqual(context.exception.code, 404)
 
     def test_voice_capture_uses_supported_recording_and_vad_contract(self):
         source = Path("frontend/voice-capture.js").read_text(encoding="utf-8")
@@ -149,55 +174,36 @@ class FrontendStaticTests(unittest.TestCase):
         self.assertIn("speechSynthesis.resume", source)
         self.assertIn("speechSynthesis.speak(utterance)", source)
 
-    def test_styles_keep_large_avatar_control_and_visible_focus(self):
+    def test_controls_have_visible_focus_and_reduced_motion_support(self):
         css = Path("frontend/styles.css").read_text(encoding="utf-8")
-        self.assertIn(".ponte-button", css)
-        self.assertIn(".voice-status-panel", css)
-        self.assertIn(":focus-visible", css)
-        self.assertIn("prefers-reduced-motion", css)
-        self.assertIn("conversation-caption", css)
-        self.assertIn("caption-line", css)
-        self.assertIn("clamp(500px", css)
-        self.assertIn(".language-option", css)
-        self.assertIn("min-height: 44px", css)
-        self.assertIn(".operational-status", css)
-        self.assertNotIn(".stop-audio", css)
+        focus_rule = re.search(r":focus-visible\s*\{([^}]+)\}", css).group(1)
+        self.assertRegex(focus_rule, r"outline:\s*(?!none|0)[^;]+")
+        reduced_motion = css.split("@media (prefers-reduced-motion: reduce)", 1)[1].split("@media", 1)[0]
+        self.assertRegex(reduced_motion, r"animation(?:-duration)?:")
+        self.assertRegex(reduced_motion, r"transition(?:-duration)?:")
+        self.assertRegex(css, r"\[hidden\]\s*\{[^}]*display:\s*none\s*!important")
 
-    def test_demo_popups_are_centered_translucent_and_theme_consistent(self):
-        css = Path("frontend/styles.css").read_text(encoding="utf-8")
-        for marker in (
-            ".voice-exceptions.has-modal",
-            "place-items: center",
-            "backdrop-filter: blur(12px)",
-            "rgba(250, 250, 252, .82)",
-            ".artifact-drawer",
-            ".artifact-sheet",
-            "animation: modal-in",
-        ):
-            self.assertIn(marker, css)
+    def test_receipt_and_reset_dialogs_have_accessible_titles_and_controls(self):
+        page = PageElements(Path("frontend/index.html").read_text(encoding="utf-8"))
+        receipt = page.by_id("artifact-drawer")
+        self.assertEqual(receipt["role"], "dialog")
+        self.assertEqual(receipt["aria-modal"], "true")
+        self.assertIsNotNone(page.by_id(receipt["aria-labelledby"]))
+        self.assertIn("hidden", receipt)
+        reset = page.by_id("reset-dialog")
+        self.assertIsNotNone(page.by_id(reset["aria-labelledby"]))
+        for control in ("reset-cancel", "reset-confirm", "artifact-print", "artifact-download"):
+            self.assertEqual(page.by_id(control)["type"], "button")
+        self.assertEqual(page.by_id("global-error")["role"], "alert")
+        self.assertEqual(page.by_id("workspace-loading")["role"], "status")
 
-    def test_apple_material_tokens_keep_system_type_and_quiet_surface(self):
+    def test_small_screens_stack_panels_and_print_keeps_receipt_content(self):
         css = Path("frontend/styles.css").read_text(encoding="utf-8")
-        for marker in (
-            '"SF Pro Display"',
-            "-webkit-font-smoothing: antialiased",
-            "--canvas: #f5f5f7",
-            "--accent: #0a84ff",
-            "rgba(255, 255, 255, .68)",
-        ):
-            self.assertIn(marker, css)
-
-    def test_transient_captions_and_errors_auto_dismiss(self):
-        app = Path("frontend/app.js").read_text(encoding="utf-8")
-        exceptions = Path("frontend/voice-exceptions.js").read_text(encoding="utf-8")
-        css = Path("frontend/styles.css").read_text(encoding="utf-8")
-        for marker in ("captionTimer", "clearTimeout(captionTimer)", "setTimeout", "currentCaption = null"):
-            self.assertIn(marker, app)
-        for marker in ("errorTimer", "clearTimeout(errorTimer)", "setTimeout", "clearError()", "8000"):
-            self.assertIn(marker, exceptions)
-        self.assertIn("color: #667085", css)
-        self.assertIn("font-size: clamp(.86rem", css)
-        self.assertIn("font-size: .74rem", css)
+        responsive = css.split("@media (max-width: 820px)", 1)[1].split("@media", 1)[0]
+        self.assertRegex(responsive, r"\.demo-layout\s*\{[^}]*grid-template-columns:\s*1fr")
+        print_rules = css.split("@media print", 1)[1]
+        self.assertRegex(print_rules, r"#artifact-drawer:not\(\[hidden\]\)\s*\{[^}]*display:\s*block\s*!important")
+        self.assertRegex(print_rules, r"\.artifact-sheet\s*\{[^}]*overflow:\s*visible")
 
 
 if __name__ == "__main__":

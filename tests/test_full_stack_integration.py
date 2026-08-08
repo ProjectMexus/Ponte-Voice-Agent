@@ -138,7 +138,7 @@ class FullStackIntegrationTests(unittest.TestCase):
             ),
         )
 
-        self.assertIn("Ponte 語音服務", html)
+        self.assertIn("service-workspace", html)
         self.assertIn("MiddlewareClient", client_js)
         self.assertTrue(health["backend_reachable"])
         self.assertEqual(response["task"]["status"], "completed")
@@ -284,7 +284,7 @@ class FullStackIntegrationTests(unittest.TestCase):
                 "message": (
                     "mcp one_account.book_government_service_center_queue "
                     '{"service_center_id":"GSC-MAIN",'
-                    '"service_type":"general_counter","requested_date":"2026-08-20",'
+                    '"service_type":"general_counter","requested_date":"2099-08-20",'
                     '"confirmation":{"confirmation_id":"DEMO-CONF"}}'
                 ),
                 "source": "text",

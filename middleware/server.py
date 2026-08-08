@@ -26,6 +26,9 @@ from .intent import IntentRecognizer
 from .interaction_contracts import EventEnvelope
 from .interaction_core import InteractionCore
 from .medical_workflow import MedicalWorkflow
+from .demo_medical_workflow import DemoMedicalWorkflow
+from .demo_model import RegistryToolNameClient, ScriptedCardiologyClient
+from .llm_transport import ChatCompletionClient, OpenAICompatibleChatClient
 from .interaction_delivery import DeliveryOrchestrator
 from .interaction_voice import CoreVoiceTurnProvider
 from .mcp_client import McpStdioClient
@@ -75,12 +78,33 @@ class MiddlewareApplication:
         intent_recognizer: IntentRecognizer | None = None,
         recovery_interpreter: TaskRecoveryInterpreter | None = None,
         voice_turn_provider: VoiceTurnProvider | None = None,
+        demo_agent_mode: str = "off",
+        demo_model_client: ChatCompletionClient | None = None,
+        demo_clock: Any | None = None,
     ) -> None:
         self.backend_url = backend_url.rstrip("/")
         self.patient_id = patient_id
         self.authorization = authorization
         self.mock_user_id = mock_user_id
         self.frontend_origins = frontend_origins
+        if demo_agent_mode not in {"off", "scripted", "real"}:
+            raise ValueError("PONTE_DEMO_AGENT_MODE must be off, scripted, or real")
+        self.demo_agent_mode = demo_agent_mode
+        demo_client = demo_model_client
+        if demo_agent_mode == "scripted" and demo_client is None:
+            demo_client = ScriptedCardiologyClient()
+        elif demo_agent_mode == "real" and demo_client is None:
+            demo_url = os.environ.get("PONTE_DEMO_LLM_API_URL") or os.environ.get("PONTE_LLM_API_URL", "")
+            if not demo_url:
+                raise ValueError("real demo mode requires PONTE_DEMO_LLM_API_URL or PONTE_LLM_API_URL")
+            demo_client = OpenAICompatibleChatClient(
+                demo_url,
+                api_key=os.environ.get("PONTE_DEMO_LLM_API_KEY") or os.environ.get("PONTE_LLM_API_KEY", ""),
+                model=os.environ.get("PONTE_DEMO_LLM_MODEL") or os.environ.get("PONTE_LLM_MODEL", "gpt-4o-mini"),
+                timeout=30,
+            )
+        if demo_agent_mode == "real":
+            demo_client = RegistryToolNameClient(demo_client)
         self._closed = False
         self.registry = build_registry()
         self.mcp_client = mcp_client or McpStdioClient(self.backend_url)
@@ -101,11 +125,19 @@ class MiddlewareApplication:
             authorization,
             mock_user_id=mock_user_id,
         )
+        self.demo_workflow = None
+        if demo_agent_mode != "off":
+            self.demo_workflow = DemoMedicalWorkflow(
+                self.pipeline, patient_id, authorization,
+                registry=self.registry, client=demo_client, clock=demo_clock,
+                mock_user_id=mock_user_id,
+            )
         self.interaction_core = InteractionCore(
             self.sessions,
             self.medical_workflow,
             intent_recognizer=intent_recognizer,
             cash_workflow=self.cash_workflow,
+            demo_workflow=self.demo_workflow,
         )
         self.delivery_orchestrator = DeliveryOrchestrator()
         self.voice_turn_provider = voice_turn_provider or UnavailableVoiceTurnProvider()
@@ -152,6 +184,9 @@ def create_application(
     intent_recognizer: IntentRecognizer | None = None,
     recovery_interpreter: TaskRecoveryInterpreter | None = None,
     voice_turn_provider: VoiceTurnProvider | None = None,
+    demo_agent_mode: str | None = None,
+    demo_model_client: ChatCompletionClient | None = None,
+    demo_clock: Any | None = None,
 ) -> MiddlewareApplication:
     """Create one isolated middleware application with in-memory sessions."""
 
@@ -167,6 +202,9 @@ def create_application(
         intent_recognizer=intent_recognizer,
         recovery_interpreter=recovery_interpreter,
         voice_turn_provider=voice_turn_provider,
+        demo_agent_mode=demo_agent_mode if demo_agent_mode is not None else os.environ.get("PONTE_DEMO_AGENT_MODE", "off"),
+        demo_model_client=demo_model_client,
+        demo_clock=demo_clock,
     )
     if voice_turn_provider is None:
         configured = _configured_voice_provider(application)
@@ -381,6 +419,7 @@ def _make_request_handler(application: MiddlewareApplication) -> Type[BaseHTTPRe
                     "tool_count": len(application.registry.names()),
                     "backend_reachable": result.ok,
                     "voice_ready": not isinstance(application.voice_turn_provider, UnavailableVoiceTurnProvider),
+                    "demo_agent_mode": application.demo_agent_mode,
                 }
                 return response
             if path == "/api/mcp/tools":

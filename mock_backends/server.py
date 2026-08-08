@@ -7,6 +7,7 @@ import json
 import re
 import time
 import uuid
+from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Type
@@ -51,12 +52,23 @@ def create_application(data_dir: str | Path, clock: Clock | None = None) -> Mock
     )
 
     medical_root = root / "medical"
+    appointment_repository = JsonLinesTextRepository(medical_root / "appointments.txt")
+    slot_seed_repository = JsonLinesTextRepository(medical_root / "slot_seed.txt")
+    slot_seed = slot_seed_repository.get("medical-demo-slots")
+    if slot_seed is None and clock is None and not appointment_repository.list():
+        # Seed a fresh live demo once; saved bookings retain their dates and capacity.
+        slot_seed = {
+            "id": "medical-demo-slots",
+            "reference_date": (active_clock.now().date() + timedelta(days=1)).isoformat(),
+        }
+        slot_seed_repository.insert(slot_seed)
     medical_service = MedicalService(
         clock=active_clock,
         ids=ids,
-        appointment_repository=JsonLinesTextRepository(medical_root / "appointments.txt"),
+        appointment_repository=appointment_repository,
         task_repository=JsonLinesTextRepository(medical_root / "tasks.txt"),
         idempotency=RepositoryIdempotencyStore(JsonLinesTextRepository(medical_root / "idempotency.txt")),
+        appointment_slot_reference_date=date.fromisoformat(slot_seed["reference_date"]) if slot_seed else None,
     )
 
     welfare_root = root / "social_welfare"

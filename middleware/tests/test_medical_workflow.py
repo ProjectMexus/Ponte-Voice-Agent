@@ -4,6 +4,7 @@ from middleware.contracts import ToolExecutionResult
 from middleware.intent import IntentDecision
 from middleware.interaction_contracts import EventEnvelope
 from middleware.medical_workflow import MedicalWorkflow
+from middleware.interaction_delivery import DeliveryOrchestrator
 
 
 class FakePipeline:
@@ -128,8 +129,8 @@ class MedicalWorkflowTests(unittest.TestCase):
         self.assertEqual(task["current_step"], "select_service")
         self.assertEqual(result.response_intent, "select_service")
         self.assertEqual(result.facts["services"][0]["id"], "SERVICE-US-001")
-        self.assertEqual(result.allowed_actions[0]["event"]["type"], "service_selected")
-        self.assertIn("action_id", result.allowed_actions[0]["event"])
+        self.assertEqual(DeliveryOrchestrator.deliver(result)["workspace"]["fields"][0]["action"]["event"]["type"], "service_selected")
+        self.assertIn("action_id", DeliveryOrchestrator.deliver(result)["workspace"]["fields"][0]["action"]["event"])
         self.assertEqual([entry["type"] for entry in logs], [
             "user_utterance", "tool_execution", "service_selected",
         ])

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import date, datetime, timedelta
+from threading import RLock
 from typing import Any, Callable
 
 from mock_backends.core.contracts import Clock, IdGenerator, IdempotencyStore, RecordRepository
@@ -12,7 +13,12 @@ from mock_backends.core.http import BackendResponse, success_body
 from mock_backends.core.idempotency import canonical_json_hash
 
 from .contracts import required_body, required_idempotency_key
-from .fixtures import appointment_services, appointment_slots, departments, doctors, registration_slots
+from .fixtures import appointment_services, appointment_slots, departments, doctors, next_tuesday, registration_slots
+
+
+# Covers the entire write/replay sequence, including services sharing a repository
+# in this process. JSON writes remain separate and are not crash-atomic.
+_MEDICAL_WRITE_LOCK = RLock()
 
 
 class MedicalService:
@@ -23,12 +29,16 @@ class MedicalService:
         appointment_repository: RecordRepository,
         task_repository: RecordRepository,
         idempotency: IdempotencyStore,
+        appointment_slot_reference_date: date | None = None,
+        registration_slot_reference_date: date | None = None,
     ) -> None:
         self.clock = clock
         self.ids = ids
         self.appointment_repository = appointment_repository
         self.task_repository = task_repository
         self.idempotency = idempotency
+        self.appointment_slot_reference_date = appointment_slot_reference_date
+        self.registration_slot_reference_date = registration_slot_reference_date or next_tuesday(clock.now().date())
 
     def _response(self, request_id: str, status: int, data: Any, meta: dict[str, Any] | None = None) -> BackendResponse:
         body = success_body(request_id, data)
@@ -49,16 +59,17 @@ class MedicalService:
         body: dict[str, Any],
         operation: Callable[[], BackendResponse],
     ) -> BackendResponse:
-        key = required_idempotency_key(headers)
-        scope = f"{patient_id}:{path}"
-        request_hash = canonical_json_hash(body)
-        saved = self.idempotency.lookup(scope, key)
-        if saved is not None:
-            self.idempotency.remember(scope, key, request_hash, saved["response"])
-            return self._saved_response(saved)
-        response = operation()
-        self.idempotency.remember(scope, key, request_hash, {"status": response.status, "body": response.body, "headers": response.headers})
-        return response
+        with _MEDICAL_WRITE_LOCK:
+            key = required_idempotency_key(headers)
+            scope = f"{patient_id}:{path}"
+            request_hash = canonical_json_hash(body)
+            saved = self.idempotency.lookup(scope, key)
+            if saved is not None:
+                self.idempotency.remember(scope, key, request_hash, saved["response"])
+                return self._saved_response(saved)
+            response = operation()
+            self.idempotency.remember(scope, key, request_hash, {"status": response.status, "body": response.body, "headers": response.headers})
+            return response
 
     @staticmethod
     def _value(query: dict[str, list[str]], name: str, default: str = "") -> str:
@@ -88,7 +99,7 @@ class MedicalService:
         return self._response(request_id, 200, result, {"total": len(result)})
 
     def _registration_slot(self, slot_id: str) -> dict[str, Any] | None:
-        for base in registration_slots():
+        for base in registration_slots(self.registration_slot_reference_date):
             if base["id"] == slot_id:
                 item = base
                 used = len(self.appointment_repository.find(lambda record: record.get("slot_id") == slot_id))
@@ -99,7 +110,7 @@ class MedicalService:
         return None
 
     def _appointment_slot(self, slot_id: str) -> dict[str, Any] | None:
-        for base in appointment_slots():
+        for base in appointment_slots(self.appointment_slot_reference_date):
             if base["id"] == slot_id:
                 item = base
                 used = len(self.appointment_repository.find(lambda record: record.get("slot_id") == slot_id))
@@ -127,7 +138,7 @@ class MedicalService:
         session = self._value(query, "session")
         location_id = self._value(query, "location_id")
         result = []
-        for base in registration_slots():
+        for base in registration_slots(self.registration_slot_reference_date):
             item = self._registration_slot(base["id"])
             if item["department_id"] != department_id or item["start"][:10] != raw_date:
                 continue
@@ -252,7 +263,7 @@ class MedicalService:
     def _has_available_appointment_slot(self, service_id: str) -> bool:
         today = self.clock.now().date()
         latest = today + timedelta(days=14)
-        for base in appointment_slots():
+        for base in appointment_slots(self.appointment_slot_reference_date):
             item = self._appointment_slot(base["id"])
             slot_date = date.fromisoformat(item["start"][:10])
             if (
@@ -287,7 +298,7 @@ class MedicalService:
         doctor_id = self._value(query, "doctor_id")
         location_id = self._value(query, "location_id")
         result = []
-        for base in appointment_slots():
+        for base in appointment_slots(self.appointment_slot_reference_date):
             item = self._appointment_slot(base["id"])
             if item["service_id"] != service["id"] or not (date_from <= date.fromisoformat(item["start"][:10]) <= date_to):
                 continue
@@ -330,7 +341,7 @@ class MedicalService:
                 "patient_id": patient_id,
                 "service": {"id": service["id"], "display": service["name"]},
                 "department": {"id": department["id"], "display": department["name"]},
-                "location": {"id": slot["location_id"], "display": "影像中心" if service["type"] == "examination" else "復康治療室"},
+                "location": deepcopy(slot["location"]),
                 "start": slot["start"],
                 "end": slot["end"],
                 "slot_id": slot["id"],

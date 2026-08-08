@@ -132,6 +132,26 @@ class InteractionCoreTests(unittest.TestCase):
         self.assertNotIn("pipeline", parameters)
         self.assertNotIn("executor", parameters)
 
+    def test_cardiology_demo_entry_is_narrow_and_keeps_legacy_tasks(self):
+        medical, demo = FakeWorkflow(), FakeWorkflow()
+        core = InteractionCore(SessionStore(), medical, demo_workflow=demo,
+                               intent_recognizer=FakeIntentRecognizer())
+        core.handle(envelope("S-DEMO", "I-1", {
+            "type": "user_utterance", "content": "心臟科下週二下午",
+        }))
+        self.assertEqual(len(demo.started), 1)
+        for index, text in enumerate(("我想預約心臟科超聲波檢查", "我的醫療預約中已有心臟科預約")):
+            core.handle(envelope(f"S-LEGACY-{index}", f"I-{index+2}", {
+                "type": "user_utterance", "content": text,
+            }))
+        self.assertEqual(len(medical.started), 2)
+        self.assertEqual(len(demo.started), 1)
+        core.handle(envelope("S-LEGACY-0", "I-4", {
+            "type": "user_utterance", "content": "心臟科下週二下午",
+        }))
+        self.assertEqual(len(medical.handled), 1)
+        self.assertEqual(len(demo.started), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

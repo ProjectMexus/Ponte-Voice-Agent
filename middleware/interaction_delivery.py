@@ -89,7 +89,14 @@ def _appointment_details(result: CanonicalInteractionResult) -> dict[str, str]:
     if not isinstance(appointment, Mapping):
         appointment = _as_mapping(result.confirmation).get("appointment")
     if not isinstance(appointment, Mapping):
-        appointment = {}
+        selected = _as_mapping(facts.get("selected_slot"))
+        start = _text(selected.get("start"))
+        service = _as_mapping(facts.get("service"))
+        appointment = {
+            "service": _record_name(service),
+            "date": start[:10], "time": start[11:16],
+            "location": selected.get("location") or service.get("location"),
+        }
 
     service = appointment.get("service")
     if isinstance(service, Mapping):
@@ -98,7 +105,8 @@ def _appointment_details(result: CanonicalInteractionResult) -> dict[str, str]:
         details["service"] = _text(service)
     for key in ("date", "time", "location"):
         if appointment.get(key) is not None:
-            details[key] = _text(appointment[key])
+            value = appointment[key]
+            details[key] = _record_name(value) if isinstance(value, Mapping) else _text(value)
     return details
 
 
@@ -160,6 +168,8 @@ class ResponseComposer:
             receipt = _as_mapping(result.receipt)
             if receipt.get("receipt_id"):
                 display_text += f"參考編號：{_text(receipt['receipt_id'])}。"
+            if task.get("type") == "medical_demo_agent" and facts.get("late_change_message"):
+                display_text += _text(facts["late_change_message"])
         elif intent in _CANCELLED_INTENTS or status in {"cancelled", "canceled"}:
             display_text = "已取消這次協助，沒有作出更改。"
         elif result.recovery is not None or intent in _RECOVERY_INTENTS or status in {"recovery", "awaiting_recovery"}:
@@ -398,9 +408,6 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
         return _slot_selection_fields(facts, task_id)
     if view == "appointment_confirmation":
         fields = _appointment_fields(result)
-        confirmation = _as_mapping(result.confirmation)
-        if confirmation.get("confirmation_id"):
-            fields.append(_field("confirmation_id", "確認編號", confirmation["confirmation_id"]))
         return fields
     if view == "appointment_recovery":
         recovery = _as_mapping(result.recovery)

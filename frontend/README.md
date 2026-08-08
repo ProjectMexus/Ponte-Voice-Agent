@@ -46,3 +46,28 @@ node --check frontend/speech.js
 ```
 
 完整驗收流程請參考 repo 根目錄的 `README.md`：輸入上述任一需求並送出，畫面應顯示 middleware 已連線、對應進度，以及可讀的服務資料摘要。
+
+
+## 醫療預約 UI demo
+
+醫療預約為主要情境。點選情境只會預覽需求，按「送出」才開始。
+1. 點「試試預約醫療服務」，送出需求，選擇服務與可用時段。
+2. 在確認頁核對服務、日期、時間、地點；可修改資料或取消。
+3. 確認後查看回執，下載 HTML 或列印。
+4. 切換「我的預約」並送出，讀回剛建立的模擬預約。
+5. 「現金分享」只讀取資格與發放資料。進行中切換情境會要求重新開始。
+
+對話與服務足跡持續保留；「重新開始」清除本次對話，但不刪除已保存的模擬預約。
+朗讀按鈕可立即靜音；繁中／EN 切換介面，服務內容沿用伺服器提供的文字。
+手機版上下排列，可向下捲動選擇服務。文字流程不需要語音供應商設定。
+新的資料目錄會產生翌日起三天的醫療時段，既有目錄保留原本資料。
+
+```bash
+python scripts/run_stack.py --data-dir .demo-data-fresh
+PONTE_LOG_LEVEL=INFO python scripts/run_stack.py
+PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py
+node --test tests/frontend_demo_console.test.mjs tests/frontend_workspace_behavior.test.mjs
+```
+
+PowerShell 可先設定 `$env:PONTE_LOG_LEVEL='INFO'` 再啟動。
+請為新一輪展示選用未使用的 `--data-dir` 名稱。所有預約均為本機模擬資料。

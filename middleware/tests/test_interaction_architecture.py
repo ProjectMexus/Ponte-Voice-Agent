@@ -210,7 +210,7 @@ class SharedCoreBehaviorTests(unittest.TestCase):
         self.assertIn("plan", cash_result.facts)
         self.assertNotIn("services", cash_result.facts)
 
-        self.assertTrue(medical_workspace["actions"])
+        self.assertTrue(medical_workspace["fields"][0]["action"]["event"])
         self.assertEqual(cash_workspace["actions"], [])
         self.assertIsNone(cash_workspace["artifact"])
         self.assertIsNone(cash_result.receipt)
@@ -220,7 +220,7 @@ class SharedCoreBehaviorTests(unittest.TestCase):
         medical_first = self.core.handle(envelope("S-ARCH-MED", "INT-ARCH-3", "我想預約醫療服務"))
         self.core.handle(envelope("S-ARCH-CASH", "INT-ARCH-4", "我想查現金分享計劃"))
 
-        service_event = medical_first.allowed_actions[0]["event"]
+        service_event = DeliveryOrchestrator.deliver(medical_first)["workspace"]["fields"][0]["action"]["event"]
         medical_second = self.core.handle(EventEnvelope.from_json({
             "routing": {"session_id": "S-ARCH-MED", "interaction_id": "INT-ARCH-5"},
             "event": service_event,

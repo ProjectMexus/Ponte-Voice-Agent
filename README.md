@@ -1,3 +1,5 @@
+已批准的小型心臟科 agent demo：`python scripts/run_stack.py --demo-agent scripted --data-dir .demo-data-cardiology`。啟動、P1→P2 展示、測試及限制見 [心臟科 demo 操作說明](docs/demo/Cardiology_Demo.md)。Scripted mode 使用可重現模型決策，實際通過 HTTP→MCP→mock backend；real-model 驗證需另行配置 credentials。
+
 <div align="center">
   <img src="background.png" alt="聆澳 Ponte — 聆聽澳門，連結每一段故事" width="100%" />
 </div>
@@ -165,3 +167,51 @@ Ponte 僅作為展示用途的本機／雲端原型，**不會**連接真實的�
 即使在 Demo 中，涉及變更的流程仍需明確確認。此設計旨在實踐 Ponte 的核心治理原則：
 
 > **AI 可以輔助操作，但使用者必須「看得見、聽得懂」，並始終保有確認、修正與終止流程的絕對權利。**
+
+
+## 醫療預約 UI demo
+
+醫療預約為主要情境。點選情境只會預覽需求，按「送出」才開始。
+1. 點「試試預約醫療服務」，送出需求，選擇服務與可用時段。
+2. 在確認頁核對服務、日期、時間、地點；可修改資料或取消。
+3. 確認後查看回執，下載 HTML 或列印。
+4. 切換「我的預約」並送出，讀回剛建立的模擬預約。
+5. 「現金分享」只讀取資格與發放資料。進行中切換情境會要求重新開始。
+
+對話與服務足跡持續保留；「重新開始」清除本次對話，但不刪除已保存的模擬預約。
+朗讀按鈕可立即靜音；繁中／EN 切換介面，服務內容沿用伺服器提供的文字。
+手機版上下排列，可向下捲動選擇服務。文字流程不需要語音供應商設定。
+新的資料目錄會產生翌日起三天的醫療時段，既有目錄保留原本資料。
+
+```bash
+python scripts/run_stack.py --data-dir .demo-data-fresh
+PONTE_LOG_LEVEL=INFO python scripts/run_stack.py
+PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py
+node --test tests/frontend_demo_console.test.mjs tests/frontend_workspace_behavior.test.mjs
+```
+
+PowerShell 可先設定 `$env:PONTE_LOG_LEVEL='INFO'` 再啟動。
+請為新一輪展示選用未使用的 `--data-dir` 名稱。所有預約均為本機模擬資料。
+
+## Terminal logging
+
+
+`run_stack.py` 會在啟動 child processes 前載入本地 `.env`，shell 中已存在的同名環境變數優先。`INFO`（預設）只顯示 safe summaries：
+
+```bash
+PONTE_LOG_LEVEL=INFO python scripts/run_stack.py
+```
+
+若要在本機除錯 intent、預約或醫療查詢的內容流，可改用 DEBUG：
+
+```bash
+PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py
+```
+
+DEBUG 會使用 `[frontend]`、`[middleware]`、`[llm]`、`[mcp]` 和 `[backend]` component prefix，並在安全摘要之外顯示完整 LLM prompt/response 及 MCP request/response，包括醫療資料（medical data）。LLM provider 的 success response bodies 和 provider error response bodies 在 DEBUG 中只要可取得就會記錄，包括正常回應、解析失敗回應及 HTTP error body；若沒有 response 可取得，則記錄 `response_unavailable=true` 和固定的 error type。JSON 會以 indented multi-line 格式輸出，每行都保留完整 timestamp/level/component prefix。frontend、middleware HTTP server 和 mock backend 仍不記錄 HTTP body；API key、Authorization、Cookie、Bearer token 及其他 credentials 在任何 level 都會遮罩。DEBUG 可能包含醫療資料，只應在受控的本機 terminal 使用；完成除錯後改回 `PONTE_LOG_LEVEL=INFO`。
+
+若已將 terminal output 保存為 `ponte-terminal.log`，可用以下篩選 component logs：
+
+```bash
+rg '\[(frontend|middleware|llm|mcp|backend)\]' ponte-terminal.log
+```

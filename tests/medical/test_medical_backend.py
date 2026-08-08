@@ -207,6 +207,42 @@ class MedicalBackendTests(unittest.TestCase):
         self.assertIn("SERVICE-US-001", service_ids)
         self.assertIn("SERVICE-ECHO-001", service_ids)
 
+    def test_service_and_slot_catalogs_expose_human_locations(self):
+        services = self.backend.handle(self.medical_request("GET", "/appointment-services"))
+        locations = {
+            "SERVICE-US-001": {"id": "LOC-IMAGING-CENTER", "display": "影像中心"},
+            "SERVICE-PT-001": {"id": "LOC-REHAB-01", "display": "復康治療室"},
+            "SERVICE-ECHO-001": {"id": "LOC-MAIN-OPD", "display": "第一門診"},
+        }
+        for service in services.body["data"]:
+            with self.subTest(service=service["id"]):
+                self.assertEqual(service.get("location"), locations[service["id"]])
+                slots = self.backend.handle(self.medical_request(
+                    "GET", "/appointment-slots", query={
+                        "service_id": [service["id"]],
+                        "date_from": ["2026-08-10"],
+                        "date_to": ["2026-08-14"],
+                    },
+                ))
+                self.assertTrue(slots.body["data"])
+                for slot in slots.body["data"]:
+                    self.assertEqual(slot.get("location"), locations[service["id"]])
+
+    def test_created_appointments_keep_the_selected_services_actual_locations(self):
+        for service_id, slot_id, expected_location in (
+            ("SERVICE-US-001", "SLOT-US-20260812-1400", {"id": "LOC-IMAGING-CENTER", "display": "影像中心"}),
+            ("SERVICE-PT-001", "SLOT-PT-20260813-1000", {"id": "LOC-REHAB-01", "display": "復康治療室"}),
+            ("SERVICE-ECHO-001", "SLOT-ECHO-20260812-0900", {"id": "LOC-MAIN-OPD", "display": "第一門診"}),
+        ):
+            with self.subTest(service=service_id):
+                created = self.backend.handle(self.medical_request(
+                    "POST", "/appointments",
+                    body={**self.appointment_body(slot_id), "service_id": service_id},
+                    **{"Idempotency-Key": f"LOCATION-{service_id}"},
+                ))
+                self.assertEqual(created.status, 201)
+                self.assertEqual(created.body["data"]["location"], expected_location)
+
     def test_appointment_create_list_detail_and_task_do_not_leak_patient_data(self):
         created = self.backend.handle(
             self.medical_request("POST", "/appointments", body=self.appointment_body(), **{"Idempotency-Key": "APT-1"})

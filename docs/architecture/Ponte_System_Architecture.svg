@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc"><title id="title">Ponte — Final System Architecture</title><desc id="desc">Final planned architecture. Existing HTTP and MCP paths are retained. AgentRuntime owns durable lifecycle and transcript. ExecutionPipeline is the trusted gateway. A shared same-host SQLite database enables atomic mock-medical authorization and booking. The model never authorizes or verifies success.</desc><defs><marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#3768C2"/></marker><marker id="arrow-amber" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#B66B0D"/></marker><marker id="arrow-teal" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 Z" fill="#0B8071"/></marker></defs><rect width="1920" height="1080" fill="#F6F8FC"/>
+<text x="48" y="66" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="46" font-weight="700" text-anchor="start">
+<tspan x="48" dy="0">Ponte — Final System Architecture</tspan>
+</text>
+<text x="50" y="110" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="400" text-anchor="start">
+<tspan x="50" dy="0">Option A: extend Ponte • no AgentOrchestrator • ExecutionPipeline remains the trusted gateway</tspan>
+</text>
+<circle cx="50" cy="150" r="6" fill="#3768C2"/>
+<text x="67" y="158" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="67" dy="0">Reasoning / communication</tspan>
+</text>
+<circle cx="460" cy="150" r="6" fill="#B66B0D"/>
+<text x="477" y="158" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="477" dy="0">Authorization / state</tspan>
+</text>
+<circle cx="810" cy="150" r="6" fill="#0B8071"/>
+<text x="827" y="158" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="827" dy="0">Execution / verified result</tspan>
+</text>
+<rect x="400" y="190" width="1090" height="825" rx="22" fill="#F1F5FA" stroke="#53687D" stroke-width="2" stroke-dasharray="10 7"/>
+<text x="425" y="222" fill="#53687D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start">
+<tspan x="425" dy="0">TRUSTED PONTE SERVER</tspan>
+</text>
+<rect x="40" y="294" width="310" height="414" rx="18" fill="#FFFFFF" stroke="#CDD8E4" stroke-width="2"/>
+<text x="62" y="335" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">
+<tspan x="62" dy="0">Voice / Text UI</tspan>
+</text>
+<text x="62" y="371" fill="#53687D" font-family="Consolas, monospace" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="62" dy="0">frontend/app.js</tspan>
+</text>
+<text x="62" y="418" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="62" dy="0">POST /api/interactions</tspan>
+<tspan x="62" dy="33">HTTP JSON events</tspan>
+</text>
+<text x="62" y="501" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="62" dy="0">POST /api/voice/turn</tspan>
+<tspan x="62" dy="33">multipart audio → STT</tspan>
+</text>
+<text x="62" y="584" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="62" dy="0">GET state snapshot [NEW]</tspan>
+<tspan x="62" dy="33">NEW • poll / restart resume</tspan>
+</text>
+<text x="62" y="679" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" text-anchor="start">
+<tspan x="62" dy="0">Untrusted input</tspan>
+</text>
+<rect x="425" y="248" width="480" height="485" rx="18" fill="#FFFFFF" stroke="#CDD8E4" stroke-width="2"/>
+<text x="450" y="288" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">
+<tspan x="450" dy="0">AgentRuntime  [NEW]</tspan>
+</text>
+<text x="450" y="325" fill="#53687D" font-family="Consolas, monospace" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="450" dy="0">middleware/runtime.py</tspan>
+</text>
+<text x="450" y="368" fill="#17324D" font-family="Consolas, monospace" font-size="26" font-weight="600" text-anchor="start">
+<tspan x="450" dy="0">handle() / resume()</tspan>
+</text>
+<text x="450" y="410" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="400" text-anchor="start">
+<tspan x="450" dy="0">Task lifecycle • inbox • leases</tspan>
+<tspan x="450" dy="39">Intent revision + transcript</tspan>
+<tspan x="450" dy="39">ApprovalService: propose / decide</tspan>
+</text>
+<text x="450" y="520" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23">Pause → explicit approval → resume</text>
+<rect x="449" y="536" width="432" height="170" rx="12" fill="#EAF0FC" stroke="#3768C2" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="468" y="571" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="600" text-anchor="start">
+<tspan x="468" dy="0">RegistryDrivenAgent.next_decision()</tspan>
+</text>
+<text x="468" y="610" fill="#53687D" font-family="Consolas, monospace" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="468" dy="0">agent.py + llm_transport.py</tspan>
+</text>
+<text x="468" y="651" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="468" dy="0">LLM: one tool call or reply</tspan>
+<tspan x="468" dy="30">Advisory output; no authority</tspan>
+</text>
+<rect x="425" y="754" width="480" height="45" rx="10" fill="#FFFFFF" stroke="#CDD8E4" stroke-width="2"/>
+<text x="665" y="785" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="665" dy="0">InteractionCore.handle → thin adapter</tspan>
+</text>
+<rect x="1015" y="248" width="450" height="485" rx="18" fill="#FFF2DA" stroke="#B66B0D" stroke-width="2"/>
+<text x="1040" y="288" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" text-anchor="start">
+<tspan x="1040" dy="0">ExecutionPipeline</tspan>
+</text>
+<text x="1040" y="325" fill="#53687D" font-family="Consolas, monospace" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="1040" dy="0">middleware/execution.py</tspan>
+</text>
+<text x="1040" y="366" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="600" text-anchor="start">
+<tspan x="1040" dy="0">dispatch() • trusted admission</tspan>
+</text>
+<text x="1040" y="410" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="400" text-anchor="start">
+<tspan x="1040" dy="0">Schema + policy validation</tspan>
+<tspan x="1040" dy="43">Task / principal / proposal binding</tspan>
+<tspan x="1040" dy="43">Atomic admission fence</tspan>
+<tspan x="1040" dy="43">Durable operation journal</tspan>
+<tspan x="1040" dy="43">Verified result ↔ proposal</tspan>
+</text>
+<text x="1040" y="656" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" text-anchor="start">
+<tspan x="1040" dy="0">KEEP: McpExecutionStage</tspan>
+<tspan x="1040" dy="33">→ mcp_client.call_tool()</tspan>
+</text>
+<rect x="1575" y="248" width="305" height="252" rx="18" fill="#E3F5EF" stroke="#0B8071" stroke-width="2"/>
+<text x="1596" y="288" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" text-anchor="start">
+<tspan x="1596" dy="0">Existing MCP</tspan>
+</text>
+<text x="1596" y="330" fill="#17324D" font-family="Consolas, monospace" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1596" dy="0">MCP/registry.py</tspan>
+<tspan x="1596" dy="40">MCP/server.py</tspan>
+<tspan x="1596" dy="40">tools/call</tspan>
+<tspan x="1596" dy="40">→ RestAdapter.invoke()</tspan>
+</text>
+<rect x="1575" y="583" width="305" height="252" rx="18" fill="#E3F5EF" stroke="#0B8071" stroke-width="2"/>
+<text x="1596" y="624" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" text-anchor="start">
+<tspan x="1596" dy="0">Service backends</tspan>
+</text>
+<text x="1596" y="666" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1596" dy="0">MedicalStore [NEW]</tspan>
+<tspan x="1596" dy="35">book_with_authorization()</tspan>
+</text>
+<text x="1596" y="744" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1596" dy="0">Revalidate P2 + intent rev</tspan>
+<tspan x="1596" dy="31">Atomic booking + receipt</tspan>
+<tspan x="1596" dy="31">Gov / welfare: reads only</tspan>
+</text>
+<rect x="425" y="837" width="1040" height="157" rx="18" fill="#FFFFFF" stroke="#B66B0D" stroke-width="2"/>
+<text x="450" y="875" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" text-anchor="start">
+<tspan x="450" dy="0">SQLiteTaskStore  [NEW]  •  task_store.py  •  same-host SQLite DB</tspan>
+</text>
+<path d="M950,895 L950,971" fill="none" stroke="#B66B0D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="450" y="918" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="450" dy="0">Runtime owns: task / proposal / transcript</tspan>
+<tspan x="450" dy="36">Inbox + leases + durable execution attempts</tspan>
+</text>
+<text x="978" y="918" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start">
+<tspan x="978" dy="0">Backend owns: booking outcome</tspan>
+<tspan x="978" dy="36">Receipt + replayable operation result</tspan>
+</text>
+<path d="M195,708 L195,776 L418,776" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="205" y="751" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23">normalized event</text>
+<path d="M425,620 L357,620" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="383" y="657" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="383" dy="0">UI</tspan>
+<tspan x="383" dy="29">delivery</tspan>
+</text>
+<path d="M905,396 L1008,396" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="960" y="350" fill="#3768C2" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="960" dy="0">selected</tspan>
+<tspan x="960" dy="29">tool</tspan>
+</text>
+<path d="M1015,600 L912,600" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-teal)"/>
+<text x="960" y="639" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="960" dy="0">verified</tspan>
+<tspan x="960" dy="29">observation</tspan>
+</text>
+<path d="M1465,396 L1568,396" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-teal)"/>
+<text x="1520" y="350" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="middle">
+<tspan x="1520" dy="0">fixed</tspan>
+<tspan x="1520" dy="29">dispatch</tspan>
+</text>
+<path d="M1575,461 L1472,461" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 6" marker-end="url(#arrow-teal)"/>
+<path d="M1725,500 L1725,576" fill="none" stroke="#0B8071" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-teal)"/>
+<text x="1740" y="549" fill="#0B8071" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1740" dy="0">REST API</tspan>
+</text>
+<path d="M665,754 L665,739" fill="none" stroke="#3768C2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/><path d="M905,706 L932,706 L932,830" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<path d="M1240,733 L1240,830" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<text x="1256" y="774" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1256" dy="0">admit / journal</tspan>
+<tspan x="1256" dy="29">before send</tspan>
+</text>
+<path d="M1725,835 L1725,949 L1472,949" fill="none" stroke="#B66B0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<text x="1738" y="877" fill="#B66B0D" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" text-anchor="start">
+<tspan x="1738" dy="0">narrow shared</tspan>
+<tspan x="1738" dy="30">medical UoW</tspan>
+</text>
+<text x="48" y="1053" fill="#17324D" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="600" text-anchor="start">
+<tspan x="48" dy="0">Approval authorizes frozen intent. Admission freezes execution. Only a verified backend receipt permits confirmed success.</tspan>
+</text>
+</svg>
