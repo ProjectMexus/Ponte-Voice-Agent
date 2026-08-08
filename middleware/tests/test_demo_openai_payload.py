@@ -66,7 +66,7 @@ class OpenAIPayloadTests(unittest.TestCase):
             native_call("medical_list_departments", "dept", {"keyword": "Cardiology", "active_only": True}),
             native_call("medical_search_registration_slots", "search", {"department_id": "DEPT-CARDIO", "date": "2026-10-20", "session": "afternoon"}),
             native_call("medical_create_registration", "P1-provider-id", {"department_id": "DEPT-CARDIO", "slot_id": self.pipeline.slots[0]["id"], "consent": True}),
-            {"choices": [{"message": {"content": json.dumps({"action": "update_constraints", "after_three": True})}}]},
+            {"choices": [{"message": {"content": json.dumps({"action": "update_constraints", "time_constraint": {"kind":"lower_bound","time":"15:00","inclusive":False}})}}]},
             native_call("medical_search_registration_slots", "search-revised", {"department_id": "DEPT-CARDIO", "date": "2026-10-20", "session": "afternoon"}),
             native_call("medical_create_registration", "P2-provider-id", {"department_id": "DEPT-CARDIO", "slot_id": self.pipeline.slots[1]["id"], "consent": True}),
         ])

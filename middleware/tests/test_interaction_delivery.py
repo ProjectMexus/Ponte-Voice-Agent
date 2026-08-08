@@ -329,3 +329,39 @@ class InteractionDeliveryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class PilotDeliveryRegressionTests(unittest.TestCase):
+    def test_recovery_overrides_old_round2_message_in_both_channels(self):
+        result = result_for('appointment_recovery', facts={'round2_message': '舊草稿訊息'},
+                            recovery={'reason': 'slot_unavailable', 'message': '時段已滿，請重新選擇。'})
+        delivery = DeliveryOrchestrator.deliver(result)
+        self.assertEqual(delivery['response']['display_text'], '時段已滿，請重新選擇。')
+        self.assertNotIn('舊草稿', delivery['response']['speech_text'])
+        self.assertEqual(delivery['workspace']['view'], 'appointment_recovery')
+
+    def test_clarification_overrides_old_message_preserves_candidate(self):
+        result = result_for('clarification', facts={'candidate_id': 'P1', 'round2_message': '舊訊息',
+                            'response_kind': 'clarification', 'clarification_message': '你想選哪個時段？'})
+        delivery = DeliveryOrchestrator.deliver(result)
+        self.assertEqual(delivery['response']['display_text'], '你想選哪個時段？')
+        self.assertNotIn('舊訊息', delivery['response']['speech_text'])
+        self.assertEqual(delivery['workspace']['view'], 'appointment_draft')
+        self.assertEqual(delivery['workspace']['actions'], [])
+
+    def test_display_and_speech_follow_published_order_not_search_order(self):
+        facts = {'candidate_id': 'P1', 'round2_message': '請選擇。',
+                 'slots': [{'id': 'A', 'start': '2026-10-20T14:00:00'},
+                           {'id': 'B', 'start': '2026-10-20T15:30:00'}],
+                 'options_presentation': {'presentation_id': 'O1', 'revision': 1,
+                     'ordered_slot_ids': ['B', 'A'], 'visible_times': ['15:30', '14:00']}}
+        result = result_for('select_slot', facts=facts)
+        before = copy.deepcopy(result.to_dict())
+        delivery = DeliveryOrchestrator.deliver(result)
+        for channel in ('display_text', 'speech_text'):
+            text = delivery['response'][channel]
+            self.assertLess(text.index('15:30'), text.index('14:00'))
+        fields = [field for field in delivery['workspace']['fields'] if field['key'].startswith('slot_')]
+        self.assertIn('15:30', fields[0]['label'])
+        self.assertIn('14:00', fields[1]['label'])
+        self.assertFalse(any('action' in field for field in fields))
+        self.assertEqual(result.to_dict(), before)

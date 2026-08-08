@@ -1,0 +1,4 @@
+{"id":"SEQ-APT","prefix":"APT","value":1}
+{"id":"SEQ-REGNO","prefix":"REGNO","value":1}
+{"id":"SEQ-TASK","prefix":"TASK","value":1}
+{"id":"SEQ-MED-REG","prefix":"MED-REG","value":1}

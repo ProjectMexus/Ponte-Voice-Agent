@@ -67,6 +67,12 @@ def proposal_call(slot_id=SLOT_1400, call_id="call-P1"):
 
 
 def control(action, **fields):
+    # Explicit test model decisions follow the runtime's typed control contract.
+    if action == "select_slot" and "target" not in fields:
+        fields["target"] = {"kind": "current"}
+    if action == "update_constraints" and "after_three" in fields:
+        fields["time_constraint"] = ({"kind": "lower_bound", "time": "15:00", "inclusive": False}
+                                     if fields.pop("after_three") else {"kind": "afternoon"})
     return {"action": action, **fields}
 
 
@@ -320,6 +326,10 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         self.assertIsNone(self.app.mcp_client.process.poll())
         self.assertEqual(self.app.mcp_client.process.args[1:3], ["-m", "MCP"])
         for _, options in self.model.requests:
+            if options.get("demo_control"):
+                self.assertEqual(options["tools"], [])
+                self.assertEqual(options["tool_choice"], "none")
+                continue
             self.assertEqual({item["function"]["name"] for item in options["tools"]}, ALLOWLIST)
             self.assertTrue(all("context" not in item["function"]["parameters"].get("properties", {})
                                 for item in options["tools"]))

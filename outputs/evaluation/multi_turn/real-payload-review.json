@@ -1,0 +1,16 @@
+{
+  "destination": "https://api.openai.com",
+  "model": "gpt-4.1-mini",
+  "matches_baseline_destination": true,
+  "matches_baseline_model": true,
+  "api_key_present_in_model_messages": false,
+  "model_request_source": "isolated acceptance test pipeline, synthetic PAT-DEMO-AGENT-E2E, cases.json user utterances and synthetic fixture responses only",
+  "authorization_in_model_messages": false,
+  "source_references": [
+    "tests/test_demo_agent_e2e.py:PATIENT",
+    "evals/multi_turn/adapter.py:isolated fixture injection",
+    "middleware/demo_medical_workflow.py:_model_messages and _dispatch (auth context only to local MCP)",
+    "middleware/llm_transport.py:API key in request Authorization header only"
+  ],
+  "user_scope": "Delegated instruction explicitly requests existing credentials, same real model and original 8 cases, no account changes. The approved destination is the baseline OpenAI-compatible endpoint."
+}

@@ -1,0 +1,46 @@
+2026-10-14 00:47:54,600 INFO [mcp] send request_id=MCP-1 operation=initialize input_keys=capabilities,clientInfo,protocolVersion
+2026-10-14 00:47:54,890 INFO [mcp] receive request_id=MCP-1 operation=initialize outcome=success latency_ms=306.865
+2026-10-14 00:47:54,956 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-E4F364D83C5D
+2026-10-14 00:47:56,811 INFO [mcp] send request_id=2 operation=tools/call tool=medical.list_departments input_keys=context,input
+2026-10-14 00:47:56,839 INFO [backend] request_start method=GET path=/mock/medical/v1/departments request_id=HTTP-BE-3B40901DC8B7
+2026-10-14 00:47:56,840 INFO [backend] request_end method=GET path=/mock/medical/v1/departments request_id=HTTP-BE-3B40901DC8B7 status=200 latency_ms=1.2043 bytes=197
+2026-10-14 00:47:56,841 INFO [mcp] receive request_id=2 operation=tools/call tool=medical.list_departments outcome=success latency_ms=29.813
+2026-10-14 00:47:58,325 INFO [mcp] send request_id=3 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:47:58,341 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-44F11B717A50
+2026-10-14 00:47:58,344 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-44F11B717A50 status=200 latency_ms=2.4883 bytes=838
+2026-10-14 00:47:58,344 INFO [mcp] receive request_id=3 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=19.918
+2026-10-14 00:47:59,891 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-E4F364D83C5D status=200 latency_ms=4934.8869
+2026-10-14 00:47:59,945 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-24FC5AD8C941
+2026-10-14 00:48:00,885 INFO [mcp] send request_id=4 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:48:00,910 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-EF2E56A5DE6D
+2026-10-14 00:48:00,913 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-EF2E56A5DE6D status=200 latency_ms=3.2128 bytes=838
+2026-10-14 00:48:00,914 INFO [mcp] receive request_id=4 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=28.9
+2026-10-14 00:48:00,915 INFO [mcp] send request_id=5 operation=tools/call tool=medical.get_my_appointments input_keys=context,input
+2026-10-14 00:48:00,918 INFO [backend] request_start method=GET path=/mock/medical/v1/appointments request_id=HTTP-BE-9437C51C419F
+2026-10-14 00:48:00,920 INFO [backend] request_end method=GET path=/mock/medical/v1/appointments request_id=HTTP-BE-9437C51C419F status=200 latency_ms=1.7104 bytes=304
+2026-10-14 00:48:00,921 INFO [mcp] receive request_id=5 operation=tools/call tool=medical.get_my_appointments outcome=success latency_ms=5.612
+2026-10-14 00:48:00,922 INFO [mcp] send request_id=6 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:48:00,941 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-90CB25F325FD
+2026-10-14 00:48:00,943 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-90CB25F325FD status=200 latency_ms=2.6348 bytes=838
+2026-10-14 00:48:00,944 INFO [mcp] receive request_id=6 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=22.24
+2026-10-14 00:48:00,946 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-24FC5AD8C941 status=200 latency_ms=1000.6337
+2026-10-14 00:48:01,002 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-44E5453EE2BD
+2026-10-14 00:48:02,574 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-44E5453EE2BD status=200 latency_ms=1572.0932
+2026-10-14 00:48:02,630 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-CC6EE5BE9D82
+2026-10-14 00:48:06,341 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-CC6EE5BE9D82 status=200 latency_ms=3711.5138
+2026-10-14 00:48:06,430 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-98C70061FBDE
+2026-10-14 00:48:07,835 INFO [mcp] send request_id=7 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:48:07,837 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-44E839165D46
+2026-10-14 00:48:07,840 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-44E839165D46 status=200 latency_ms=2.7823 bytes=838
+2026-10-14 00:48:07,841 INFO [mcp] receive request_id=7 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=6.413
+2026-10-14 00:48:07,842 INFO [mcp] send request_id=8 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:48:07,844 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-6FD3352BE653
+2026-10-14 00:48:07,846 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-6FD3352BE653 status=200 latency_ms=2.1139 bytes=838
+2026-10-14 00:48:07,847 INFO [mcp] receive request_id=8 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=5.256
+2026-10-14 00:48:07,849 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-98C70061FBDE status=200 latency_ms=1419.0635
+2026-10-14 00:48:07,899 INFO [middleware] request_start method=POST path=/api/interactions request_id=HTTP-MW-4AA94C8902F5
+2026-10-14 00:48:09,103 INFO [mcp] send request_id=9 operation=tools/call tool=medical.search_registration_slots input_keys=context,input
+2026-10-14 00:48:09,106 INFO [backend] request_start method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-86A43BCBC598
+2026-10-14 00:48:09,109 INFO [backend] request_end method=GET path=/mock/medical/v1/registration-slots request_id=HTTP-BE-86A43BCBC598 status=200 latency_ms=2.855 bytes=838
+2026-10-14 00:48:09,109 INFO [mcp] receive request_id=9 operation=tools/call tool=medical.search_registration_slots outcome=success latency_ms=6.297
+2026-10-14 00:48:09,111 INFO [middleware] request_end method=POST path=/api/interactions request_id=HTTP-MW-4AA94C8902F5 status=200 latency_ms=1211.8678

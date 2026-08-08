@@ -19,6 +19,7 @@ import uuid
 
 from MCP.registry import ToolRegistry
 
+from .demo_time import validate_constraint, validate_target, matches_time, parse_time_constraint
 from .agent import AgentProtocolError, parse_agent_decision, project_registry_tools
 from .contracts import PendingToolProposal, ToolCall, ToolExecutionResult
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope, InteractionTask
@@ -102,7 +103,12 @@ class _TaskState:
     date: str
     transcript: list[dict[str, Any]]
     revision: int = 1
-    after_three: bool = False
+    time_constraint: dict = field(default_factory=lambda: {"kind": "afternoon"})
+    presentation: dict | None = None
+
+    @property
+    def after_three(self):
+        return self.time_constraint == {"kind":"lower_bound","time":"15:00","inclusive":False}
     departments: dict[str, dict[str, Any]] = field(default_factory=dict)
     slots: dict[str, dict[str, Any]] = field(default_factory=dict)
     proposals: dict[str, DemoProposal] = field(default_factory=dict)
@@ -121,12 +127,26 @@ class DemoMedicalWorkflow:
     """Allowlisted model reads and immutable, button-approved registrations."""
 
     ROUND2_PROMPT = (
-        'For each new user message with an existing candidate, first classify its meaning with strict JSON '
-        '{"action":"query_appointments"}, {"action":"answer_question"}, {"action":"resume_booking"}, '
-        '{"action":"select_slot"}, {"action":"update_constraints","after_three":true|false}, or '
-        '{"action":"clarify","message":"..."}. No other fields are allowed. '
-        'Queries and questions never change booking constraints. Resume is not selection or approval. '
-        'create_registration only creates a draft; explicit slot selection creates a confirmation card. '
+        'Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, '
+        'resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. '
+        'clarify has action and message (a question for the user). update_constraints has action and '
+        'time_constraint: {"kind":"afternoon"} or {"kind":"lower_bound","time":"HH:MM","inclusive":true|false} '
+        'or {"kind":"exact","time":"HH:MM"}. New requirements replace previous constraints. '
+        'select_slot MUST have target: {"kind":"time","time":"HH:MM"}, '
+        '{"kind":"ordinal","ordinal":1,"presentation_id":"the published ID"}, '
+        '{"kind":"slot_id","slot_id":"..."}, or {"kind":"current"} for explicit this/that draft. '
+        'A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. '
+        'An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. '
+        'query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. '
+        'answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. '
+        'update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), '
+        'strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. '
+        'Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. '
+        'Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. '
+        'select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. '
+        'A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. '
+        'For update_constraints never substitute the earliest available slot for the requested boundary. '
+        'Tool names are never control actions. Do not infer approval from text. '
     )
     SYSTEM_PROMPT = (
         "You are Ponte's bounded cardiology demonstration agent. Use only provided tools, "
@@ -220,7 +240,8 @@ class DemoMedicalWorkflow:
         }])
         self._states[task["task_id"]] = state
         content = _required(envelope.event.get("content"), "content")
-        state.after_three = after_three(content)
+        state.time_constraint = parse_time_constraint(content) or {"kind":"afternoon"}
+        state.task["facts"]["time_constraint"] = deepcopy(state.time_constraint)
         state.transcript.append({"role": "user", "content": content})
         logs = [{"type": "user_utterance", "content": content}]
         if self._patient_blocked():
@@ -254,16 +275,14 @@ class DemoMedicalWorkflow:
             state.resume_action = None
             state.transcript.append({"role": "user", "content": content})
             if self._unsupported_intent(content, state.date) and self._changes_intent(content):
-                state.candidate = None
+                self._clear_candidate(state)
+                self._clear_options(state)
                 return self._pause(state, envelope, logs, "unsupported_demo_intent", "此示範只支援下週二心臟科下午或三點後；沒有提交掛號。")
             try:
-                response = self.client.complete(self._model_messages(state, control=True), tools=deepcopy(self.tools), tool_choice="none", response_format={"type": "json_object"}, temperature=0, demo_control=True)
-                control = dict(response) if "action" in response else dict(strict_json_content(response))
-                state.transcript.append({"role": "assistant", "content": json.dumps(control, ensure_ascii=False)})
-                action = control.get("action")
-                allowed = {"action", "after_three"} if action == "update_constraints" else {"action", "message"} if action == "clarify" else {"action"}
-                if set(control) != allowed:
-                    raise ValueError("invalid control fields")
+                control = self._control(state)
+                action = control["action"]
+                if action == "clarify":
+                    return self._pause(state, envelope, logs, "needs_clarification", control["message"])
                 if action == "query_appointments":
                     state.resume_action = {"type": "recovery_action", "action": "resume_booking", "action_id": _identifier("ACT"), "task_id": state.task["task_id"]}
                     state.phase = "inquiry"
@@ -274,32 +293,32 @@ class DemoMedicalWorkflow:
                         self._query_appointments(state, logs)
                     state.resume_action = {"type": "recovery_action", "action": "resume_booking", "action_id": _identifier("ACT"), "task_id": state.task["task_id"]}
                     return self._draft_outcome(state, envelope, logs)
-                if action == "resume_booking" and state.candidate and state.phase == "inquiry":
+                if action == "resume_booking" and state.candidate:
                     self._resume_booking(state, logs)
                     return self._draft_outcome(state, envelope, logs)
-                if action == "select_slot" and state.phase == "awaiting_selection" and state.candidate:
-                    times = re.findall(r"\b\d{1,2}:\d{2}\b", content)
-                    selected_time = datetime.fromisoformat(state.candidate.frozen.tool_arguments()["slot"]["start"]).astimezone(LOCAL_TZ).strftime("%H:%M")
-                    if times and any(value != selected_time for value in times):
-                        return self._pause(state, envelope, logs, "selection_mismatch", "請選定目前草稿的時段，或先修改時間要求；沒有提交掛號。")
-                    if self._now().timestamp() - state.verified_at > 60:
-                        original = state.candidate
-                        self._resume_booking(state, logs)
-                        if state.candidate is not original:
-                            return self._draft_outcome(state, envelope, logs)
+                if action == "select_slot" and state.candidate:
+                    try:
+                        slot_id = self._resolve_target(state, control["target"])
+                    except ValueError:
+                        return self._pause(state, envelope, logs, "needs_clarification", "請說明所選時段的時間，或目前清單的編號。")
+                    selected = deepcopy(state.slots.get(slot_id))
+                    self._resume_booking(state, logs)
+                    if not selected or slot_id not in state.slots:
+                        return self._pause(state, envelope, logs, "selection_unavailable", "所選時段已失效，請重新選擇。")
+                    current = state.candidate.frozen.tool_arguments()["slot"] if state.candidate else None
+                    if not current or current["id"] != slot_id:
+                        self._propose(state, envelope, logs, _identifier("DRAFT"), {"slot_id":slot_id}, planning_call=False)
                     if not state.snapshot or self._now().timestamp() - state.snapshot["fetched_at"] > 60:
                         self._query_appointments(state, logs)
                     return self._issue_confirmation(state, envelope, logs)
-                if action == "update_constraints" and type(control["after_three"]) is bool:
-                    if self._unsupported_intent(content, state.date):
-                        state.candidate = None
-                        return self._pause(state, envelope, logs, "unsupported_demo_intent", "此示範只支援下週二心臟科下午或三點後；沒有提交掛號。")
-                    if state.after_three != control["after_three"]:
+                if action == "update_constraints":
+                    value = validate_constraint(control["time_constraint"])
+                    if value != state.time_constraint:
                         state.revision += 1
-                    state.after_three = control["after_three"]
-                    state.task["facts"]["intent_revision"] = state.revision
-                    state.candidate = None
-                    state.slots.clear()
+                    state.time_constraint = value
+                    state.task["facts"].update(intent_revision=state.revision, time_constraint=deepcopy(value))
+                    self._clear_candidate(state)
+                    self._clear_options(state)
                     state.phase = "planning"
                     return self._run(state, envelope, logs)
                 raise ValueError("decision is not legal in this phase")
@@ -337,9 +356,9 @@ class DemoMedicalWorkflow:
         """
         text = content.casefold().replace(" ", "")
         if any(word in text for word in (
-            "morning", "evening", "tonight", "tomorrow", "today", "before", "earlier",
+            "四點後", "四点后", "morning", "evening", "tonight", "tomorrow", "today", "before", "earlier",
             "nextmonth", "nextyear", "下個月", "下个月", "明年",
-            "上午", "早上", "晚上", "今晚", "明天", "聽日", "今天", "今日", "之前", "以前", "三點前", "3點前",
+            "上午", "早上", "晚上", "今晚", "明天", "聽日", "今天", "今日", "之前", "以前",
             "骨科", "婦科", "妇科", "皮膚科", "皮肤科", "影像科", "超聲", "超声", "復康", "复康",
             "monday", "wednesday", "thursday", "friday", "saturday", "sunday",
             "星期一", "星期三", "星期四", "星期五", "星期六", "星期日", "星期天",
@@ -348,20 +367,16 @@ class DemoMedicalWorkflow:
             return True
         if any(value != target_date for value in re.findall(r"\d{4}-\d{2}-\d{2}", text)):
             return True
-        # Only the after-three threshold is supported; do not silently weaken
-        # another explicit after/before time into the original afternoon request.
-        if ("after" in text or any(word in text for word in ("點後", "点后", "點之後", "点之后", "時後", "时后"))) and not after_three(content):
-            return True
-        if any(word in text for word in ("after4", "after16", "四點", "四点", "4點", "4点", "16:00", "兩點後", "两点后", "2點後", "2点后")):
-            return True
-        if any(word in text for word in ("改", "change", "instead")) and not (after_three(content) or any(word in text for word in ("下午", "afternoon", "下週二", "下周二", "nexttuesday", "14:00", "2pm", "兩點", "两点"))):
-            return True
         return False
 
     def _model_messages(self, state, *, control):
         messages = deepcopy(state.transcript)
-        context = {"phase": state.phase, "candidate_id": state.task["facts"].get("candidate_id"), "candidate": state.candidate.frozen.tool_arguments() if state.candidate else None, "current_verified_slots": list(state.slots.values()), "after_three": state.after_three, "intent_revision": state.revision, "conflict_result": state.task["facts"].get("conflict_result")}
+        context = {"phase": state.phase, "candidate_id": state.task["facts"].get("candidate_id"), "candidate": state.candidate.frozen.tool_arguments() if state.candidate else None, "current_verified_slots": list(state.slots.values()), "time_constraint": state.time_constraint, "options_presentation": state.presentation, "intent_revision": state.revision, "conflict_result": state.task["facts"].get("conflict_result")}
         instruction = "Classify only the latest user message using the Round2 control JSON schema. Do not call tools." if control else "Planning mode: do not classify again. Call the next catalogue/search/create draft tool using current server constraints. If current_verified_slots is empty, previous search results are invalid for this revision: search again before create. Only propose slots in current_verified_slots."
+        if control:
+            latest = next(message["content"] for message in reversed(state.transcript) if message["role"] == "user")
+            repair = state.transcript[-1].get("content", "") if state.transcript[-1]["role"] == "system" else ""
+            return [{"role":"system", "content":self.ROUND2_PROMPT + " " + repair + " SERVER_STATE=" + json.dumps(context, ensure_ascii=False)}, {"role":"user", "content":latest}]
         messages.append({"role": "system", "content": instruction + " SERVER_STATE=" + json.dumps(context, ensure_ascii=False)})
         return messages
 
@@ -370,6 +385,8 @@ class DemoMedicalWorkflow:
             try:
                 response = self.client.complete(self._model_messages(state, control=False), tools=deepcopy(self.tools), tool_choice="auto", response_format={"type": "json_object"}, temperature=0)
                 decision = parse_agent_decision(response)
+                if decision.action == "clarify":
+                    return self._pause(state, envelope, logs, "needs_clarification", decision.message)
                 if decision.action != "tool_call":
                     # Model prose never establishes completion or authority.
                     return self._pause(state, envelope, logs, "agent_paused", "模型已暫停。請提供有效的心臟科時段要求，再由確認按鈕提交。")
@@ -420,6 +437,7 @@ class DemoMedicalWorkflow:
             if set(arguments) != {"keyword", "active_only"} or arguments.get("keyword") != "Cardiology" or arguments.get("active_only") is not True:
                 raise AgentProtocolError("demo department lookup must target active Cardiology")
         elif name == "medical.search_registration_slots":
+            arguments.setdefault("session", "afternoon")
             if not {"department_id", "date", "session"}.issubset(arguments) or set(arguments) - {"department_id", "date", "session", "doctor_id", "location_id"}:
                 raise AgentProtocolError("unsupported slot search arguments")
             if not state.departments.get("DEPT-CARDIO") or arguments["department_id"] != "DEPT-CARDIO" or arguments["date"] != state.date or arguments["session"] != "afternoon":
@@ -452,7 +470,13 @@ class DemoMedicalWorkflow:
             state.task["facts"]["service"] = {"id": department["id"], "name": department.get("name", "心臟科")}
         else:
             state.slots = {item["id"]: item for item in records if isinstance(item.get("id"), str) and self._eligible_slot(state, item)}
-            state.task["facts"]["slots"] = deepcopy(list(state.slots.values()))
+            ordered = sorted(state.slots.values(), key=lambda slot: (slot["start"], slot["id"]))
+            state.task["facts"]["slots"] = deepcopy(ordered)
+            state.presentation = {"presentation_id":_identifier("PRESENT"), "revision":state.revision,
+                "ordered_slot_ids":[slot["id"] for slot in ordered],
+                "visible_times":[datetime.fromisoformat(slot["start"]).astimezone(LOCAL_TZ).strftime("%H:%M") for slot in ordered],
+                "source_request_id":result.request_id}
+            state.task["facts"]["options_presentation"] = deepcopy(state.presentation)
 
     def _eligible_slot(self, state: _TaskState, slot: Mapping[str, Any]) -> bool:
         try:
@@ -464,7 +488,7 @@ class DemoMedicalWorkflow:
             return (
                 slot.get("department_id") == "DEPT-CARDIO" and local.date().isoformat() == state.date
                 and start > self._now() and 12 * 60 <= minute < 18 * 60
-                and (not state.after_three or minute > 15 * 60)
+                and matches_time(state.time_constraint, local.strftime("%H:%M"))
                 and isinstance(slot.get("remaining"), (int, float)) and not isinstance(slot.get("remaining"), bool)
                 and slot["remaining"] > 0 and slot.get("status") == "free"
             )
@@ -494,6 +518,57 @@ class DemoMedicalWorkflow:
             state.proposal_status[state.pending_id] = reason.lower()
             state.pending_id = None
         state.task["pending_confirmation"] = None
+        if state.phase == "awaiting_approval":
+            state.phase = "awaiting_selection" if state.candidate else "planning"
+        state.task["facts"]["phase"] = state.phase
+
+    def _clear_candidate(self, state):
+        state.candidate = None
+        for key in ("selected_slot", "slot_id", "candidate_id"):
+            state.task["facts"].pop(key, None)
+
+    @staticmethod
+    def _clear_options(state):
+        state.slots.clear()
+        state.presentation = None
+        state.task["facts"]["slots"] = []
+        state.task["facts"].pop("options_presentation", None)
+
+    def _control(self, state):
+        for attempt in range(2):
+            response = self.client.complete(self._model_messages(state, control=True), tools=[], tool_choice="none", response_format={"type":"json_object"}, temperature=0, demo_control=True)
+            try:
+                control = dict(response) if "action" in response else dict(strict_json_content(response))
+                action = control.get("action")
+                fields = {"action","time_constraint"} if action == "update_constraints" else {"action","target"} if action == "select_slot" else {"action","message"} if action == "clarify" else {"action"}
+                if action not in {"query_appointments","answer_question","resume_booking","select_slot","update_constraints","clarify"} or set(control) != fields:
+                    raise ValueError("invalid control schema")
+                if action == "update_constraints": validate_constraint(control["time_constraint"])
+                if action == "select_slot": validate_target(control["target"])
+                if action == "clarify": _required(control["message"], "message")
+                if action in {"select_slot","resume_booking"} and not state.candidate: raise ValueError("candidate required; use clarify")
+                if action == "answer_question" and state.phase != "inquiry": raise ValueError("answer_question needs inquiry; use query_appointments for retrieval")
+                state.transcript.append({"role":"assistant","content":json.dumps(control,ensure_ascii=False)})
+                return control
+            except (ValueError, TypeError, ChatCompletionError) as error:
+                state.transcript.append({"role":"system","content":"Invalid control schema or phase: " + str(error) + ". Correct once using the explicit control enum and required typed fields."})
+        return {"action":"clarify","message":"請說明想選哪個時段，或是否返回原草稿？"}
+
+    def _resolve_target(self, state, target):
+        kind = target.get("kind")
+        presentation = state.presentation or {}
+        if kind == "ordinal" and set(target) == {"kind","ordinal","presentation_id"}:
+            index = target["ordinal"]
+            if type(index) is int and target["presentation_id"] == presentation.get("presentation_id") and presentation.get("revision") == state.revision and 1 <= index <= len(presentation["ordered_slot_ids"]):
+                return presentation["ordered_slot_ids"][index-1]
+        elif kind == "time" and set(target) == {"kind","time"}:
+            matches = [sid for sid,time in zip(presentation.get("ordered_slot_ids",[]),presentation.get("visible_times",[])) if time == target["time"]]
+            if len(matches) == 1: return matches[0]
+        elif kind == "slot_id" and set(target) == {"kind","slot_id"} and target["slot_id"] in presentation.get("ordered_slot_ids",[]):
+            return target["slot_id"]
+        elif target == {"kind":"current"} and state.candidate:
+            return state.candidate.frozen.tool_arguments()["slot"]["id"]
+        raise ValueError("ambiguous or stale selection reference")
 
     def _read_exchange(self, state, name, arguments, logs):
         call_id = _identifier("READ")
@@ -515,9 +590,15 @@ class DemoMedicalWorkflow:
         result = self._read_exchange(state, "medical.search_registration_slots", {"department_id": "DEPT-CARDIO", "date": state.date, "session": "afternoon"}, logs)
         if not result.ok:
             state.verified_at = 0
+            self._clear_options(state)
+            self._clear_candidate(state)
+            state.task["facts"]["invalidation_message"] = "未能重新核實時段，原草稿已撤銷；請重新查詢，沒有提交掛號。"
+            state.phase = "awaiting_selection"
             return
         self._cache_read(state, "medical.search_registration_slots", result)
         old = state.candidate
+        if old is None:
+            return
         slot = old.frozen.tool_arguments()["slot"]
         current = state.slots.get(slot["id"])
         if old.frozen.is_expired(self._now().timestamp()) or current != slot:
@@ -536,17 +617,24 @@ class DemoMedicalWorkflow:
 
     def _draft_outcome(self, state, envelope, logs):
         facts = state.task["facts"]
+        facts["response_kind"] = "draft"
         facts["phase"] = state.phase
         facts["appointments_snapshot"] = deepcopy(state.snapshot)
         conflict = evaluate_conflicts(state.candidate.frozen.tool_arguments()["slot"] if state.candidate else {}, state.snapshot)
         facts["conflict_result"] = conflict
         facts["round2_message"] = ("目前未能核實預約，不能確認沒有撞期。" if conflict["status"] == "unknown" else "這個時段與現有預約時間重疊，請選其他時段。" if conflict["status"] == "overlap" else "目前查詢的時間區間沒有重疊。") if state.phase == "inquiry" else "這是候選草稿，尚未掛號；請選定時段才建立正式確認卡。"
+        if not state.candidate:
+            facts["round2_message"] = facts.get("invalidation_message") or "目前沒有有效草稿；請重新選擇時段，沒有提交掛號。"
+        facts.update(response_reason="needs_reselection" if not state.candidate else None, response_message=facts["round2_message"], clarification_message=None)
         state.task.update({"status": "awaiting_input", "current_step": "select_slot", "recovery": None, "pending_confirmation": None})
         return self._outcome(state, envelope, "slot_selection", logs)
 
     def _issue_confirmation(self, state, envelope, logs):
+        original = state.candidate
+        if original:
+            self._resume_booking(state, logs)
         candidate = state.candidate
-        if not candidate or state.phase != "awaiting_selection":
+        if not candidate or candidate is not original or state.phase != "awaiting_selection":
             return self._draft_outcome(state, envelope, logs)
         conflict = evaluate_conflicts(candidate.frozen.tool_arguments()["slot"], state.snapshot)
         if candidate.frozen.is_expired(self._now().timestamp()) or self._now().timestamp() - state.verified_at > 60 or conflict["status"] != "clear":
@@ -558,8 +646,10 @@ class DemoMedicalWorkflow:
         state.proposal_status[frozen.proposal_id] = "pending"
         state.pending_id = frozen.proposal_id
         state.phase = "awaiting_approval"
+        state.task["facts"]["response_kind"] = "confirmation"
         state.task["facts"]["phase"] = state.phase
         state.task["facts"]["round2_message"] = "尚未掛號；請核對病人、時段與撞期資料，點擊批准才提交。"
+        state.task["facts"].update(response_reason=None, response_message=state.task["facts"]["round2_message"], clarification_message=None)
         state.task.update({"status": "awaiting_confirmation", "current_step": "confirm_registration", "recovery": None})
         state.task["pending_confirmation"] = {"confirmation_id": frozen.proposal_id, "candidate_id": state.task["facts"]["candidate_id"], "intent_revision": state.revision, "digest": frozen.proposal_hash, "expires_at": frozen.expires_at, "appointment": self._slot_details(state, frozen.tool_arguments()["slot"]), "patient_id": self.patient_id, "conflict_result": conflict, "fetched_at": state.snapshot["fetched_at"]}
         return self._outcome(state, envelope, "request_confirmation", logs)
@@ -570,7 +660,7 @@ class DemoMedicalWorkflow:
         if proposal is None:
             raise ValueError("confirmation is not a server-issued demo proposal")
         issued_id = dict(proposal.actions).get(event.get("decision"))
-        expected = {"type": "confirmation_decision", "task_id": proposal.task_id, "confirmation_id": proposal.frozen.proposal_id, "candidate_id": state.task["facts"]["candidate_id"], "decision": event.get("decision"), "action_id": issued_id}
+        expected = {"type": "confirmation_decision", "task_id": proposal.task_id, "confirmation_id": proposal.frozen.proposal_id, "candidate_id": proposal.frozen.tool_arguments()["candidate_id"], "decision": event.get("decision"), "action_id": issued_id}
         if not issued_id or dict(event) != expected or envelope.session_id != proposal.session_id:
             raise ValueError("confirmation action is not the exact server-issued action")
         status = state.proposal_status[proposal.frozen.proposal_id]
@@ -645,6 +735,7 @@ class DemoMedicalWorkflow:
             return self._uncertain(state, envelope, logs, "invalid_backend_response")
         state.proposal_status[proposal.frozen.proposal_id] = "executed"
         state.phase = "completed"
+        state.task["facts"].update(phase="completed", response_kind="completed", response_reason=None, response_message=None, clarification_message=None)
         state.task["facts"].pop("round2_message", None)
         state.task["facts"]["appointment"] = appointment
         state.task.update({"status": "completed", "current_step": "complete", "receipt": receipt, "recovery": None})
@@ -747,7 +838,9 @@ class DemoMedicalWorkflow:
         return self._pause(state, envelope, logs, "outcome_needs_checking", "掛號結果需要人工查核。此示範病人的新掛號已封鎖；不會自動重試或更換掛號識別碼。請由操作員檢查後端紀錄，重新啟動不代表未曾掛號。", cause=cause)
 
     def _pause(self, state: _TaskState, envelope: EventEnvelope, logs: list[dict[str, Any]], reason: str, message: str, *, cause: str | None = None) -> WorkflowResult:
+        self._invalidate_approval(state, reason)
         state.task.update({"status": "awaiting_input", "current_step": "manual_review" if reason == "outcome_needs_checking" else "agent_paused"})
+        state.task["facts"].update(response_kind="clarification" if reason == "needs_clarification" else "recovery", response_reason=reason, response_message=message, clarification_message=message if reason == "needs_clarification" else None, round2_message=message, phase=state.phase)
         state.task["recovery"] = {"reason": reason, "message": message, "allowed_actions": []}
         if cause:
             state.task["recovery"]["cause"] = cause
@@ -761,6 +854,10 @@ class DemoMedicalWorkflow:
         return {"service": state.departments["DEPT-CARDIO"].get("name", "心臟科"), "date": start.date().isoformat(), "time": start.strftime("%H:%M"), "location": deepcopy(location) if isinstance(location, Mapping) else {"display": "第一門診"}}
 
     def _outcome(self, state: _TaskState, envelope: EventEnvelope, intent: str, logs: list[dict[str, Any]]) -> WorkflowResult:
+        if state.task["status"] == "cancelled":
+            state.phase = "cancelled"
+            state.task["facts"].update(phase="cancelled", response_kind="cancelled", response_reason=None, response_message=None, clarification_message=None)
+            state.task["facts"].pop("round2_message", None)
         task = deepcopy(state.task)
         actions: list[dict[str, Any]] = []
         if state.phase == "inquiry" and state.resume_action:

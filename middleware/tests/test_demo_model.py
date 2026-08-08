@@ -37,13 +37,27 @@ class RegistryToolNameClientTests(unittest.TestCase):
             ("Can you check my appointments?", {"action": "query_appointments"}),
             ("Would that overlap?", {"action": "answer_question"}),
             ("Let's return to the booking", {"action": "resume_booking"}),
-            ("Select that slot", {"action": "select_slot"}),
-            ("下午三點後先得", {"action": "update_constraints", "after_three": True}),
-            ("改為兩點", {"action": "update_constraints", "after_three": False}),
+            ("Select that slot", {"action": "select_slot", "target": {"kind": "current"}}),
+            ("下午三點後先得", {"action": "update_constraints", "time_constraint": {"kind": "lower_bound", "time": "15:00", "inclusive": False}}),
+            ("改為兩點", {"action": "update_constraints", "time_constraint": {"kind": "exact", "time": "14:00"}}),
         ]
         for content, expected in cases:
             with self.subTest(content=content):
                 response = client.complete([{"role": "user", "content": content}], demo_control=True)
+                self.assertEqual(json.loads(response["choices"][0]["message"]["content"]), expected)
+
+    def test_scripted_target_and_constraint_use_server_presentation(self):
+        client = ScriptedCardiologyClient()
+        state = {"time_constraint": {"kind": "afternoon"}, "options_presentation": {"presentation_id": "PRESENT-2"}}
+        for content, expected in [
+            ("選第二個", {"action": "select_slot", "target": {"kind": "ordinal", "ordinal": 2, "presentation_id": "PRESENT-2"}}),
+            ("就15:30嗰個", {"action": "select_slot", "target": {"kind": "time", "time": "15:30"}}),
+            ("change to >=15:30", {"action": "update_constraints", "time_constraint": {"kind": "lower_bound", "time": "15:30", "inclusive": True}}),
+            ("change to after 15:00", {"action": "update_constraints", "time_constraint": {"kind": "lower_bound", "time": "15:00", "inclusive": False}}),
+        ]:
+            with self.subTest(content=content):
+                messages = [{"role": "user", "content": content}, {"role": "system", "content": "Control SERVER_STATE=" + json.dumps(state)}]
+                response = client.complete(messages, demo_control=True)
                 self.assertEqual(json.loads(response["choices"][0]["message"]["content"]), expected)
 
     def tools(self):

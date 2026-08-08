@@ -1,0 +1,73 @@
+{
+  "case_id": "MT08",
+  "track": "scripted",
+  "observations": [],
+  "dispatches": [],
+  "backend_effects": [],
+  "coverage": {
+    "dispatch_trace": true,
+    "backend_effects": true
+  },
+  "final": {
+    "booking_count": 0,
+    "write_count": 0,
+    "tools_called": [],
+    "constraints_preserved": false,
+    "rejected_unavailable": false
+  },
+  "error": {
+    "category": "harness",
+    "type": "URLError"
+  },
+  "metadata": {
+    "model": "queued-native-decisions",
+    "temperature": 0,
+    "prompt_config": "DemoMedicalWorkflow.SYSTEM_PROMPT/runtime-control",
+    "fixture_version": 1,
+    "dataset_hash": "00eef01eea1c3609fde6ba707ad31a23875d7e3405fb2adac02b4e42425666c8"
+  },
+  "calls": [],
+  "model_exchanges": [],
+  "fixture": {
+    "slots": {
+      "S1400": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT08-S1400",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T14:00:00+08:00",
+        "end": "2026-10-20T14:15:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      },
+      "S1530": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT08-S1530",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T15:30:00+08:00",
+        "end": "2026-10-20T15:45:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      }
+    },
+    "appointments": [],
+    "intervention_ids": []
+  }
+}

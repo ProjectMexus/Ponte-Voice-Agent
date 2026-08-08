@@ -146,6 +146,30 @@ def _cash_recovery_text(reason: Any) -> str:
     }.get(_normalised(reason), "暫時未能完成現金分享查詢，請選擇下一步。")
 
 
+def _presented_slots(facts: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Use the published presentation order, never a refreshed search order."""
+    slots = [dict(slot) for slot in _as_list(facts.get("slots")) if isinstance(slot, Mapping)]
+    presentation = _as_mapping(facts.get("options_presentation"))
+    if not presentation:
+        return slots
+    by_id = {slot.get("id"): slot for slot in slots}
+    ordered = _as_list(presentation.get("ordered_slot_ids"))
+    times = _as_list(presentation.get("visible_times"))
+    return [dict(by_id.get(slot_id, {"id": slot_id}), visible_time=times[i] if i < len(times) else "")
+            for i, slot_id in enumerate(ordered)]
+
+
+def _options_text(facts: Mapping[str, Any]) -> str:
+    if not facts.get("options_presentation"):
+        return ""
+    options = []
+    for i, slot in enumerate(_presented_slots(facts), 1):
+        time = _text(slot.get("visible_time")) or _text(slot.get("start"))[11:16]
+        if time:
+            options.append(f"第 {i} 個：{time}")
+    return "可選時段：" + "；".join(options) + "。" if options else ""
+
+
 class ResponseComposer:
     """Compose fixed, channel-neutral written and spoken response text."""
 
@@ -157,7 +181,14 @@ class ResponseComposer:
         status = _normalised(task.get("status"))
         details = _appointment_details(result)
 
-        if facts.get("round2_message"):
+        if intent == "cash_sharing_recovery":
+            display_text = _cash_recovery_text(_as_mapping(result.recovery).get("reason"))
+        elif result.recovery is not None:
+            recovery = _as_mapping(result.recovery)
+            display_text = _text(recovery.get("message") or recovery.get("explanation"), "暫時未能完成預約，請選擇下一步。")
+        elif _normalised(facts.get("response_kind")) in {"clarify", "clarification"} or intent in {"clarify", "clarification"}:
+            display_text = _text(facts.get("clarification_message") or facts.get("response_message"), "請說明你想選擇哪個時段。")
+        elif facts.get("round2_message"):
             display_text = _text(facts["round2_message"])
         elif intent == "cash_sharing_summary":
             display_text = _cash_summary_text(facts)
@@ -194,6 +225,9 @@ class ResponseComposer:
             display_text = f"{prefix}請選擇你想預約的服務。"
         else:
             display_text = "請選擇下一步。"
+
+        if result.recovery is None and result.confirmation is None and result.receipt is None:
+            display_text += _options_text(facts)
 
         return {
             "display_text": display_text,
@@ -327,14 +361,16 @@ def _service_selection_fields(facts: Mapping[str, Any], task_id: str) -> list[di
 def _slot_selection_fields(facts: Mapping[str, Any], task_id: str) -> list[dict[str, Any]]:
     """Generate one field per slot with human-readable label and value."""
     fields: list[dict[str, Any]] = []
-    for i, slot in enumerate(_as_list(facts.get("slots"))):
+    for i, slot in enumerate(_presented_slots(facts)):
         if not isinstance(slot, Mapping):
             continue
         # Extract date and time from start
         start = _text(slot.get("start"))
         date_part = start[:10] if len(start) >= 10 else start
-        time_part = start[11:16] if len(start) >= 16 else ""
+        time_part = _text(slot.get("visible_time")) or (start[11:16] if len(start) >= 16 else "")
         label = f"{date_part} {time_part}".strip() if date_part or time_part else "時段"
+        if facts.get("options_presentation"):
+            label = f"第 {i + 1} 個：{label}"
         # Extract service
         service = slot.get("service")
         if isinstance(service, Mapping):
@@ -411,6 +447,11 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
                 fields.append(_field("appointments_fetched_at", "預約資料查詢時間", snapshot["fetched_at"]))
         if facts.get("conflict_result") is not None:
             fields.append(_field("conflict_result", "撞期核對", facts["conflict_result"]))
+        if facts.get("options_presentation"):
+            # Drafts remain read-only; explicit text selection requests a new
+            # formal card through the authoritative workflow.
+            fields.extend({key: value for key, value in field.items() if key != "action"}
+                          for field in _slot_selection_fields(facts, task_id))
         return fields
     if view == "cash_sharing_summary":
         return _cash_summary_fields(facts)
@@ -504,6 +545,7 @@ class WorkspaceProjector:
             "title": _VIEW_TITLES[view],
             "fields": _fields_for(result, view),
             "actions": _project_actions(result),
+            "options_presentation": deepcopy(_facts(result).get("options_presentation")),
             "artifact": deepcopy(dict(result.receipt)) if isinstance(result.receipt, Mapping) else None,
         }
 

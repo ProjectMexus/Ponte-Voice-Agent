@@ -16,7 +16,8 @@ from typing import Any
 from types import MappingProxyType
 import uuid
 
-from .demo_medical_workflow import LOCAL_TZ, after_three
+from .demo_medical_workflow import LOCAL_TZ
+from .demo_time import matches_time, parse_time_constraint, selection_target
 from .llm_transport import ChatCompletionClient
 
 
@@ -107,19 +108,17 @@ class ScriptedCardiologyClient:
     mode = "scripted"
 
     def complete(self, messages: Sequence[Mapping[str, Any]], **options: Any) -> Mapping[str, Any]:
+        server_state = {}
+        for message in messages:
+            content = str(message.get("content", ""))
+            if message.get("role") == "system" and " SERVER_STATE=" in content:
+                server_state = json.loads(content.split(" SERVER_STATE=", 1)[1])
         if options.get("demo_control"):
-            return self._control(str(next(message for message in reversed(messages) if message.get("role") == "user").get("content", "")))
+            return self._control(str(next(message for message in reversed(messages) if message.get("role") == "user").get("content", "")), server_state)
         context = json.loads(str(messages[0]["content"]).split("DEMO_SERVER_CONTEXT=", 1)[1])
         calls: dict[str, str] = {}
         last_user = max(index for index, message in enumerate(messages) if message.get("role") == "user")
-        minimum_after_three = False
-        for message in messages:
-            if message.get("role") == "user":
-                content = str(message.get("content", ""))
-                if after_three(content):
-                    minimum_after_three = True
-                elif any(word in content.casefold() for word in ("afternoon", "下午", "14:00", "2 pm", "兩點", "两点")):
-                    minimum_after_three = False
+        constraint = server_state.get("time_constraint", {"kind": "afternoon"})
         department_seen = False
         search_index = -1
         failed_create_index = -1
@@ -146,7 +145,7 @@ class ScriptedCardiologyClient:
         eligible = []
         for slot in slots:
             start = datetime.fromisoformat(slot["start"]).astimezone(LOCAL_TZ)
-            if slot.get("remaining", 0) > 0 and slot.get("status") == "free" and (not minimum_after_three or start.hour * 60 + start.minute > 15 * 60):
+            if slot.get("remaining", 0) > 0 and slot.get("status") == "free" and matches_time(constraint, start.strftime("%H:%M")):
                 eligible.append(slot)
         if not eligible:
             return {"choices": [{"message": {"role": "assistant", "content": json.dumps({"action": "clarify", "message": "No available cardiology slot matches the requested time."})}}]}
@@ -157,25 +156,29 @@ class ScriptedCardiologyClient:
         return self._call("medical.create_registration", arguments)
 
     @staticmethod
-    def _control(content: str) -> Mapping[str, Any]:
+    def _control(content: str, server_state=None) -> Mapping[str, Any]:
         """Disclosed rehearsal heuristics; real runs use the model's JSON decision.
 
         Classify families of phrasing, never a turn number or the seven exact
         demonstration strings. Runtime remains authoritative for legal phases.
         """
         text = content.casefold()
+        state = server_state or {}
+        constraint = parse_time_constraint(content)
+        target = selection_target(content, state.get("options_presentation"))
+        is_change = any(word in text for word in ("改", "change", "instead", "after", "之後", "之后", "點後", "点后", "不早", ">="))
         if any(word in text for word in ("撞", "衝突", "冲突", "overlap", "conflict", "clash")):
             action = {"action": "answer_question"}
+        elif constraint is not None and (is_change or constraint["kind"] != "afternoon"):
+            action = {"action": "update_constraints", "time_constraint": constraint}
+        elif target is not None:
+            action = {"action": "select_slot", "target": target}
         elif any(word in text for word in ("返去", "返回", "繼續", "继续", "resume", "go back", "back to", "return to")):
             action = {"action": "resume_booking"}
-        elif after_three(content):
-            action = {"action": "update_constraints", "after_three": True}
         elif any(word in text for word in ("其他預約", "其他预约", "之前", "已有", "現有", "现有", "my appointments", "existing appointment", "other appointment", "already have", "scheduled")):
             action = {"action": "query_appointments"}
-        elif any(word in text for word in ("改", "change", "instead", "兩點", "两点", "2 pm")):
-            action = {"action": "update_constraints", "after_three": False}
-        elif any(word in text for word in ("就", "選", "选", "嗰個", "那個", "那个", "choose", "select", "take", "book that", "15:30", "14:00")):
-            action = {"action": "select_slot"}
+        elif any(word in text for word in ("選", "选", "choose", "select")) and any(word in text for word in ("current", "目前", "當前", "当前")):
+            action = {"action": "select_slot", "target": {"kind": "current"}}
         else:
             action = {"action": "clarify", "message": "請說明是查詢已有預約、返回掛號、修改時間，還是選定目前時段。"}
         return {"choices": [{"message": {"role": "assistant", "content": json.dumps(action, ensure_ascii=False)}}]}

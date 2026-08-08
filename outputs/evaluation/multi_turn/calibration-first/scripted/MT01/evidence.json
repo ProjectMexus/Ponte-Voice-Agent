@@ -1,0 +1,16 @@
+{
+  "case_id": "MT01",
+  "track": "scripted",
+  "observations": [],
+  "dispatches": [],
+  "backend_effects": [],
+  "coverage": {
+    "dispatch_trace": false,
+    "backend_effects": false
+  },
+  "final": {},
+  "error": {
+    "category": "harness",
+    "type": "PermissionError"
+  }
+}

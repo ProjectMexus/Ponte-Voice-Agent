@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "status": "evaluation_spec_not_executed",
+  "clock": "2026-10-13T09:00:00+08:00",
+  "service_timezone": "Asia/Macau",
+  "run_matrix": {
+    "modes": [
+      "scripted",
+      "real_model"
+    ],
+    "cases_per_mode": 8,
+    "repetitions": 1
+  },
+  "tool_names": [
+    "medical.list_departments",
+    "medical.search_registration_slots",
+    "medical.get_my_appointments",
+    "medical.create_registration"
+  ],
+  "fixture_contract": {
+    "slots": {
+      "S1400": {
+        "start": "2026-10-20T14:00:00+08:00",
+        "end": "2026-10-20T14:15:00+08:00"
+      },
+      "S1500": {
+        "start": "2026-10-20T15:00:00+08:00",
+        "end": "2026-10-20T15:15:00+08:00"
+      },
+      "S1515": {
+        "start": "2026-10-20T15:15:00+08:00",
+        "end": "2026-10-20T15:30:00+08:00"
+      },
+      "S1530": {
+        "start": "2026-10-20T15:30:00+08:00",
+        "end": "2026-10-20T15:45:00+08:00"
+      }
+    },
+    "existing_appointment": {
+      "id": "APT-EXIST-1",
+      "status": "booked",
+      "start": "2026-10-20T15:00:00+08:00",
+      "end": "2026-10-20T15:30:00+08:00"
+    },
+    "profiles": {
+      "base_empty": {
+        "slot_aliases": [
+          "S1400",
+          "S1530"
+        ],
+        "appointments": []
+      },
+      "base_boundary": {
+        "slot_aliases": [
+          "S1400",
+          "S1530"
+        ],
+        "appointments": [
+          "APT-EXIST-1"
+        ]
+      },
+      "time_boundaries": {
+        "slot_aliases": [
+          "S1400",
+          "S1500",
+          "S1515",
+          "S1530"
+        ],
+        "appointments": []
+      }
+    },
+    "notes": [
+      "Slot aliases resolve to concrete injected server fixture IDs; never send aliases as made-up MCP tool names or existing-production IDs.",
+      "Department DEPT-CARDIO; same configured demo patient, valid slot doctor/location from fixture; capacity 1 before each run.",
+      "Use isolated mock dataset and fresh session/process state per case. Fixture control events are excluded from agent side effects."
+    ]
+  },
+  "cases": [
+    {
+      "id": "MT01",
+      "category": "reference",
+      "name": "七輪主線與撞期邊界",
+      "fixture": "base_boundary",
+      "expected_outcome": "BOOKED_1530",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "department": "DEPT-CARDIO",
+            "date": "2026-10-20",
+            "candidate": "eligible",
+            "approval": "none",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "capture": {
+            "candidate": "P2"
+          },
+          "expect": {
+            "min_time": {
+              "value": "15:00",
+              "inclusive": false
+            },
+            "candidate_slot": "S1530",
+            "old_candidate": "invalidated",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "等等，我之前有冇其他預約？",
+          "expect": {
+            "tool_called": "medical.get_my_appointments",
+            "preserve": [
+              "task_id",
+              "constraints",
+              "candidate_id"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "咁會唔會撞時間？",
+          "expect": {
+            "conflict": "clear",
+            "grounded_in": [
+              "S1530",
+              "APT-EXIST-1"
+            ],
+            "preserve": [
+              "task_id",
+              "constraints",
+              "candidate_id"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "好，返去頭先個預約",
+          "expect": {
+            "tool_called": "medical.search_registration_slots",
+            "revalidated_candidate": "P2",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "capture": {
+            "approval": "A2"
+          },
+          "expect": {
+            "candidate_slot": "S1530",
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "A2",
+          "expect": {
+            "receipt_slot": "S1530",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT02",
+      "category": "paraphrasing",
+      "name": "時間下限改寫與包含邊界",
+      "fixture": "time_boundaries",
+      "expected_outcome": "BOOKED_1500",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "approval": "none",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "三點半先得",
+          "expect": {
+            "min_time": {
+              "value": "15:30",
+              "inclusive": true
+            },
+            "eligible_slot_set": [
+              "S1530"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "改成唔好三點前就得",
+          "expect": {
+            "min_time": {
+              "value": "15:00",
+              "inclusive": true
+            },
+            "eligible_slot_set": [
+              "S1500",
+              "S1515",
+              "S1530"
+            ],
+            "old_candidate": "invalidated",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:00嗰個",
+          "capture": {
+            "approval": "A"
+          },
+          "expect": {
+            "candidate_slot": "S1500",
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "A",
+          "expect": {
+            "receipt_slot": "S1500",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT03",
+      "category": "implicit_reference",
+      "name": "當前清單第二個的指代",
+      "fixture": "base_empty",
+      "expected_outcome": "BOOKED_1530",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科，先按時間先後列出全部可用時段",
+          "expect": {
+            "visible_slot_order": [
+              "S1400",
+              "S1530"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就頭先第二個",
+          "capture": {
+            "approval": "A"
+          },
+          "expect": {
+            "candidate_slot": "S1530",
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "A",
+          "expect": {
+            "receipt_slot": "S1530",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT04",
+      "category": "interruption",
+      "name": "未指明的插話先澄清再恢復",
+      "fixture": "base_boundary",
+      "expected_outcome": "BOOKED_1530",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "capture": {
+            "candidate": "P2"
+          },
+          "expect": {
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "等等，先幫我查另一件事",
+          "expect": {
+            "needs_clarification": true,
+            "preserve": [
+              "task_id",
+              "constraints",
+              "candidate_id"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "查下我之前有冇其他預約",
+          "expect": {
+            "tool_called": "medical.get_my_appointments",
+            "preserve": [
+              "task_id",
+              "constraints",
+              "candidate_id"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "咁15:30會唔會撞時間？",
+          "expect": {
+            "conflict": "clear",
+            "grounded_in": [
+              "S1530",
+              "APT-EXIST-1"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "返去頭先個掛號",
+          "expect": {
+            "tool_called": "medical.search_registration_slots",
+            "revalidated_candidate": "P2",
+            "preserve": [
+              "task_id",
+              "constraints"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "capture": {
+            "approval": "A"
+          },
+          "expect": {
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "A",
+          "expect": {
+            "receipt_slot": "S1530",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT05",
+      "category": "reversal",
+      "name": "反悔回兩點且重放舊批准",
+      "fixture": "base_empty",
+      "expected_outcome": "BOOKED_1400",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "capture": {
+            "candidate": "P2"
+          },
+          "expect": {
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "capture": {
+            "approval": "OLD_A"
+          },
+          "expect": {
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "算啦，返去兩點嗰個",
+          "expect": {
+            "candidate_slot": "S1400",
+            "old_candidate": "invalidated",
+            "approval_target": "OLD_A",
+            "approval_target_state": "invalidated",
+            "exact_time": "14:00",
+            "min_time": null,
+            "tool_called": "medical.search_registration_slots",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "replay_approval",
+          "target": "OLD_A",
+          "expect": {
+            "rejected": true,
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就14:00嗰個",
+          "capture": {
+            "approval": "NEW_A"
+          },
+          "expect": {
+            "approval": "issued",
+            "candidate_slot": "S1400",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "NEW_A",
+          "expect": {
+            "receipt_slot": "S1400",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT06",
+      "category": "ambiguous_approval",
+      "name": "口頭同意不是執行批准",
+      "fixture": "base_empty",
+      "expected_outcome": "BOOKED_1530",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "expect": {
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "expect": {
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "OK，應該冇問題",
+          "expect": {
+            "approval_consumed": false,
+            "write_delta": 0,
+            "booking_delta": 0
+          }
+        },
+        {
+          "user": "幫我confirm",
+          "expect": {
+            "approval_consumed": false,
+            "write_delta": 0,
+            "booking_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "capture": {
+            "approval": "LATEST_A"
+          },
+          "expect": {
+            "approval": "issued",
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve",
+          "target": "LATEST_A",
+          "expect": {
+            "receipt_slot": "S1530",
+            "booking_delta": 1,
+            "write_delta": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT07",
+      "category": "stale_context",
+      "name": "查詢後時段被佔用",
+      "fixture": "base_boundary",
+      "expected_outcome": "NEEDS_RESELECTION_NO_BOOKING",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "capture": {
+            "candidate": "P2"
+          },
+          "expect": {
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "等等，我之前有冇其他預約？",
+          "expect": {
+            "tool_called": "medical.get_my_appointments",
+            "preserve": [
+              "task_id",
+              "constraints",
+              "candidate_id"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "control": "occupy_slot",
+          "slot": "S1530",
+          "actor": "other_patient",
+          "expect": {
+            "agent_write_delta": 0
+          }
+        },
+        {
+          "user": "返去頭先個預約",
+          "expect": {
+            "tool_called": "medical.search_registration_slots",
+            "candidate_target": "P2",
+            "candidate_target_state": "invalidated",
+            "approval_for_slot_S1530": false,
+            "preserve": [
+              "task_id",
+              "constraints"
+            ],
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "expect": {
+            "needs_reselection": true,
+            "approval_for_slot_S1530": false,
+            "reported_booked": false,
+            "write_delta": 0,
+            "booking_delta": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "MT08",
+      "category": "duplicate_approval",
+      "name": "雙擊及完成後重送批准",
+      "fixture": "base_empty",
+      "expected_outcome": "BOOKED_1530_ONCE",
+      "steps": [
+        {
+          "user": "幫我預約下星期二的心臟科",
+          "expect": {
+            "date": "2026-10-20",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "下午三點後先得",
+          "expect": {
+            "candidate_slot": "S1530",
+            "write_delta": 0
+          }
+        },
+        {
+          "user": "就15:30嗰個",
+          "capture": {
+            "approval": "A"
+          },
+          "expect": {
+            "approval": "issued",
+            "write_delta": 0
+          }
+        },
+        {
+          "action": "approve_concurrently",
+          "target": "A",
+          "copies": 2,
+          "distinct_interaction_ids": true,
+          "expect": {
+            "write_delta": 1,
+            "booking_delta": 1,
+            "receipt_slot": "S1530",
+            "one_idempotency_key": true
+          }
+        },
+        {
+          "action": "replay_approval",
+          "target": "A",
+          "expect": {
+            "already_processed_or_same_receipt": true,
+            "write_delta": 0,
+            "booking_delta": 0
+          }
+        }
+      ]
+    }
+  ]
+}
+

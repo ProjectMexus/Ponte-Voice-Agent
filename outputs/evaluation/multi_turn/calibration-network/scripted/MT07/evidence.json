@@ -1,0 +1,590 @@
+{
+  "case_id": "MT07",
+  "track": "scripted",
+  "observations": [
+    {
+      "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+      "candidate_id": "P1",
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "after_three": false
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": "eligible",
+      "candidate_slot": "S1400",
+      "approval": "none",
+      "approval_consumed": false,
+      "min_time": null,
+      "exact_time": null,
+      "eligible_slot_set": [
+        "S1400",
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.list_departments",
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": "unknown",
+      "grounded_in": [],
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": true,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.list_departments",
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": false,
+        "candidate_id": false,
+        "constraints": false
+      },
+      "old_candidate": "valid",
+      "manual_review": [
+        "visible_slot_order",
+        "needs_clarification"
+      ],
+      "revalidated_candidate": null,
+      "candidate_target_state": "invalidated",
+      "approval_target_state": "invalidated"
+    },
+    {
+      "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+      "candidate_id": "P2",
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "after_three": true
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": "eligible",
+      "candidate_slot": "S1530",
+      "approval": "none",
+      "approval_consumed": false,
+      "min_time": {
+        "value": "15:00",
+        "inclusive": false
+      },
+      "exact_time": null,
+      "eligible_slot_set": [
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": "unknown",
+      "grounded_in": [],
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": true,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": false,
+        "constraints": false
+      },
+      "old_candidate": "invalidated",
+      "manual_review": [
+        "visible_slot_order",
+        "needs_clarification"
+      ],
+      "revalidated_candidate": "P2",
+      "candidate_target_state": "invalidated",
+      "approval_target_state": "invalidated"
+    },
+    {
+      "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+      "candidate_id": "P2",
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "after_three": true
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": "eligible",
+      "candidate_slot": "S1530",
+      "approval": "none",
+      "approval_consumed": false,
+      "min_time": {
+        "value": "15:00",
+        "inclusive": false
+      },
+      "exact_time": null,
+      "eligible_slot_set": [
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.get_my_appointments"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": "clear",
+      "grounded_in": [
+        "S1530",
+        "APT-EXIST-1"
+      ],
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": true,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.get_my_appointments"
+      ],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": true,
+        "constraints": true
+      },
+      "old_candidate": "valid",
+      "manual_review": [
+        "visible_slot_order",
+        "needs_clarification"
+      ],
+      "revalidated_candidate": "P2",
+      "candidate_target_state": "invalidated",
+      "approval_target_state": "invalidated"
+    },
+    {
+      "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "after_three": true
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "min_time": {
+        "value": "15:00",
+        "inclusive": false
+      },
+      "exact_time": null,
+      "eligible_slot_set": [
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": "unknown",
+      "grounded_in": [],
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": true,
+      "approval_for_slot_S1530": false,
+      "rejected": true,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": false,
+        "constraints": true
+      },
+      "old_candidate": "invalidated",
+      "manual_review": [
+        "visible_slot_order",
+        "needs_clarification"
+      ],
+      "revalidated_candidate": null,
+      "candidate_target_state": "invalidated",
+      "approval_target_state": "invalidated"
+    },
+    {
+      "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "after_three": true
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "min_time": {
+        "value": "15:00",
+        "inclusive": false
+      },
+      "exact_time": null,
+      "eligible_slot_set": [
+        "S1530"
+      ],
+      "tools_called": [],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": "unknown",
+      "grounded_in": [],
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": true,
+      "approval_for_slot_S1530": false,
+      "rejected": true,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": true,
+        "constraints": true
+      },
+      "old_candidate": "valid",
+      "manual_review": [
+        "visible_slot_order",
+        "needs_clarification"
+      ],
+      "revalidated_candidate": null,
+      "candidate_target_state": "valid",
+      "approval_target_state": "invalidated"
+    }
+  ],
+  "dispatches": [],
+  "backend_effects": [],
+  "coverage": {
+    "dispatch_trace": true,
+    "backend_effects": true
+  },
+  "final": {
+    "task_id": "TASK-64D05317C9EB406DBD5D3AEA81A4DFCC",
+    "candidate_id": null,
+    "constraints": {
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "after_three": true
+    },
+    "department": "DEPT-CARDIO",
+    "date": "2026-10-20",
+    "candidate": null,
+    "candidate_slot": null,
+    "approval": "none",
+    "approval_consumed": false,
+    "min_time": {
+      "value": "15:00",
+      "inclusive": false
+    },
+    "exact_time": null,
+    "eligible_slot_set": [
+      "S1530"
+    ],
+    "tools_called": [
+      "medical.list_departments",
+      "medical.search_registration_slots",
+      "medical.search_registration_slots",
+      "medical.get_my_appointments",
+      "medical.search_registration_slots"
+    ],
+    "write_delta": 0,
+    "booking_delta": 0,
+    "conflict": "unknown",
+    "grounded_in": [],
+    "receipt_slot": null,
+    "receipt_verified": false,
+    "reported_booked": false,
+    "needs_reselection": true,
+    "approval_for_slot_S1530": false,
+    "rejected": true,
+    "one_idempotency_key": false,
+    "already_processed_or_same_receipt": false,
+    "tool_called": [],
+    "preserve": {
+      "task_id": true,
+      "candidate_id": true,
+      "constraints": true
+    },
+    "old_candidate": "valid",
+    "manual_review": [
+      "visible_slot_order",
+      "needs_clarification"
+    ],
+    "revalidated_candidate": null,
+    "candidate_target_state": "valid",
+    "approval_target_state": "invalidated",
+    "booking_count": 0,
+    "write_count": 0,
+    "constraints_preserved": true,
+    "rejected_unavailable": true
+  },
+  "metadata": {
+    "model": "queued-native-decisions",
+    "temperature": 0,
+    "prompt_config": "DemoMedicalWorkflow.SYSTEM_PROMPT/runtime-control",
+    "fixture_version": 1,
+    "dataset_hash": "ef48caefef33378ec7281c4f7c0b15eadb5e8e274bb1246a20c3153ba5590494"
+  },
+  "calls": [
+    {
+      "id": "1",
+      "tool": "medical.list_departments",
+      "call_id": "eval-depts",
+      "input": {
+        "keyword": "Cardiology",
+        "active_only": true
+      },
+      "result": {
+        "tool_name": "medical.list_departments",
+        "step_id": "eval-depts",
+        "ok": true,
+        "request_id": "REQ-CDAEE804E631",
+        "data": {
+          "request_id": "REQ-CDAEE804E631",
+          "data": [
+            {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true
+            }
+          ],
+          "meta": {
+            "total": 1
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "id": "2",
+      "tool": "medical.search_registration_slots",
+      "call_id": "eval-search-1",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "eval-search-1",
+        "ok": true,
+        "request_id": "REQ-16ABD16AE181",
+        "data": {
+          "request_id": "REQ-16ABD16AE181",
+          "data": [
+            {
+              "resourceType": "Slot",
+              "id": "SLOT-EVAL-MT07-S1400",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T14:00:00+08:00",
+              "end": "2026-10-20T14:15:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon"
+            },
+            {
+              "resourceType": "Slot",
+              "id": "SLOT-EVAL-MT07-S1530",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T15:30:00+08:00",
+              "end": "2026-10-20T15:45:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon"
+            }
+          ],
+          "meta": {
+            "total": 2,
+            "timezone": "Asia/Macau",
+            "booking_window_days": 14
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "id": "3",
+      "tool": "medical.search_registration_slots",
+      "call_id": "eval-search-2",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "eval-search-2",
+        "ok": true,
+        "request_id": "REQ-B889E08DF3D1",
+        "data": {
+          "request_id": "REQ-B889E08DF3D1",
+          "data": [
+            {
+              "resourceType": "Slot",
+              "id": "SLOT-EVAL-MT07-S1400",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T14:00:00+08:00",
+              "end": "2026-10-20T14:15:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon"
+            },
+            {
+              "resourceType": "Slot",
+              "id": "SLOT-EVAL-MT07-S1530",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T15:30:00+08:00",
+              "end": "2026-10-20T15:45:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon"
+            }
+          ],
+          "meta": {
+            "total": 2,
+            "timezone": "Asia/Macau",
+            "booking_window_days": 14
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "id": "4",
+      "tool": "medical.get_my_appointments",
+      "call_id": "READ-F7C155D28FC54E17BC164F4B46C64FCD",
+      "input": {},
+      "result": {
+        "tool_name": "medical.get_my_appointments",
+        "step_id": "READ-F7C155D28FC54E17BC164F4B46C64FCD",
+        "ok": true,
+        "request_id": "REQ-0BC5F69E6EFF",
+        "data": {
+          "request_id": "REQ-0BC5F69E6EFF",
+          "data": [
+            {
+              "department": {
+                "id": "DEPT-OTHER",
+                "name": "既有預約"
+              },
+              "end": "2026-10-20T15:30:00+08:00",
+              "id": "APT-EXIST-1",
+              "patient": {
+                "id": "PAT-DEMO-AGENT-E2E"
+              },
+              "start": "2026-10-20T15:00:00+08:00",
+              "status": "booked"
+            }
+          ],
+          "meta": {
+            "page": 1,
+            "page_size": 20,
+            "total": 1,
+            "has_next": false
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "id": "5",
+      "tool": "medical.search_registration_slots",
+      "call_id": "READ-295F949DA7224485822498FBF4994BB2",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "READ-295F949DA7224485822498FBF4994BB2",
+        "ok": true,
+        "request_id": "REQ-42E408EF4403",
+        "data": {
+          "request_id": "REQ-42E408EF4403",
+          "data": [
+            {
+              "resourceType": "Slot",
+              "id": "SLOT-EVAL-MT07-S1400",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T14:00:00+08:00",
+              "end": "2026-10-20T14:15:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon"
+            }
+          ],
+          "meta": {
+            "total": 1,
+            "timezone": "Asia/Macau",
+            "booking_window_days": 14
+          }
+        },
+        "error": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# Preserve evaluation dataset hashes and append-only evidence byte for byte.
+evals/multi_turn/cases.json -text
+outputs/evaluation/multi_turn/** -text
