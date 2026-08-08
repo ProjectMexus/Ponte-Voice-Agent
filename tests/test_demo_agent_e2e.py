@@ -37,6 +37,7 @@ ALLOWLIST = {
     "medical.list_departments",
     "medical.search_registration_slots",
     "medical.create_registration",
+    "medical.get_my_appointments",
 }
 
 
@@ -65,6 +66,10 @@ def proposal_call(slot_id=SLOT_1400, call_id="call-P1"):
     })
 
 
+def control(action, **fields):
+    return {"action": action, **fields}
+
+
 def first_proposal_script():
     return [
         native_call("call-departments-1", "medical.list_departments", {
@@ -85,6 +90,7 @@ class QueuedModel:
         self.requests = []
         self.lock = threading.Lock()
         self.block_call_id = None
+        self.block_action = None
         self.entered = threading.Event()
         self.release = threading.Event()
 
@@ -99,7 +105,7 @@ class QueuedModel:
                 raise AssertionError("Unexpected extra model decision")
             result = self.responses.pop(0)
         calls = result.get("choices", [{}])[0].get("message", {}).get("tool_calls", [])
-        if calls and calls[0].get("id") == self.block_call_id:
+        if (calls and calls[0].get("id") == self.block_call_id) or (self.block_action and result.get("action") == self.block_action):
             self.entered.set()
             if not self.release.wait(8):
                 raise AssertionError("Model decision test gate was not released")
@@ -194,14 +200,20 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         return result
 
     def say(self, text, **kwargs):
+        if text == CHANGE and not self.app.demo_workflow._patient_blocked():
+            with self.model.lock:
+                self.model.responses.insert(0, control("update_constraints", after_three=True))
         return self.interact({"type": "user_utterance", "task_id": None, "content": text}, **kwargs)
 
     def p1(self):
         self.model.add(*first_proposal_script())
         result = self.say(REQUEST)
         self.assertEqual(result["task"]["type"], "medical_demo_agent")
+        self.assertEqual(result["task"]["status"], "awaiting_input")
+        self.assertFalse(any(a["event"].get("decision") == "approve" for a in result["workspace"]["actions"]))
+        self.model.add(control("select_slot"))
+        result = self.say("就14:00嗰個")
         self.assertEqual(result["task"]["status"], "awaiting_confirmation")
-        self.assertEqual(result["workspace"]["view"], "appointment_confirmation")
         self.assertIn("14:00", json.dumps(result, ensure_ascii=False))
         self.assertIsNone(result["receipt"])
         self.assertEqual(self.booking_requests(), [])
@@ -211,6 +223,9 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         p1 = self.p1()
         self.model.add(search_call("call-search-2"), proposal_call(SLOT_1530, "call-P2"))
         p2 = self.say(CHANGE)
+        self.assertEqual(p2["task"]["status"], "awaiting_input")
+        self.model.add(control("select_slot"))
+        p2 = self.say("就15:30嗰個")
         self.assertEqual(p2["task"]["status"], "awaiting_confirmation")
         self.assertIn("15:30", json.dumps(p2, ensure_ascii=False))
         self.assertNotEqual(self.approval(p1)["confirmation_id"], self.approval(p2)["confirmation_id"])
@@ -279,9 +294,9 @@ class DemoAgentEndToEndTests(unittest.TestCase):
     def test_primary_story_pairs_superseded_p1_and_books_p2_once(self):
         p1, p2 = self.p2()
         transcript = self.transcript(p2)
-        issued, results = self.assert_pairing(transcript, pending="call-P2")
+        issued, results = self.assert_pairing(transcript, pending=None)
         superseded = transcript[results["call-P1"]]
-        self.assertIn("SUPERSEDED", superseded["content"])
+        self.assertIn("DRAFT_ONLY", superseded["content"])
         change_index = next(index for index, item in enumerate(transcript)
                             if item["role"] == "user" and item["content"] == CHANGE)
         self.assertLess(results["call-P1"], change_index)
@@ -332,10 +347,10 @@ class DemoAgentEndToEndTests(unittest.TestCase):
             self.model.release.set()
             p2 = change.result(timeout=10)
             stale = approval.result(timeout=10)
-        self.assertEqual(p2["task"]["status"], "awaiting_confirmation")
+        self.assertEqual(p2["task"]["status"], "awaiting_input")
         self.assertIsNone(stale.get("receipt"))
         self.assertEqual(self.booking_requests(), [])
-        self.assert_pairing(self.transcript(p2), pending="call-P2")
+        self.assert_pairing(self.transcript(p2), pending=None)
 
     def test_approval_winning_lock_finishes_before_later_change(self):
         p1 = self.p1()
@@ -362,14 +377,17 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         )
         first = provider.handle_transcript(self.session_id, REQUEST).metadata
         self.assertEqual(first["task"]["type"], "medical_demo_agent")
-        self.assertEqual(first["task"]["status"], "awaiting_confirmation")
+        self.assertEqual(first["task"]["status"], "awaiting_input")
+        self.model.add(control("clarify", message="請選定時段。"))
         spoken_yes = provider.handle_transcript(self.session_id, "yes，確認掛號").metadata
         self.assertEqual(spoken_yes["task"]["task_id"], first["task"]["task_id"])
         self.assertNotEqual(spoken_yes["task"]["status"], "completed")
         self.assertIsNone(spoken_yes["receipt"])
         self.assertEqual(self.booking_requests(), [])
-        self.assertEqual(len(self.model.requests), 3)
-        confirmed = self.interact(self.approval(first))
+        self.assertEqual(len(self.model.requests), 4)
+        self.model.add(control("select_slot"))
+        selected = self.say("就14:00嗰個")
+        confirmed = self.interact(self.approval(selected))
         self.assert_booked(confirmed, SLOT_1400, "14:00")
 
     def test_forged_or_cross_session_action_cannot_authorize(self):
@@ -415,7 +433,9 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         self.assertEqual(status, 201, external)
         self.model.add(search_call("call-search-recovery"), proposal_call(SLOT_1530, "call-replacement"))
         replacement = self.interact(self.approval(p1))
-        self.assertEqual(replacement["task"]["status"], "awaiting_confirmation")
+        self.assertEqual(replacement["task"]["status"], "awaiting_input")
+        self.model.add(control("select_slot"))
+        replacement = self.say("就15:30嗰個")
         self.assertIsNone(replacement["receipt"])
         self.assertNotEqual(self.approval(replacement)["confirmation_id"], self.approval(p1)["confirmation_id"])
         self.assertEqual(len(self.booking_requests()), 1)
@@ -501,7 +521,7 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         ):
             self.assertIsNone(result.get("receipt"))
         self.assertEqual(len(self.booking_requests()), 1)
-        self.assertEqual(len(self.model.requests), 3)
+        self.assertEqual(len(self.model.requests), 4)
         self.assert_pairing(self.transcript(uncertain))
 
     def test_patient_block_serializes_two_sessions_across_lost_write_reply(self):
@@ -509,6 +529,8 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         other_session = "S-SAME-PATIENT-SECOND"
         self.model.add(*first_proposal_script())
         second = self.say(REQUEST, session_id=other_session)
+        self.model.add(control("select_slot"))
+        second = self.say("就14:00嗰個", session_id=other_session)
         self.assertEqual(second["task"]["status"], "awaiting_confirmation")
         self.assertNotEqual(first["task"]["task_id"], second["task"]["task_id"])
 
@@ -554,7 +576,7 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         self.assertEqual(len(self.booking_requests()), 1)
         self.assertEqual(self.booking_requests()[0].header("Idempotency-Key"), first_key[0])
         self.assertEqual(len(self.appointments()), 1)
-        self.assertEqual(len(self.model.requests), 6)
+        self.assertEqual(len(self.model.requests), 8)
         self.assert_pairing(self.transcript(uncertain_first))
         self.assert_pairing(self.transcript(uncertain_second))
 
@@ -592,7 +614,7 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         self.assertEqual(query["workspace"]["view"], "appointment_list")
         examination = self.say("我想預約醫療檢查服務")
         self.assertEqual(examination["task"]["type"], "medical_appointment")
-        self.assertEqual(len(self.model.requests), 3)
+        self.assertEqual(len(self.model.requests), 4)
         self.assertEqual(len(self.booking_requests()), 1)
 
 

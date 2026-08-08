@@ -17,6 +17,7 @@ from .speech import to_cantonese_spoken
 
 
 _VIEW_TITLES = {
+    "appointment_draft": "預約草稿（尚未掛號）",
     "appointment_list": "我的醫療預約",
     "service_selection": "選擇醫療服務",
     "slot_selection": "選擇預約時段",
@@ -156,7 +157,9 @@ class ResponseComposer:
         status = _normalised(task.get("status"))
         details = _appointment_details(result)
 
-        if intent == "cash_sharing_summary":
+        if facts.get("round2_message"):
+            display_text = _text(facts["round2_message"])
+        elif intent == "cash_sharing_summary":
             display_text = _cash_summary_text(facts)
         elif intent == "cash_sharing_recovery":
             recovery = _as_mapping(result.recovery)
@@ -210,6 +213,12 @@ def _view_for(result: CanonicalInteractionResult) -> str:
         return "cash_sharing_recovery"
     if _normalised(task.get("type")) == "cash_sharing_query":
         return "cash_sharing_recovery" if result.recovery is not None else "cash_sharing_summary"
+    if facts.get("candidate_id") and (result.receipt is not None or status == "completed"):
+        return "appointment_completed"
+    if facts.get("candidate_id") and result.confirmation is not None:
+        return "appointment_confirmation"
+    if facts.get("candidate_id") and result.confirmation is None and result.receipt is None and result.recovery is None:
+        return "appointment_draft"
     if intent == "appointment_list" or "appointments" in facts:
         return "appointment_list"
     if status == "completed" or result.receipt is not None or intent in _COMPLETED_INTENTS:
@@ -391,6 +400,18 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
     facts = _facts(result)
     task = _task(result)
     task_id = task.get("task_id", "")
+    if view == "appointment_draft":
+        fields = _appointment_fields(result)
+        fields.append(_field("candidate_id", "候選草稿", facts["candidate_id"]))
+        fields.append(_field("booking_status", "掛號狀態", "尚未掛號"))
+        snapshot = _as_mapping(facts.get("appointments_snapshot"))
+        if snapshot:
+            fields.extend(_appointment_list_fields({"appointments": snapshot.get("records")}))
+            if snapshot.get("fetched_at") is not None:
+                fields.append(_field("appointments_fetched_at", "預約資料查詢時間", snapshot["fetched_at"]))
+        if facts.get("conflict_result") is not None:
+            fields.append(_field("conflict_result", "撞期核對", facts["conflict_result"]))
+        return fields
     if view == "cash_sharing_summary":
         return _cash_summary_fields(facts)
     if view == "cash_sharing_recovery":
@@ -408,6 +429,13 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
         return _slot_selection_fields(facts, task_id)
     if view == "appointment_confirmation":
         fields = _appointment_fields(result)
+        confirmation = _as_mapping(result.confirmation)
+        if confirmation.get("candidate_id") is not None:
+            fields.append(_field("candidate_id", "候選草稿", confirmation["candidate_id"]))
+            fields.append(_field("booking_status", "掛號狀態", "尚未掛號"))
+            for key, label in (("patient_id", "病人"), ("conflict_result", "撞期核對"), ("fetched_at", "預約資料查詢時間")):
+                if confirmation.get(key) is not None:
+                    fields.append(_field(key, label, confirmation[key]))
         return fields
     if view == "appointment_recovery":
         recovery = _as_mapping(result.recovery)

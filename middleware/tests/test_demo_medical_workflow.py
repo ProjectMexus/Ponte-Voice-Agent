@@ -30,6 +30,8 @@ class MemoryPipeline:
             data = {"data": departments()[:1]}
         elif call.name == "medical.search_registration_slots":
             data = {"data": deepcopy(self.slots)}
+        elif call.name == "medical.get_my_appointments":
+            data = {"data": []}
         elif call.name == "medical.create_registration":
             if self.write_result is not None:
                 return ToolExecutionResult(call.name, call.step_id, False, "REQ", error=self.write_result)
@@ -58,8 +60,14 @@ class DemoMedicalWorkflowTests(unittest.TestCase):
         self.pipeline = MemoryPipeline()
         self.workflow = DemoMedicalWorkflow(self.pipeline, "PAT-UNIT", "Bearer test", registry=build_registry(), client=ScriptedCardiologyClient(), clock=self.clock)
 
-    def start(self, content=REQUEST):
-        return self.workflow.start(envelope({"type": "user_utterance", "content": content}))
+    def start(self, content=REQUEST, session="S-UNIT"):
+        task, draft, logs = self.workflow.start(envelope({"type": "user_utterance", "content": content}, session))
+        if draft.recovery is not None:
+            return task, draft, logs
+        self.assertIsNone(draft.confirmation)
+        self.assertEqual(draft.allowed_actions, [])
+        self.assertEqual(self.writes(), [])
+        return self.workflow.handle(task, envelope({"type": "user_utterance", "content": "select current slot"}, session))
 
     @staticmethod
     def approval(result):
@@ -68,22 +76,38 @@ class DemoMedicalWorkflowTests(unittest.TestCase):
     def writes(self):
         return [call for call in self.pipeline.calls if call.name == "medical.create_registration"]
 
-    def test_unsupported_refinement_supersedes_before_new_user_and_does_not_run_model(self):
+    def test_initial_draft_has_no_formal_approval_or_backend_write(self):
+        task, draft, _ = self.workflow.start(envelope({"type": "user_utterance", "content": REQUEST}))
+        self.assertEqual(draft.facts["candidate_id"], "P1")
+        self.assertEqual(draft.facts["selected_slot"]["start"][11:16], "14:00")
+        self.assertIsNone(draft.confirmation)
+        self.assertEqual(draft.allowed_actions, [])
+        self.assertEqual(self.writes(), [])
+        transcript = self.workflow.transcript(task["task_id"])
+        calls = [call["id"] for message in transcript for call in message.get("tool_calls", [])]
+        results = [message["tool_call_id"] for message in transcript if message["role"] == "tool"]
+        self.assertCountEqual(calls, results)
+        self.assertEqual(len(results), len(set(results)))
+
+    def test_unsupported_refinement_revokes_approval_and_does_not_dispatch(self):
         for content in ("改為明天上午", "改星期三", "tomorrow morning", "change to next Wednesday afternoon", "改為下午四點後", "改為2026-10-21下午", "改為婦科", "change to before 3 pm"):
             with self.subTest(content=content):
                 self.setUp()
                 task, pending, _ = self.start()
                 p1 = self.approval(pending)
-                old_call = self.workflow.transcript(task["task_id"])[-1]["tool_calls"][0]["id"]
+                before = self.workflow.transcript(task["task_id"])
                 calls_before = len(self.pipeline.calls)
                 task, paused, _ = self.workflow.handle(task, envelope({"type": "user_utterance", "content": content}))
                 self.assertEqual(paused.recovery["reason"], "unsupported_demo_intent")
                 self.assertIsNone(paused.confirmation)
                 self.assertEqual(len(self.pipeline.calls), calls_before)
                 transcript = self.workflow.transcript(task["task_id"])
-                self.assertEqual(transcript[-2]["tool_call_id"], old_call)
-                self.assertEqual(json.loads(transcript[-2]["content"])["error"]["code"], "SUPERSEDED")
-                self.assertEqual(transcript[-1], {"role": "user", "content": content})
+                self.assertEqual(transcript[:len(before)], before)
+                self.assertIn({"role": "user", "content": content}, transcript[len(before):])
+                calls = [call["id"] for message in transcript for call in message.get("tool_calls", [])]
+                results = [message["tool_call_id"] for message in transcript if message["role"] == "tool"]
+                self.assertCountEqual(calls, results)
+                self.assertEqual(len(results), len(set(results)))
                 with self.assertRaises(ValueError):
                     self.workflow.handle(task, envelope(p1))
                 self.assertEqual(self.writes(), [])
@@ -100,7 +124,9 @@ class DemoMedicalWorkflowTests(unittest.TestCase):
                 task, _, _ = self.start()
                 task, proposal, _ = self.workflow.handle(task, envelope({"type": "user_utterance", "content": text}))
                 self.assertTrue(after_three(text))
-                self.assertEqual(proposal.confirmation["appointment"]["time"], "15:30")
+                self.assertIsNone(proposal.confirmation)
+                self.assertEqual(proposal.facts["selected_slot"]["start"][11:16], "15:30")
+                self.assertEqual(proposal.allowed_actions, [])
                 self.assertEqual(self.writes(), [])
 
     def test_browser_snapshot_and_diagnostic_transcript_cannot_change_authoritative_proposal(self):
@@ -108,7 +134,7 @@ class DemoMedicalWorkflowTests(unittest.TestCase):
         task["facts"]["selected_slot"]["id"] = "ATTACKER"
         task["facts"]["slot_id"] = "ATTACKER"
         copy = self.workflow.transcript(task["task_id"])
-        copy[-1]["tool_calls"][0]["function"]["arguments"] = "{}"
+        next(message for message in copy if message.get("tool_calls"))["tool_calls"][0]["function"]["arguments"] = "{}"
         _, complete, _ = self.workflow.handle(task, envelope(self.approval(proposal)))
         self.assertEqual(complete.receipt["appointment"]["time"], "14:00")
         self.assertEqual(self.writes()[0].arguments["input"]["patient_id"], "PAT-UNIT")
@@ -146,7 +172,7 @@ class DemoMedicalWorkflowTests(unittest.TestCase):
 
     def test_queued_other_session_cannot_write_after_first_write_becomes_unknown(self):
         task_a, p1, _ = self.start()
-        task_b, p2, _ = self.workflow.start(envelope({"type": "user_utterance", "content": REQUEST}, "S-SECOND"))
+        task_b, p2, _ = self.start(session="S-SECOND")
         entered_dispatch = threading.Event()
         release_dispatch = threading.Event()
         queued_second = threading.Event()

@@ -6,7 +6,6 @@ import argparse
 import json
 import sys
 import uuid
-from urllib.error import HTTPError
 from urllib.request import ProxyHandler, Request, build_opener
 
 
@@ -36,23 +35,43 @@ def rehearse(base_url: str) -> dict:
         return next(action["event"] for action in result["workspace"]["actions"]
                     if action["event"].get("decision") == "approve")
 
-    p1 = send({"type": "user_utterance", "content": "心臟科下週二下午"})
-    assert p1["task"]["status"] == "awaiting_confirmation", p1
-    assert p1["task"]["facts"]["selected_slot"]["start"][11:16] == "14:00", p1
-    old_action = approve(p1)
-    print("P1: 14:00 proposed; paused without booking", flush=True)
-    p2 = send({"type": "user_utterance", "content": "改為下午3點後"})
+    def draft(result, candidate_id, expected_time):
+        assert result["receipt"] is None, result
+        assert not any(a["event"].get("decision") == "approve" for a in result["workspace"]["actions"]), result
+        assert result["task"]["facts"]["candidate_id"] == candidate_id, result
+        assert result["task"]["facts"]["selected_slot"]["start"][11:16] == expected_time, result
+
+    p1 = send({"type": "user_utterance", "content": "幫我預約下星期二的心臟科"})
+    draft(p1, "P1", "14:00")
+    print("Turn 1 / P1: 14:00 draft; no approval or booking", flush=True)
+    p2 = send({"type": "user_utterance", "content": "下午三點後先得"})
+    draft(p2, "P2", "15:30")
+    task_id = p2["task"]["task_id"]
+    revision = p2["task"]["facts"]["intent_revision"]
+    print("Turn 2 / P2: 15:30 draft after constraint revision", flush=True)
+    for number, text in ((3, "等等，我之前有冇其他預約？"),
+                         (4, "咁會唔會撞時間？"),
+                         (5, "好，返去頭先個預約")):
+        result = send({"type": "user_utterance", "content": text})
+        draft(result, "P2", "15:30")
+        assert result["task"]["task_id"] == task_id, result
+        assert result["task"]["facts"]["intent_revision"] == revision, result
+        if number == 3:
+            assert result["task"]["facts"]["phase"] == "inquiry", result
+            snapshot = result["task"]["facts"]["appointments_snapshot"]
+            assert snapshot and snapshot["source"] == "medical.get_my_appointments", result
+            assert snapshot["records"] is not None, result
+        elif number == 4:
+            assert result["task"]["facts"]["phase"] == "inquiry", result
+            assert result["task"]["facts"]["appointments_snapshot"] == snapshot, result
+        elif number == 5:
+            assert result["task"]["facts"]["phase"] == "awaiting_selection", result
+        print(f"Turn {number}: {result['response']['display_text']}", flush=True)
+    p2 = send({"type": "user_utterance", "content": "就15:30嗰個"})
     assert p2["task"]["status"] == "awaiting_confirmation", p2
-    assert p2["task"]["facts"]["selected_slot"]["start"][11:16] == "15:30", p2
-    print("P2: 15:30 proposed after intent revision", flush=True)
-    try:
-        stale = send(old_action)
-    except HTTPError as error:
-        assert error.code == 400, error
-        print("P1 stale approval: rejected", flush=True)
-    else:
-        assert stale.get("receipt") is None and stale["task"]["status"] != "completed", stale
-        print("P1 stale approval: rejected without dispatch", flush=True)
+    assert p2["receipt"] is None, p2
+    assert p2["task"]["pending_confirmation"]["candidate_id"] == "P2", p2
+    print("Turn 6 / A2: formal card issued; still not booked", flush=True)
     approved_action = approve(p2)
     booked = send(approved_action)
     assert booked["task"]["status"] == "completed", booked
@@ -60,7 +79,7 @@ def rehearse(base_url: str) -> dict:
     assert receipt["receipt_id"].startswith("MED-REG-"), booked
     repeated = send(approved_action)
     assert repeated["receipt"] == receipt, repeated
-    print("P2 explicit confirmation: booked; repeated confirmation returns same receipt", flush=True)
+    print("Turn 7 / explicit approval: booked; repeated approval returns same receipt", flush=True)
     print(json.dumps(receipt, ensure_ascii=False, indent=2), flush=True)
     return booked
 

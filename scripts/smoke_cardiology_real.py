@@ -118,20 +118,25 @@ def smoke():
             assert backend_task["status"] == "completed" and backend_task["appointment_id"] == appointment["id"]
             transcript = app.demo_workflow.transcript(booked["task"]["task_id"])
             pending = {}
-            superseded = 0
+            drafts = 0
+            names = []
             for message in transcript:
                 for call in message.get("tool_calls", []):
                     assert call["function"]["name"] in MODEL_TOOL_ALIASES
                     assert call["id"] not in pending
                     pending[call["id"]] = call
+                    names.append(call["function"]["name"])
                 if message["role"] == "tool":
                     call = pending.pop(message["tool_call_id"])
-                    if "SUPERSEDED" in message["content"]:
+                    if "DRAFT_ONLY" in message["content"]:
                         assert call["function"]["name"] == "medical.create_registration"
-                        superseded += 1
-            assert not pending and superseded == 1
+                        drafts += 1
+            assert not pending and drafts == 2
+            assert names.count("medical.get_my_appointments") == 1
+            assert names.count("medical.search_registration_slots") >= 3
+            assert names.count("medical.create_registration") == 3  # two closed drafts, one write
             evidence.update(passed=True, appointment=appointment, backend_task=backend_task,
-                            receipt=booked["receipt"], superseded_pairs=superseded)
+                            receipt=booked["receipt"], draft_pairs=drafts)
             print("REAL MODEL PASS: backend booked 15:30; MED-REG receipt; one booking.", flush=True)
             return 0
     except Exception as error:

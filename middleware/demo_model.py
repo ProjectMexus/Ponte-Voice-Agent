@@ -26,12 +26,13 @@ MODEL_TOOL_ALIASES = MappingProxyType({
     "medical.list_departments": "medical_list_departments",
     "medical.search_registration_slots": "medical_search_registration_slots",
     "medical.create_registration": "medical_create_registration",
+    "medical.get_my_appointments": "medical_get_my_appointments",
 })
 _REGISTRY_NAMES = {wire: registry for registry, wire in MODEL_TOOL_ALIASES.items()}
 
 
 class RegistryToolNameClient:
-    """Translate only the demo's three tool names at the real-model boundary.
+    """Translate only the demo's four tool names at the real-model boundary.
 
     Native tool call IDs, arguments, call counts and result pairing are preserved.
     Unknown names stay unknown so the workflow's allowlist rejects them.
@@ -56,6 +57,7 @@ class RegistryToolNameClient:
             if message.get("role") == "assistant":
                 self._native_calls(message, MODEL_TOOL_ALIASES)
         wire_options = deepcopy(options)
+        wire_options.pop("demo_control", None)
         for tool in wire_options.get("tools", []):
             function = tool.get("function")
             if isinstance(function, dict) and function.get("name") in MODEL_TOOL_ALIASES:
@@ -105,7 +107,8 @@ class ScriptedCardiologyClient:
     mode = "scripted"
 
     def complete(self, messages: Sequence[Mapping[str, Any]], **options: Any) -> Mapping[str, Any]:
-        del options
+        if options.get("demo_control"):
+            return self._control(str(next(message for message in reversed(messages) if message.get("role") == "user").get("content", "")))
         context = json.loads(str(messages[0]["content"]).split("DEMO_SERVER_CONTEXT=", 1)[1])
         calls: dict[str, str] = {}
         last_user = max(index for index, message in enumerate(messages) if message.get("role") == "user")
@@ -152,6 +155,30 @@ class ScriptedCardiologyClient:
         if slot.get("doctor_id"):
             arguments["doctor_id"] = slot["doctor_id"]
         return self._call("medical.create_registration", arguments)
+
+    @staticmethod
+    def _control(content: str) -> Mapping[str, Any]:
+        """Disclosed rehearsal heuristics; real runs use the model's JSON decision.
+
+        Classify families of phrasing, never a turn number or the seven exact
+        demonstration strings. Runtime remains authoritative for legal phases.
+        """
+        text = content.casefold()
+        if any(word in text for word in ("撞", "衝突", "冲突", "overlap", "conflict", "clash")):
+            action = {"action": "answer_question"}
+        elif any(word in text for word in ("返去", "返回", "繼續", "继续", "resume", "go back", "back to", "return to")):
+            action = {"action": "resume_booking"}
+        elif after_three(content):
+            action = {"action": "update_constraints", "after_three": True}
+        elif any(word in text for word in ("其他預約", "其他预约", "之前", "已有", "現有", "现有", "my appointments", "existing appointment", "other appointment", "already have", "scheduled")):
+            action = {"action": "query_appointments"}
+        elif any(word in text for word in ("改", "change", "instead", "兩點", "两点", "2 pm")):
+            action = {"action": "update_constraints", "after_three": False}
+        elif any(word in text for word in ("就", "選", "选", "嗰個", "那個", "那个", "choose", "select", "take", "book that", "15:30", "14:00")):
+            action = {"action": "select_slot"}
+        else:
+            action = {"action": "clarify", "message": "請說明是查詢已有預約、返回掛號、修改時間，還是選定目前時段。"}
+        return {"choices": [{"message": {"role": "assistant", "content": json.dumps(action, ensure_ascii=False)}}]}
 
     @staticmethod
     def _call(name: str, arguments: Mapping[str, Any]) -> Mapping[str, Any]:

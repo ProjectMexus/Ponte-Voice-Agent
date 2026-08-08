@@ -52,6 +52,47 @@ class WorkingSpeechAdapter:
 
 
 class InteractionDeliveryTests(unittest.TestCase):
+    def test_round2_inquiry_preserves_read_only_candidate_and_snapshot(self):
+        result = result_for("appointment_list", facts={
+            "round2_message": "已暫停掛號，以下是現有預約。",
+            "candidate_id": "P2",
+            "service": {"name": "心臟科"},
+            "selected_slot": {"start": "2026-10-20T15:30:00+08:00", "location": "醫院"},
+            "slots": [{"id": "slot-1", "start": "2026-10-20T15:30:00+08:00"}],
+            "appointments_snapshot": {
+                "fetched_at": "2026-10-13T10:00:00+08:00",
+                "records": [{"service": "眼科", "start": "2026-10-20T09:00:00+08:00", "status": "booked"}],
+            },
+            "conflict_result": {"status": "clear"},
+        })
+        before = copy.deepcopy(result.to_dict())
+        delivery = DeliveryOrchestrator.deliver(result)
+        self.assertEqual(delivery["response"]["display_text"], result.facts["round2_message"])
+        workspace = delivery["workspace"]
+        self.assertEqual(workspace["view"], "appointment_draft")
+        fields = {field["key"]: field for field in workspace["fields"]}
+        self.assertEqual(fields["time"]["value"], "15:30")
+        self.assertEqual(fields["appointment_0"]["label"], "眼科")
+        self.assertEqual(fields["candidate_id"]["value"], "P2")
+        self.assertIn("appointments_fetched_at", fields)
+        self.assertEqual(workspace["actions"], [])
+        self.assertFalse(any("action" in field for field in workspace["fields"]))
+        self.assertIsNone(delivery["confirmation"])
+        self.assertEqual(result.to_dict(), before)
+
+    def test_round2_formal_card_keeps_candidate_and_server_action_metadata(self):
+        event = {"type": "confirmation_decision", "action_id": "A2-approve", "confirmation_id": "A2", "candidate_id": "P2", "task_id": "TASK-1", "decision": "approve"}
+        result = result_for("confirm_appointment", facts={"candidate_id": "P2", "appointments": []},
+            confirmation={"confirmation_id": "A2", "candidate_id": "P2", "patient_id": "PAT-1", "fetched_at": "2026-10-13T10:00:00+08:00", "conflict_result": {"status": "clear"}},
+            allowed_actions=[{"event": event}])
+        workspace = WorkspaceProjector.project(result)
+        self.assertEqual(workspace["view"], "appointment_confirmation")
+        self.assertEqual(workspace["actions"][0]["event"], event)
+        fields = {field["key"]: field["value"] for field in workspace["fields"]}
+        self.assertEqual(fields["candidate_id"], "P2")
+        self.assertEqual(fields["booking_status"], "尚未掛號")
+        self.assertEqual(fields["patient_id"], "PAT-1")
+
     def test_workspace_preserves_complete_server_action_event(self):
         event = {
             "type": "confirmation_decision",

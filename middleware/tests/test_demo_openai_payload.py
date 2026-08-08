@@ -66,13 +66,14 @@ class OpenAIPayloadTests(unittest.TestCase):
             native_call("medical_list_departments", "dept", {"keyword": "Cardiology", "active_only": True}),
             native_call("medical_search_registration_slots", "search", {"department_id": "DEPT-CARDIO", "date": "2026-10-20", "session": "afternoon"}),
             native_call("medical_create_registration", "P1-provider-id", {"department_id": "DEPT-CARDIO", "slot_id": self.pipeline.slots[0]["id"], "consent": True}),
+            {"choices": [{"message": {"content": json.dumps({"action": "update_constraints", "after_three": True})}}]},
             native_call("medical_search_registration_slots", "search-revised", {"department_id": "DEPT-CARDIO", "date": "2026-10-20", "session": "afternoon"}),
             native_call("medical_create_registration", "P2-provider-id", {"department_id": "DEPT-CARDIO", "slot_id": self.pipeline.slots[1]["id"], "consent": True}),
         ])
         task, p1, _ = self.workflow.start(envelope({"type": "user_utterance", "content": "心臟科下週二下午"}))
-        self.assertEqual(p1.task["status"], "awaiting_confirmation")
+        self.assertEqual(p1.task["status"], "awaiting_input")
         task, p2, _ = self.workflow.handle(task, envelope({"type": "user_utterance", "content": "改為下午3點後"}))
-        self.assertEqual(p2.task["status"], "awaiting_confirmation")
+        self.assertEqual(p2.task["status"], "awaiting_input")
         sent = self.payloads[-1]["messages"]
         self.assertIn("medical_create_registration call", sent[0]["content"])
         pending = {}
@@ -83,12 +84,15 @@ class OpenAIPayloadTests(unittest.TestCase):
                 call = pending.pop(message["tool_call_id"])
                 if message["tool_call_id"] == "P1-provider-id":
                     self.assertEqual(call["function"]["name"], "medical_create_registration")
-                    self.assertIn("SUPERSEDED", message["content"])
+                    self.assertIn("DRAFT_ONLY", message["content"])
+                    self.assertFalse(json.loads(message["content"])["executed"])
                     self.assertEqual(sent[index + 1]["content"], "改為下午3點後")
         self.assertEqual(pending, {})
         transcript = self.workflow.transcript(task["task_id"])
-        self.assertEqual(transcript[-1]["tool_calls"][0]["id"], "P2-provider-id")
-        self.assertEqual(transcript[-1]["tool_calls"][0]["function"]["name"], "medical.create_registration")
+        self.assertEqual(transcript[-2]["tool_calls"][0]["id"], "P2-provider-id")
+        self.assertEqual(transcript[-2]["tool_calls"][0]["function"]["name"], "medical.create_registration")
+        self.assertEqual(transcript[-1]["tool_call_id"], "P2-provider-id")
+        self.assertNotIn("demo_control", self.payloads[-1])
         self.assertNotIn("medical.create_registration", [call.name for call in self.pipeline.calls])
 
     def test_multiple_calls_from_http_execute_neither(self):

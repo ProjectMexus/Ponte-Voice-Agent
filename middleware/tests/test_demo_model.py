@@ -6,7 +6,7 @@ import unittest
 from MCP.registry import build_registry
 from middleware.agent import AgentProtocolError, parse_agent_decision, project_registry_tools
 from middleware.demo_medical_workflow import ALLOWLIST, DemoMedicalWorkflow
-from middleware.demo_model import MODEL_TOOL_ALIASES, RegistryToolNameClient
+from middleware.demo_model import MODEL_TOOL_ALIASES, RegistryToolNameClient, ScriptedCardiologyClient
 from middleware.tests.test_demo_medical_workflow import MemoryPipeline, NOW, REQUEST, envelope
 from mock_backends.core.clock import FixedClock
 
@@ -31,6 +31,21 @@ class FakeTransportClient:
 
 
 class RegistryToolNameClientTests(unittest.TestCase):
+    def test_scripted_controls_classify_paraphrases_without_turn_numbers(self):
+        client = ScriptedCardiologyClient()
+        cases = [
+            ("Can you check my appointments?", {"action": "query_appointments"}),
+            ("Would that overlap?", {"action": "answer_question"}),
+            ("Let's return to the booking", {"action": "resume_booking"}),
+            ("Select that slot", {"action": "select_slot"}),
+            ("下午三點後先得", {"action": "update_constraints", "after_three": True}),
+            ("改為兩點", {"action": "update_constraints", "after_three": False}),
+        ]
+        for content, expected in cases:
+            with self.subTest(content=content):
+                response = client.complete([{"role": "user", "content": content}], demo_control=True)
+                self.assertEqual(json.loads(response["choices"][0]["message"]["content"]), expected)
+
     def tools(self):
         return [tool for tool in project_registry_tools(build_registry()) if tool["function"]["name"] in ALLOWLIST]
 
@@ -111,13 +126,14 @@ class RegistryToolNameClientTests(unittest.TestCase):
         )
         workflow = DemoMedicalWorkflow(pipeline, "PAT-UNIT", "Bearer test", registry=build_registry(), client=RegistryToolNameClient(transport), clock=FixedClock(NOW))
         task, result, _ = workflow.start(envelope({"type": "user_utterance", "content": REQUEST}))
-        self.assertEqual(result.task["status"], "awaiting_confirmation")
+        self.assertEqual(result.task["status"], "awaiting_input")
         transcript = workflow.transcript(task["task_id"])
         calls = [message["tool_calls"][0] for message in transcript if message.get("tool_calls")]
         self.assertEqual([call["id"] for call in calls], ["call-departments", "call-search", "call-proposal"])
-        self.assertEqual({call["function"]["name"] for call in calls}, ALLOWLIST)
+        self.assertEqual({call["function"]["name"] for call in calls}, ALLOWLIST - {"medical.get_my_appointments"})
         self.assertEqual([call.name for call in pipeline.calls], ["medical.list_departments", "medical.search_registration_slots"])
-        self.assertEqual(transport.requests[-1][0][2]["tool_calls"][0]["function"]["name"], "medical_list_departments")
+        sent_calls = [call for message in transport.requests[-1][0] for call in message.get("tool_calls", [])]
+        self.assertEqual(next(call for call in sent_calls if call["id"] == "call-departments")["function"]["name"], "medical_list_departments")
 
 
 if __name__ == "__main__":
