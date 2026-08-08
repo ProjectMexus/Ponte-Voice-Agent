@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#f4f7fc" /><meta name="color-scheme" content="light" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#f5f5f7" /><meta name="color-scheme" content="light" />
   <title>聆澳 Ponte · 你的公共服務助手</title><link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="voice-app">
@@ -42,15 +42,16 @@
           <button class="scenario-card" type="button" data-prompt="我想查現金分享計劃" aria-pressed="false"><span class="scenario-icon cash"><svg class="icon"><use href="#icon-wallet" /></svg></span><span class="scenario-copy"><strong data-copy="cash">現金分享</strong><small data-copy="cashHint">查看資格與發放資料</small></span><svg class="icon scenario-arrow"><use href="#icon-arrow" /></svg></button>
           <button class="scenario-card" type="button" data-prompt="我想查詢自己的醫療預約" aria-pressed="false"><span class="scenario-icon appointments"><svg class="icon"><use href="#icon-calendar" /></svg></span><span class="scenario-copy"><strong data-copy="appointments">我的預約</strong><small data-copy="appointmentsHint">查看日期、時間與地點</small></span><svg class="icon scenario-arrow"><use href="#icon-arrow" /></svg></button>
         </div></section>
-        <section id="service-workspace" class="service-workspace panel" aria-labelledby="workspace-heading">
-          <header class="workspace-panel-header"><div><p class="eyebrow" data-copy="workspaceEyebrow">服務工作區</p><h2 id="workspace-heading" data-copy="workspaceHeading">把需要，變成下一步。</h2></div><span id="task-status" class="task-status" role="status" data-copy="awaiting">等待你的需求</span></header>
-          <ol id="workflow-progress" class="workflow-progress" aria-label="醫療預約進度"><li data-phase="0"><span class="phase-dot">1</span><span data-copy="phaseService">選擇服務</span></li><li data-phase="1"><span class="phase-dot">2</span><span data-copy="phaseTime">挑選時段</span></li><li data-phase="2"><span class="phase-dot">3</span><span data-copy="phaseConfirm">確認資料</span></li><li data-phase="3"><span class="phase-dot">4</span><span data-copy="phaseDone">取得回執</span></li></ol>
+        <section id="voice-exceptions" class="voice-exceptions" aria-label="服務選項、結果與提示">
           <div id="workspace-loading" class="workspace-loading" role="status" hidden><span class="loading-spinner"></span><span data-copy="loading">小澳正在整理你的需要…</span></div>
-          <section id="voice-exceptions" class="voice-exceptions" aria-label="服務選項、結果與提示"><div id="global-error" class="voice-error" role="alert" hidden></div><div id="approval-region"></div></section>
-          <div id="workspace-empty" class="workspace-empty"><div class="demo-invitation"><div class="invitation-visual" aria-hidden="true"><svg class="bridge-scene" viewBox="0 0 220 138" fill="none"><path d="M16 107h188M34 107V39m150 68V39M34 46c32 72 118 72 150 0M65 82v25m30-12v12m30-12v12m30-25v25" /><path class="bridge-water" d="M22 119c10-7 20 7 30 0s20 7 30 0 20 7 30 0 20 7 30 0 20 7 30 0 20 7 30 0" /><circle cx="164" cy="24" r="11" /><path class="bridge-star" d="m62 18 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" /></svg><span class="floating-ticket"><svg class="icon"><use href="#icon-calendar" /></svg><span data-copy="invitationTicket">你的下一個預約</span><svg class="icon"><use href="#icon-check" /></svg></span></div><p class="invitation-kicker" data-copy="invitationKicker">從醫療預約開始體驗</p><h3 data-copy="invitationTitle">你說需要，小澳帶路。</h3><p data-copy="invitationBody">不用先找對部門。告訴小澳你想辦甚麼，可選服務與時段會在這裡出現。</p><button id="start-demo" class="primary-button" type="button"><span data-copy="startDemo">試試預約醫療服務</span><svg class="icon"><use href="#icon-arrow" /></svg></button><span class="invitation-note" data-copy="invitationNote">先預覽需求，再由你送出</span></div><div class="experience-details"><div><span class="detail-symbol"><svg class="icon"><use href="#icon-mic" /></svg></span><strong data-copy="detailVoice">說話或打字，都可以</strong><p data-copy="detailVoiceHint">用你習慣的方式表達需要。</p></div><div><span class="detail-symbol"><svg class="icon"><use href="#icon-shield" /></svg></span><strong data-copy="detailControl">關鍵一步，由你確認</strong><p data-copy="detailControlHint">看清資料後才提交預約。</p></div><div><span class="detail-symbol"><svg class="icon"><use href="#icon-receipt" /></svg></span><strong data-copy="detailReceipt">辦妥後，留下回執</strong><p data-copy="detailReceiptHint">可以查看、下載或列印。</p></div></div></div>
-          <footer class="workspace-footer"><span><svg class="icon"><use href="#icon-shield" /></svg><span data-copy="mockNote">本次體驗使用模擬資料與服務。</span></span><button id="last-receipt" class="text-button" type="button" hidden><svg class="icon"><use href="#icon-receipt" /></svg><span data-copy="lastReceipt">查看最近回執</span></button></footer>
+          <div id="global-error" class="voice-error" role="alert" hidden></div>
+          <section id="service-workspace" class="service-workspace panel" aria-labelledby="workspace-heading" hidden>
+            <header class="workspace-panel-header"><div><p class="eyebrow" data-copy="workspaceEyebrow">服務工作區</p><h2 id="workspace-heading"></h2></div><span id="task-status" class="task-status" role="status" hidden></span></header>
+            <div id="approval-region"></div>
+            <footer class="workspace-footer"><span><svg class="icon"><use href="#icon-shield" /></svg><span data-copy="mockNote">本次體驗使用模擬資料與服務。</span></span><button id="last-receipt" class="text-button" type="button" hidden><svg class="icon"><use href="#icon-receipt" /></svg><span data-copy="lastReceipt">查看最近回執</span></button></footer>
+          </section>
         </section>
-        <section class="activity-panel panel" aria-labelledby="activity-heading"><header class="section-heading"><h2 id="activity-heading" data-copy="activity">這次服務的足跡</h2><span class="activity-session" data-copy="thisSession">本次對話</span></header><ol id="activity-log" class="activity-log"><li id="activity-empty" class="activity-empty" data-copy="activityEmpty">送出需求後，每個服務階段都會記錄在這裡。</li></ol></section>
+        <section id="activity-panel" class="activity-panel panel" aria-labelledby="activity-heading" hidden><header class="section-heading"><h2 id="activity-heading" data-copy="activity">這次服務的足跡</h2><span class="activity-session" data-copy="thisSession">本次對話</span></header><ol id="activity-log" class="activity-log"></ol></section>
       </div>
     </div>
     <footer class="page-footer"><span>Ponte · 聆澳</span><span data-copy="footer">讓公共服務，從一句話開始。</span></footer>

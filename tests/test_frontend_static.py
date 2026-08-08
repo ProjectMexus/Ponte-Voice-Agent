@@ -50,7 +50,6 @@ class FrontendStaticTests(unittest.TestCase):
             "message-form",
             "conversation-log",
             "service-workspace",
-            "workflow-progress",
             "activity-log",
         ):
             self.assertIsNotNone(page.by_id(marker))
@@ -196,6 +195,14 @@ class FrontendStaticTests(unittest.TestCase):
             self.assertEqual(page.by_id(control)["type"], "button")
         self.assertEqual(page.by_id("global-error")["role"], "alert")
         self.assertEqual(page.by_id("workspace-loading")["role"], "status")
+
+    def test_workspace_is_hidden_until_agent_content_without_a_predefined_booking_script(self):
+        html = Path("frontend/index.html").read_text(encoding="utf-8")
+        page = PageElements(html)
+        self.assertIn("hidden", page.by_id("service-workspace"))
+        self.assertIn("hidden", page.by_id("activity-panel"))
+        for preset in ("workflow-progress", "workspace-empty", "start-demo", "activity-empty"):
+            self.assertFalse(any(attrs.get("id") == preset for _, attrs in page.elements))
 
     def test_small_screens_stack_panels_and_print_keeps_receipt_content(self):
         css = Path("frontend/styles.css").read_text(encoding="utf-8")

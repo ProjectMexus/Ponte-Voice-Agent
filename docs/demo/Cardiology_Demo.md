@@ -70,3 +70,40 @@ E2E 使用固定 clock、真實 middleware HTTP → MCP stdio → backend HTTP�
 - 最終版本以 `.demo-data-cardiology-final` 再次走通瀏覽器故事；JSON backend 記錄一筆 15:30 `booked`、一筆 completed task 及一筆 idempotency replay。瀏覽器保持回執畫面可查看，測試及演練目錄沒有刪除。
 - 目前執行環境需要允許本機 subprocess 的 loopback HTTP；首次限制環境下 MCP 收到 `BACKEND_UNAVAILABLE`，允許本機測試連線後全數通過。這是執行環境限制，沒有用 fake transport 取代 HTTP/MCP。
 - 沒有 model credentials，未執行 real-model smoke。
+
+
+## Agentic 展示與驗收（2026-10-14）
+
+本節對照最新 runtime 與 Apple-inspired UI。服務工作區只在 agent 回傳服務內容後打開；足跡來自實際工具執行與權威狀態變更，不預先排出流程。`service_events` 是可觀察的操作摘要，不是模型內部推理，也不能授權掛號。
+
+此 demo 是有邊界的 agent：心臟科、伺服器計算的下一個星期二、下午時段，以及四個 allowlisted medical tools。Planning mode 選擇下一個工具；control mode 理解多輪修改、查詢、選擇與澄清。批准、時段有效性和 receipt 核對由 runtime 強制執行。模型自由度與交易授權分開驗收。
+
+| 能力 | 展示要看見的細節 | 必須守住的分支 | 驗證位置 |
+| --- | --- | --- | --- |
+| 工具選擇 | 科室與時段查詢的實際回覆、目前候選、scripted／real 模式；建立草稿時明示尚未掛號 | 越界工具、多工具、虛構參數或純文字成功宣稱不能觸發寫入 | `test_demo_agent_e2e.py`：unsupported tool、multiple calls、invented parameter、model claim |
+| 條件更新 | 時間要求與需求版本、P1 撤銷、重新查詢與 P2；包含／不包含 15:00 及精確時間分開顯示 | 舊草稿和舊批准失效；精確 14:00 可取代先前的下限，不能意外保留舊條件 | `test_demo_pilot_regressions.py`：inclusive/exclusive、exact reversal；MT01／MT02 |
+| 指代與澄清 | 當前展示順序、目前候選及選定時段；需要澄清時顯示真正缺少的資訊 | 第二個必須綁定當次清單；含糊、過時或失效的指代不能被猜成批准 | ordinal／stale presentation／ambiguous selection tests；MT03／MT04 |
+| 中斷與恢復 | 插入現有預約或撞期查詢後保留候選；返回時重新取得可用性，仍未提交 | 時段被佔、查詢失敗或撞期資訊不足時不能沿用舊確認卡 | resume read failure／slot loss／conflict tests；MT04／MT07 |
+| 明確批准 | 完整資料與撞期核對後才出現伺服器發出的確認按鈕；足跡分開記錄確認與提交 | 文字／語音「確認」、舊按鈕、跨 session／task、修改參數、過期批准都不能授權 | voice yes／forged action／expiry／frozen input／concurrency tests；MT05／MT06／MT08 |
+| 回執驗證 | 只有核對完成才顯示掛號完成與 `MED-REG-*`；病人、科室、slot、start、booked、completed task 一致 | 回覆丟失、錯誤 receipt 或不確定結果不宣稱成功、不自動再寫；重複批准只有一次寫入 | receipt corruption／lost reply／duplicate approval E2E；MT08 |
+
+### 建議的現場演練
+
+1. 輸入「心臟科下週二下午」：看到兩個可選時段、P1、查詢足跡與「尚未掛號」。此時沒有批准按鈕，也沒有 backend registration write。
+2. 輸入「改為下午3點後」：時間要求顯示不包含 15:00、需求版本增加，P1 撤銷並重新查詢，P2 改成 15:30。
+3. 可另開一次對話比較「下午3點起」與「指定下午3點」。含邊界的完整庫存由 MT01／MT02 fixture 驗證；一般 live inventory 只有 14:00／15:30，不把缺少 15:00 當成邊界測試通過。
+4. 輸入「先查我已有的預約」：候選仍保留；只讀查詢及撞期結果出現在服務足跡。
+5. 按「返回原預約」：重新查詢時段可用性；返回草稿，不直接掛號。
+6. 輸入「選目前的時段」：核對可用性、病人和現有預約後，才產生最新確認卡。也可用「選第一個」驗證當次清單綁定。
+7. 輸入含糊的「就那個」：需要澄清，舊批准不可用。重新明確指定時段後才可產生新卡。
+8. 輸入／說出「確認」：不能提交。必須按下伺服器發出的「確認掛號」。
+9. 查看回執：完成訊息建立在 backend 回覆核對之後；足跡保留改選、查詢、澄清及恢復過程。
+10. 重複批准、舊卡重播、時段被佔及回覆丟失由 HTTP/MCP 驗收測試演練。不要為了展示成功而刪除失敗資料或重送不確定寫入。
+
+### 本次證據與限制
+
+- `.tmp/agentic-ui-final-20261014/report.md`：scripted 8/8 TCR、47/47 SCR、UEC 0，47/47 檢查點有觀察證據。每 case 經本地 HTTP → MCP → mock backend；各自保留 trace、result、evidence 和 backend records。
+- 本次 HTTP/MCP acceptance suite：28 個測試通過，包括重複批准一次寫入和服務足跡重播不重複。
+- `test_demo_evidence.py` 驗證實際操作摘要、時間邊界、草稿／批准失效、不從單一 write 回覆推定成功，以及對外欄位白名單；前端驗證文字安全、歷史不重複及 reset。
+- 未在本輪重跑 real-model。保留的 `post-fix-final-real/report.md` 為 6/8 TCR、44/47 SCR；MT02、MT07 未通過，MT01 最終目標達成但中間時間邊界錯判。Scripted 全通過不代表這些模型語義問題已修復。
+- 現場預覽採用獨立 `.demo-data-agentic-final-20261014`，並明示「腳本模型示範」。不使用真實病人、真實掛號或真實交易。

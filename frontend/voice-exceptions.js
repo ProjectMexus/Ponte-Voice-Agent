@@ -65,8 +65,12 @@ export function createVoiceExceptions({ approvalRoot, errorRoot, artifactRoot, a
   let lastReceipt = null;
   let lastFocusedElement = null;
   const exceptionSurface = approvalRoot?.closest(".voice-exceptions");
+  const workspaceSurface = approvalRoot?.closest("#service-workspace");
 
   function syncExceptionSurface() {
+    // Only actual agent-projected cards, recovery, or receipts open the workspace.
+    // Errors have their own visible surface outside this panel.
+    if (workspaceSurface) workspaceSurface.hidden = !approvalRoot?.children.length;
     exceptionSurface?.classList.toggle("has-content", Boolean(
       approvalRoot?.children.length || (errorRoot && !errorRoot.hidden),
     ));
@@ -190,5 +194,6 @@ export function createVoiceExceptions({ approvalRoot, errorRoot, artifactRoot, a
     }
   });
 
+  syncExceptionSurface();
   return { clearError, renderError, renderResponse, renderWorkspace, renderApproval, renderReceipt, openArtifact, closeArtifact, reset };
 }

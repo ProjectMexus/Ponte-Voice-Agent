@@ -25,21 +25,14 @@ beforeEach(() => {
   add("div", "conversation-log");
   add("div", "conversation-empty", nodes["conversation-log"]);
   add("span", "turn-count");
-  add("ol", "activity-log");
-  add("li", "activity-empty", nodes["activity-log"]);
+  add("section", "activity-panel").hidden = true;
+  add("ol", "activity-log", nodes["activity-panel"]);
   add("section", "service-workspace");
   add("h2", "workspace-heading", nodes["service-workspace"]);
   add("span", "task-status", nodes["service-workspace"]);
-  add("div", "workspace-empty");
   add("div", "workspace-loading");
-  add("ol", "workflow-progress");
-  for (let index = 0; index < 4; index += 1) {
-    const step = add("li", `step-${index}`, nodes["workflow-progress"]);
-    step.setAttribute("data-phase", String(index));
-  }
   add("div", "approval-region");
   add("button", "server-action", nodes["approval-region"]);
-  add("button", "start-demo");
   add("button", "new-session");
   add("button", "speech-toggle");
   add("span", "sound-label", nodes["speech-toggle"]).setAttribute("data-copy", "soundOn");
@@ -119,7 +112,7 @@ test("activity shows server workspace titles while excluding raw facts and inter
   assert.ok(!nodes["activity-log"].textContent.includes("SECRET-TOKEN"));
   assert.ok(!nodes["activity-log"].textContent.includes("TASK-SECRET-ID"));
   assert.equal(nodes["activity-log"].children.length, 1);
-  assert.equal(nodes["workspace-empty"].hidden, true);
+  assert.equal(nodes["activity-panel"].hidden, false);
 });
 
 test("reset clears prior messages, activity and typed content for a new session", () => {
@@ -135,7 +128,8 @@ test("reset clears prior messages, activity and typed content for a new session"
   assert.ok(!nodes["workspace-heading"].textContent.includes("OLD WORKSPACE TITLE"));
   assert.equal(nodes["message-input"].value, "");
   assert.equal(fixture.document.getElementById("conversation-empty")?.hidden, false);
-  assert.equal(nodes["workspace-empty"].hidden, false);
+  assert.equal(nodes["activity-panel"].hidden, true);
+  assert.equal(nodes["activity-log"].children.length, 0);
 });
 
 test("mute controls notify playback without clearing the conversation", () => {
@@ -149,23 +143,20 @@ test("mute controls notify playback without clearing the conversation", () => {
   assert.ok(nodes["conversation-log"].textContent.includes("保留這段對話"));
 });
 
-test("cancellation clears active and completed phases despite the previous slot view", () => {
+test("cancellation updates the actual task without forecasting medical phases", () => {
   ui.updateWorkspace({
     task: { task_id: "TASK-1", status: "awaiting_input" },
     workspace: { view: "slot_selection", title: "選擇預約時段", fields: [], actions: [] },
   });
-  assert.equal(nodes["step-1"].getAttribute("aria-current"), "step");
+  assert.equal(nodes["workspace-heading"].textContent, "選擇預約時段");
   ui.updateWorkspace({
     task: { task_id: "TASK-1", status: "cancelled" },
     workspace: { view: "slot_selection", title: "選擇預約時段", fields: [], actions: [] },
   });
-  assert.equal(nodes["workflow-progress"].hidden, true);
-  assert.equal(nodes["workflow-progress"].querySelector("[aria-current]"), null);
-  assert.equal(nodes["workflow-progress"].querySelector(".is-complete"), null);
   assert.equal(nodes["task-status"].textContent, "已取消");
 });
 
-test("a completed cash query hides medical booking phases and keeps the dialogue", () => {
+test("a completed cash query shows its own service title and keeps the dialogue", () => {
   ui.appendMessage("user", "我想查現金分享計劃");
   ui.appendMessage("assistant", "我已查到現金分享計劃資料。");
   ui.updateWorkspace({
@@ -173,8 +164,6 @@ test("a completed cash query hides medical booking phases and keeps the dialogue
     workspace: { view: "cash_sharing_summary", title: "現金分享計劃", fields: [], actions: [], artifact: null },
     receipt: null,
   });
-  assert.equal(nodes["workflow-progress"].hidden, true);
-  assert.equal(nodes["workflow-progress"].querySelector(".is-complete"), null);
   assert.ok(nodes["conversation-log"].textContent.includes("我想查現金分享計劃"));
   assert.ok(nodes["conversation-log"].textContent.includes("我已查到現金分享計劃資料。"));
 });
@@ -209,4 +198,51 @@ test("composing and Shift Enter preserve input while a pending request blocks or
   nodes["message-input"].dispatchEvent(enter);
   assert.equal(enter.defaultPrevented, true);
   assert.deepEqual(submissions, ["我想預約醫療服務"]);
+});
+
+
+test("conversation and pending requests do not invent service activity", () => {
+  assert.equal(nodes["activity-panel"].hidden, true);
+  ui.appendMessage("assistant", "你好，有甚麼可以幫你？");
+  ui.setBusy(true);
+  assert.equal(nodes["activity-panel"].hidden, true);
+  ui.setBusy(false);
+  ui.updateWorkspace({ response: { display_text: "可以告訴我多一點嗎？" } });
+  assert.equal(nodes["activity-panel"].hidden, true);
+  assert.equal(nodes["activity-log"].children.length, 0);
+});
+
+test("omitted workspace preserves the current task and explicit clearing removes its title", () => {
+  ui.updateWorkspace({ task: { task_id: "TASK-1", status: "awaiting_input" }, workspace: { view: "service_selection", title: "選擇醫療服務" } });
+  ui.updateWorkspace({ response: { display_text: "請繼續" } });
+  assert.equal(nodes["workspace-heading"].textContent, "選擇醫療服務");
+  ui.updateWorkspace({ workspace: null });
+  assert.equal(nodes["workspace-heading"].textContent, "");
+  assert.equal(nodes["task-status"].hidden, true);
+  assert.equal(nodes["activity-panel"].hidden, false);
+});
+
+
+test("recovery-only responses replace stale workspace metadata", () => {
+  ui.updateWorkspace({ workspace: { view: "slot_selection", title: "OLD SLOT TITLE" } });
+  ui.updateWorkspace({ recovery: { reason: "請補充資料" } });
+  assert.equal(nodes["workspace-heading"].textContent, "需要你的協助");
+  assert.equal(nodes["task-status"].textContent, "需要你的協助");
+});
+
+
+test("agent service events preserve details without duplicates or fabricated steps", () => {
+  const payload = {task:{task_id:"TASK-AGENT"},workspace:{title:"草稿",view:"appointment_draft",activity:[
+    {id:"E1",title:"查詢可用時段",detail:"已收到服務回覆。",at:"2026-10-14T10:00:00+08:00",status:"completed"},
+    {id:"E2",title:"需要你澄清",detail:"<img src=x> 請指定時間",at:"2026-10-14T10:01:00+08:00",status:"attention"}
+  ]}};
+  ui.updateWorkspace(payload);
+  ui.updateWorkspace(payload);
+  assert.equal(nodes["activity-log"].children.length,2);
+  assert.match(nodes["activity-log"].textContent,/請指定時間/);
+  assert.equal(nodes["activity-log"].querySelector("img"),null);
+  assert.equal(nodes["activity-log"].children[1].dataset.status,"attention");
+  ui.reset();
+  ui.updateWorkspace(payload);
+  assert.equal(nodes["activity-log"].children.length,2);
 });

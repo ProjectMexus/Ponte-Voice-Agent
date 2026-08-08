@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from .interaction_contracts import CanonicalInteractionResult
 from .medical_workflow import _today, _date_plus
 from .speech import to_cantonese_spoken
+from .demo_evidence import constraint_text
 
 
 _VIEW_TITLES = {
@@ -432,6 +434,20 @@ def _cash_summary_fields(facts: Mapping[str, Any]) -> list[dict[str, Any]]:
     return fields
 
 
+def _conflict_summary(value):
+    status = _as_mapping(value).get("status")
+    return {"clear": "目前取得的預約紀錄未見撞期", "overlap": "與現有預約時間重疊，請另選時段", "unknown": "尚未能排除撞期，需核對現有預約"}.get(status, "未能核對撞期資料")
+
+
+def _checked_at(value):
+    try:
+        local = timezone(timedelta(hours=8))
+        date = datetime.fromtimestamp(value, local) if isinstance(value, (int, float)) and not isinstance(value, bool) else datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(local)
+        return date.strftime("%Y-%m-%d %H:%M")
+    except (TypeError, ValueError, OverflowError, OSError):
+        return "查詢時間未能確認"
+
+
 def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str, Any]]:
     facts = _facts(result)
     task = _task(result)
@@ -444,9 +460,9 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
         if snapshot:
             fields.extend(_appointment_list_fields({"appointments": snapshot.get("records")}))
             if snapshot.get("fetched_at") is not None:
-                fields.append(_field("appointments_fetched_at", "預約資料查詢時間", snapshot["fetched_at"]))
+                fields.append(_field("appointments_fetched_at", "預約資料查詢時間", _checked_at(snapshot["fetched_at"])))
         if facts.get("conflict_result") is not None:
-            fields.append(_field("conflict_result", "撞期核對", facts["conflict_result"]))
+            fields.append(_field("conflict_result", "撞期核對", _conflict_summary(facts["conflict_result"])))
         if facts.get("options_presentation"):
             # Drafts remain read-only; explicit text selection requests a new
             # formal card through the authoritative workflow.
@@ -476,7 +492,7 @@ def _fields_for(result: CanonicalInteractionResult, view: str) -> list[dict[str,
             fields.append(_field("booking_status", "掛號狀態", "尚未掛號"))
             for key, label in (("patient_id", "病人"), ("conflict_result", "撞期核對"), ("fetched_at", "預約資料查詢時間")):
                 if confirmation.get(key) is not None:
-                    fields.append(_field(key, label, confirmation[key]))
+                    fields.append(_field(key, label, _conflict_summary(confirmation[key]) if key == "conflict_result" else _checked_at(confirmation[key]) if key == "fetched_at" else confirmation[key]))
         return fields
     if view == "appointment_recovery":
         recovery = _as_mapping(result.recovery)
@@ -534,6 +550,30 @@ def _project_actions(result: CanonicalInteractionResult) -> list[dict[str, Any]]
     return projected
 
 
+def _service_activity(facts):
+    # Whitelist user-safe fields; never project call IDs, prompts, raw results or authorization.
+    events = facts.get("service_events")
+    if not isinstance(events, list):
+        return []
+    return [{key: event[key] for key in ("id", "kind", "title", "detail", "status", "at") if isinstance(event.get(key), str)}
+            for event in events if isinstance(event, Mapping) and isinstance(event.get("id"), str) and isinstance(event.get("title"), str)]
+
+
+def _agent_context(facts):
+    if facts.get("engine") != "demo_agent":
+        return []
+    fields = []
+    mode = facts.get("model_mode")
+    if mode in {"scripted", "real"}:
+        fields.append({"label": "模型模式", "value": "腳本模型示範" if mode == "scripted" else "真實模型決策"})
+    constraint = constraint_text(facts.get("time_constraint"))
+    if constraint:
+        revision = facts.get("intent_revision")
+        suffix = f" · 第 {revision} 版需求" if type(revision) is int else ""
+        fields.append({"label": "目前時間要求", "value": constraint + suffix})
+    return fields
+
+
 class WorkspaceProjector:
     """Project canonical facts and server-issued actions into workspace data."""
 
@@ -546,6 +586,8 @@ class WorkspaceProjector:
             "fields": _fields_for(result, view),
             "actions": _project_actions(result),
             "options_presentation": deepcopy(_facts(result).get("options_presentation")),
+            "activity": _service_activity(_facts(result)),
+            "context": _agent_context(_facts(result)),
             "artifact": deepcopy(dict(result.receipt)) if isinstance(result.receipt, Mapping) else None,
         }
 

@@ -317,6 +317,15 @@ class DemoAgentEndToEndTests(unittest.TestCase):
         repeated = self.interact(self.approval(p2))
         self.assertEqual(repeated["receipt"], approved["receipt"])
         self.assertEqual(len(self.booking_requests()), 1)
+        events = approved["workspace"]["activity"]
+        kinds = [event["kind"] for event in events]
+        self.assertIn("service_lookup", kinds)
+        self.assertIn("constraints_updated", kinds)
+        self.assertIn("approval_received", kinds)
+        self.assertEqual(kinds.count("receipt_verified"), 1)
+        self.assertEqual(repeated["workspace"]["activity"], events)
+        self.assertEqual(len({event["id"] for event in events}), len(events))
+        self.assertNotIn("mock-user-token", json.dumps(events))
         request = self.booking_requests()[0]
         self.assertTrue(request.header("Idempotency-Key"))
         self.assertEqual(request.header("Authorization"), "Bearer mock-user-token")

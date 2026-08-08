@@ -22,6 +22,7 @@ from MCP.registry import ToolRegistry
 from .demo_time import validate_constraint, validate_target, matches_time, parse_time_constraint
 from .agent import AgentProtocolError, parse_agent_decision, project_registry_tools
 from .contracts import PendingToolProposal, ToolCall, ToolExecutionResult
+from .demo_evidence import record_service_events
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope, InteractionTask
 from .llm_transport import ChatCompletionClient, ChatCompletionError, assistant_message, strict_json_content
 from .medical_workflow import WorkflowResult
@@ -121,6 +122,8 @@ class _TaskState:
     snapshot: dict[str, Any] | None = None
     resume_action: dict[str, Any] | None = None
     call_ids: set[str] = field(default_factory=set)
+    service_events: list[dict[str, Any]] = field(default_factory=list)
+    evidence_state: dict[str, Any] = field(default_factory=dict)
 
 
 class DemoMedicalWorkflow:
@@ -301,6 +304,7 @@ class DemoMedicalWorkflow:
                         slot_id = self._resolve_target(state, control["target"])
                     except ValueError:
                         return self._pause(state, envelope, logs, "needs_clarification", "請說明所選時段的時間，或目前清單的編號。")
+                    logs.append({"type": "selection_resolved", "kind": control["target"]["kind"], "ordinal": control["target"].get("ordinal")})
                     selected = deepcopy(state.slots.get(slot_id))
                     self._resume_booking(state, logs)
                     if not selected or slot_id not in state.slots:
@@ -858,6 +862,12 @@ class DemoMedicalWorkflow:
             state.phase = "cancelled"
             state.task["facts"].update(phase="cancelled", response_kind="cancelled", response_reason=None, response_message=None, clarification_message=None)
             state.task["facts"].pop("round2_message", None)
+        events, state.evidence_state = record_service_events(
+            state.task["facts"], logs, state.evidence_state, phase=state.phase,
+            confirmation=state.task.get("pending_confirmation"), receipt=state.task.get("receipt"),
+            recovery=state.task.get("recovery"), at=self._now().isoformat(), offset=len(state.service_events))
+        state.service_events.extend(events)
+        state.task["facts"]["service_events"] = deepcopy(state.service_events)
         task = deepcopy(state.task)
         actions: list[dict[str, Any]] = []
         if state.phase == "inquiry" and state.resume_action:

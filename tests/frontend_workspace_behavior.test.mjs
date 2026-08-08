@@ -11,7 +11,9 @@ function setup(onAction) {
   const surface = add("section", "voice-exceptions", document.body, "voice-exceptions");
   const errorRoot = add("div", "global-error", surface);
   errorRoot.hidden = true;
-  const approvalRoot = add("div", "approval-region", surface);
+  const workspaceSurface = add("section", "service-workspace", surface);
+  workspaceSurface.hidden = true;
+  const approvalRoot = add("div", "approval-region", workspaceSurface);
   const artifactRoot = add("aside", "artifact-drawer");
   artifactRoot.hidden = true;
   const backdrop = add("div", "", artifactRoot);
@@ -22,7 +24,7 @@ function setup(onAction) {
   close.setAttribute("data-artifact-close", "");
   const artifactContentRoot = add("div", "artifact-content", artifactRoot);
   const view = createVoiceExceptions({ approvalRoot, errorRoot, artifactRoot, artifactContentRoot, onAction });
-  return { document, add, surface, errorRoot, approvalRoot, artifactRoot, artifactContentRoot, print, download, close, view };
+  return { document, add, surface, workspaceSurface, errorRoot, approvalRoot, artifactRoot, artifactContentRoot, print, download, close, view };
 }
 
 const readonlyWorkspace = {
@@ -157,4 +159,39 @@ test("English display localizes labels without changing canonical values", () =>
   assert.match(approvalRoot.textContent, /View receipt/);
   assert.match(approvalRoot.textContent, /景湖醫療中心/);
   assert.doesNotMatch(approvalRoot.textContent, /appointment_list/);
+});
+
+
+test("workspace opens only for agent content, preserves omitted projections, and hides when cleared", () => {
+  const { workspaceSurface, view } = setup();
+  assert.equal(workspaceSurface.hidden, true);
+  view.renderResponse({ response: { display_text: "你好" } });
+  assert.equal(workspaceSurface.hidden, true);
+  view.renderResponse({ workspace: readonlyWorkspace });
+  assert.equal(workspaceSurface.hidden, false);
+  view.renderResponse({ response: { display_text: "請繼續" } });
+  assert.equal(workspaceSurface.hidden, false);
+  view.renderResponse({ workspace: null });
+  assert.equal(workspaceSurface.hidden, true);
+});
+
+test("errors stay visible without opening an empty workspace", () => {
+  const { workspaceSurface, errorRoot, view } = setup();
+  view.renderError(new Error("Cannot connect"));
+  assert.equal(errorRoot.hidden, false);
+  assert.equal(workspaceSurface.hidden, true);
+  view.clearError();
+  assert.equal(workspaceSurface.hidden, true);
+});
+
+test("agent recovery and receipt-only responses can open the workspace, and reset hides it", () => {
+  const { workspaceSurface, view } = setup();
+  view.renderResponse({ recovery: { reason: "請補充服務資料" } });
+  assert.equal(workspaceSurface.hidden, false);
+  view.reset();
+  assert.equal(workspaceSurface.hidden, true);
+  view.renderResponse({ receipt });
+  assert.equal(workspaceSurface.hidden, false);
+  view.reset();
+  assert.equal(workspaceSurface.hidden, true);
 });

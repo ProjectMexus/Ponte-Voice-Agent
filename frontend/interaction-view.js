@@ -95,6 +95,16 @@ export function renderWorkspace(container, workspace, onAction) {
   header.append(createElement("p", "workspace-kicker", localCopy("服務資料", "Service details")));
   header.append(createElement("h2", "workspace-title", workspace.title ? String(workspace.title) : localCopy("服務工作區", "Service workspace")));
   card.append(header);
+  if (Array.isArray(workspace.context) && workspace.context.length) {
+    const context = createElement("dl", "agent-context");
+    workspace.context.forEach((field) => {
+      if (typeof field?.label !== "string" || typeof field?.value !== "string") return;
+      const row = createElement("div", "agent-context-row");
+      row.append(createElement("dt", "", field.label), createElement("dd", "", field.value));
+      context.append(row);
+    });
+    if (context.children.length) card.append(context);
+  }
   const embeddedActionIds = appendWorkspaceFields(card, workspace.fields, onAction);
 
   const actions = createElement("div", "action-list");

@@ -51,7 +51,7 @@ node --check frontend/speech.js
 ## 醫療預約 UI demo
 
 醫療預約為主要情境。點選情境只會預覽需求，按「送出」才開始。
-1. 點「試試預約醫療服務」，送出需求，選擇服務與可用時段。
+1. 點「醫療預約」或輸入需求，送出後才顯示 agent 回傳的服務與可用時段。
 2. 在確認頁核對服務、日期、時間、地點；可修改資料或取消。
 3. 確認後查看回執，下載 HTML 或列印。
 4. 切換「我的預約」並送出，讀回剛建立的模擬預約。
@@ -71,3 +71,19 @@ node --test tests/frontend_demo_console.test.mjs tests/frontend_workspace_behavi
 
 PowerShell 可先設定 `$env:PONTE_LOG_LEVEL='INFO'` 再啟動。
 請為新一輪展示選用未使用的 `--data-dir` 名稱。所有預約均為本機模擬資料。
+
+## Apple-inspired visual refinement
+
+This branch keeps the existing conversation and service workflow, with neutral paper surfaces, a deliberate system font stack, subtle layered shadows, and one blue action color. Shared presentation tokens live at the top of `styles.css`. Interactive controls have at least 44px touch targets; reduced motion, keyboard focus, and receipt printing remain supported.
+
+The layout stacks on phones. The service workspace stays hidden until the agent returns service content, recovery guidance, or a receipt. The service trail appears only after an actual service event. Conversation-only turns preserve existing results; an explicit workspace clear or session reset closes the panel. There is no preset booking introduction or forecast of future steps. Errors remain visible outside the workspace, including before any service starts.
+
+Run an isolated preview from this worktree:
+
+```bash
+python scripts/run_stack.py --backend-port 18185 --middleware-port 18195 --frontend-port 16175 --data-dir .demo-data-agentic-20261014 --demo-agent scripted
+```
+
+Open `http://127.0.0.1:16175/?middleware=http://127.0.0.1:18195`.
+
+The bounded cardiology agent now projects actual service events, current time constraints and model mode. The trail distinguishes lookups, replacement drafts, clarification, revalidation, explicit approval and verified receipts. See `docs/demo/Cardiology_Demo.md` for the six-capability walkthrough and evidence limits.
