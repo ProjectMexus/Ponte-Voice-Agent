@@ -161,3 +161,22 @@ middleware 會以設定值覆蓋 authorization、patient、language 和 request 
 ## CORS 與前端
 
 前端預設在 `http://127.0.0.1:5173` 啟動。若前端使用其他 origin，設定 `PONTE_FRONTEND_ORIGINS` 的逗號分隔 allowlist；middleware 會提供 `OPTIONS` preflight、`Content-Type` allow header，以及固定的 GET/POST methods。
+# Canonical agent execution (implemented)
+
+`PONTE_AGENT_ENABLED=true` selects `AgentOrchestrator` through the existing `InteractionCore` and `/api/interactions` route. `PONTE_LLM_*` configures its OpenAI-compatible chat client. The flag defaults to false, preserving the workflows documented below. See [AGENT_EXECUTION.md](../docs/AGENT_EXECUTION.md) for exact approval semantics, execution limits, coverage, and remaining limitations.
+
+Server session state owns model/tool history, proposals, observations, replay results, and execution traces. All canonical interactions hold a per-session lock across model and tool I/O. Registered R0 reads and validated medical appointment creation are supported; other state-changing registry tools are not authorized in agent mode. An explicit, unmodified server-issued `confirmation_decision` is required to commit. The production route does not use `ApprovalClassifier` to authorize writes. Voice utterances use the same core and cannot approve a proposal by saying “yes.”
+
+These guarantees are scoped to one running middleware process and mock identity configuration. There is no durable session store, distributed locking, production user authentication, or universal exactly-once delivery. An ambiguous execution failure is recorded and never automatically retried.
+
+## Current verification — 13 October 2026
+
+The canonical agent path now supports bounded Qwen final-response normalization. Qwen configuration opts in; generic clients remain strict. After a protocol parse failure, only an assistant message with explicit stop, absent/empty tool calls, and nonempty prose not beginning with { or [ is eligible. Exactly one additional completion receives a copied history, the prose, and a server-owned formatting instruction. It has no tools or tool choice. Only strict JSON respond/clarify with a message is accepted; native calls, operation/approval fields, repeated prose, incomplete output and malformed JSON fail closed. Repair messages never enter authoritative history. This is a text formatting step, not authorization or semantic proof of the answer.
+
+The fresh Docker Linux Python 3.13.16 run passed **362 tests and 57 subtests**, with zero failures, errors or skips (65.730 seconds). The four retained Node frontend behavior tests passed. Python compilation and git diff whitespace checks passed. Compose and Render images rebuilt locally; no cloud deployment occurred.
+
+Earlier live QwenCloud qwen3.7-plus evidence demonstrated catalog/slots/referral reads, explicit issued approval, booking commit, resume, and replay without a duplicate. That recorded run remains overall unsuccessful because its later read-only turn returned Markdown. The new repair is verified through scripted real provider HTTP and canonical /api/interactions, but has not been rerun against live Qwen. No paid provider calls were made during this continuation. The local demo remains deterministic at localhost:5173; paid agent mode is disabled pending provider capacity.
+
+The frontend now includes a collapsed, localized accessible text entry that uses the same canonical interaction route and confirmation actions. Default mock slots roll with the Macau date over today and the next three days, skipping elapsed slots; fixed-clock August fixtures remain available to retained tests. Server-owned Macau date is refreshed each turn. Native functions are serialized; protocol-only ponte__respond/ponte__clarify finalizers cannot dispatch MCP operations. Qwen thinking is disabled and completion timeout defaults to 30 seconds.
+
+Limits: history, locks, proposals, attempts and replay remain process-local without durable recovery or distributed exactly-once guarantees. Production authentication, session ownership, CSRF and IAM are not implemented. Referral observations establish an existing mock appointment, not clinical suitability. Only validated medical appointment creation is supported as an agent write. Browser speech fallback remains; no real cloud STT/TTS verification was performed. Summary correctness and universal injection resistance are not guaranteed. Persistent Compose volume was preserved; changes remain uncommitted and unpushed, with no PR.

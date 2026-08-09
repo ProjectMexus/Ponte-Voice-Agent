@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, timedelta, timezone, tzinfo
 
 try:
     from zoneinfo import ZoneInfo
 
     MACAU_TZ: tzinfo = ZoneInfo("Asia/Macau")
 except Exception:  # pragma: no cover - only used on minimal Python images
-    MACAU_TZ = timezone.utc
+    MACAU_TZ = timezone(timedelta(hours=8))
 
 
 class AsiaMacauClock:

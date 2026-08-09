@@ -148,7 +148,9 @@ class ResponseComposer:
         status = _normalised(task.get("status"))
         details = _appointment_details(result)
 
-        if intent == "cash_sharing_summary":
+        if intent == "agent_response":
+            display_text = _text(facts.get("agent_message"), "Please continue.")
+        elif intent == "cash_sharing_summary":
             display_text = _cash_summary_text(facts)
         elif intent == "cash_sharing_recovery":
             recovery = _as_mapping(result.recovery)
@@ -463,6 +465,22 @@ class WorkspaceProjector:
 
     @staticmethod
     def project(result: CanonicalInteractionResult) -> dict[str, Any]:
+        if result.response_intent == "agent_response":
+            confirmation = _as_mapping(result.confirmation)
+            fields = []
+            if confirmation:
+                details = _as_mapping(confirmation.get("booking_details"))
+                fields = [_field("operation", "Operation", "Create medical appointment")]
+                for key, label in (("service", "Service"), ("start", "Appointment time"), ("location", "Location reference")):
+                    if details.get(key) is not None:
+                        fields.append(_field(f"booking_{key}", label, details[key]))
+                labels = {"service_id": "Service reference", "slot_id": "Slot reference", "consent": "Consent on approval",
+                          "referring_appointment_id": "Referral appointment", "administrative_note": "Note"}
+                for key, value in _as_mapping(confirmation.get("arguments")).items():
+                    fields.append(_field(f"argument_{key}", labels.get(key, key), value))
+            return {"view": "agent_task", "title": "Service task", "fields": fields,
+                    "actions": _project_actions(result),
+                    "artifact": deepcopy(dict(result.receipt)) if isinstance(result.receipt, Mapping) else None}
         view = _view_for(result)
         return {
             "view": view,

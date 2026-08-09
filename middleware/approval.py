@@ -69,7 +69,7 @@ class ApprovalGate:
 
     def __init__(
         self,
-        classifier: ApprovalClassifier,
+        classifier: ApprovalClassifier | None,
         executor: ContextualExecutor,
         *,
         clock: Any = time.time,
@@ -77,6 +77,15 @@ class ApprovalGate:
         self.classifier = classifier
         self.executor = executor
         self.clock = clock
+
+    def verify_action(self, event: Mapping[str, Any], issued_event: Mapping[str, Any], proposal: PendingToolProposal) -> None:
+        """Verify an exact server-issued action without asking an LLM to authorize."""
+        if dict(event) != dict(issued_event):
+            raise ValueError("approval action does not match the server-issued action")
+        if not proposal.verify_integrity() or proposal.is_expired(self.clock()):
+            raise ValueError("proposal is invalid or expired")
+        if event.get("confirmation_id") != proposal.proposal_id:
+            raise ValueError("approval action targets a different proposal")
 
     def resolve(
         self,
@@ -92,6 +101,8 @@ class ApprovalGate:
         if pending_proposal.is_expired(self.clock()):
             return ApprovalResolution("expired", None, None)
 
+        if self.classifier is None:
+            return ApprovalResolution("uncertain", None, pending_proposal)
         classification = self.classifier.classify(user_message)
         if classification.decision == "CANCEL":
             return ApprovalResolution("cancelled", classification, None)

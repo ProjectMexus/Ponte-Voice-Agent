@@ -39,6 +39,19 @@ class TerminalObservabilityTests(unittest.TestCase):
         )
         self.middleware = create_middleware_http_server("127.0.0.1", 0, application)
         self.servers = (self.frontend, self.middleware, self.backend)
+        # Reading a Content-Length response can finish before the handler logs
+        # request_end. Keep assertLogs active until the server turn has ended.
+        self.request_finished = {}
+        for server in self.servers:
+            finished = threading.Event()
+            self.request_finished[server] = finished
+            original = server.finish_request
+            def observed_finish(*args, original=original, finished=finished):
+                try:
+                    return original(*args)
+                finally:
+                    finished.set()
+            server.finish_request = observed_finish
         self.threads = tuple(
             threading.Thread(target=server.serve_forever, daemon=True)
             for server in self.servers
@@ -56,6 +69,7 @@ class TerminalObservabilityTests(unittest.TestCase):
         self.tempdir.cleanup()
 
     def request(self, server, method, path, body=None, headers=None):
+        self.request_finished[server].clear()
         connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
         request_body = None if body is None else json.dumps(body, ensure_ascii=False)
         connection.request(method, path, body=request_body, headers=headers or {})
@@ -63,6 +77,7 @@ class TerminalObservabilityTests(unittest.TestCase):
         raw = response.read()
         status = response.status
         connection.close()
+        self.assertTrue(self.request_finished[server].wait(3), "server request handler did not finish")
         return status, raw
 
     def test_frontend_logs_safe_request_summary(self):

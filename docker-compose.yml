@@ -38,11 +38,14 @@ services:
       PONTE_PATIENT_ID: ${PONTE_PATIENT_ID:-PAT-DEMO-001}
       PONTE_MOCK_USER_ID: ${PONTE_MOCK_USER_ID:-USR-DEMO-001}
       PONTE_AUTHORIZATION: ${PONTE_AUTHORIZATION:-Bearer mock-user-token}
-      # Optional intent LLM; the middleware falls back to deterministic
-      # keyword recognition when no key is configured.
+      # Default-off resumable execution; the configured LLM handles agent
+      # decisions when enabled and intent recognition otherwise.
+      PONTE_AGENT_ENABLED: ${PONTE_AGENT_ENABLED:-false}
       PONTE_LLM_API_URL: ${PONTE_LLM_API_URL:-}
       PONTE_LLM_API_KEY: ${PONTE_LLM_API_KEY:-}
       PONTE_LLM_MODEL: ${PONTE_LLM_MODEL:-}
+      PONTE_LLM_TIMEOUT_SECONDS: ${PONTE_LLM_TIMEOUT_SECONDS:-30}
+      PONTE_LLM_ENABLE_THINKING: ${PONTE_LLM_ENABLE_THINKING:-}
       # Optional task recovery LLM; empty URL keeps the deterministic fallback.
       PONTE_TASK_RECOVERY_LLM_API_URL: ${PONTE_TASK_RECOVERY_LLM_API_URL:-}
       PONTE_TASK_RECOVERY_LLM_API_KEY: ${PONTE_TASK_RECOVERY_LLM_API_KEY:-}

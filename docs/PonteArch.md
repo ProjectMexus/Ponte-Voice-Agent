@@ -1,5 +1,7 @@
 # Ponte Demo 系統框架文檔
 
+> **Implementation status (2026-10-13):** This document includes design goals, especially durable tasks, identity verification, and broad workflows. The current canonical route supports deterministic workflows by default and a resumable LLM execution loop with `PONTE_AGENT_ENABLED=true`. Session history, explicit approval, MCP execution, replay, and resume are implemented and covered by scripted tests. Sessions are in memory; production identity verification and distributed durability are not implemented. [AGENT_EXECUTION.md](AGENT_EXECUTION.md) is the authoritative description of the implemented runtime and its limits.
+
 ## 1. 文檔目的
 
 本文定義 Ponte 比賽 Demo 的系統邊界、核心架構、模組責任、任務流程及實作優先級。
@@ -1007,3 +1009,15 @@ Ponte Demo 採用：
 此架構不嘗試在 10 天內建成完整公共服務平台，而是以最小可行實作證明 Ponte 的核心價值：
 
 > **長者只需說出需要，系統便能按照受控流程，跨服務完成辦理、持續跟進並提供完整憑證。**
+
+## Current verification — 13 October 2026
+
+The canonical agent path now supports bounded Qwen final-response normalization. Qwen configuration opts in; generic clients remain strict. After a protocol parse failure, only an assistant message with explicit stop, absent/empty tool calls, and nonempty prose not beginning with { or [ is eligible. Exactly one additional completion receives a copied history, the prose, and a server-owned formatting instruction. It has no tools or tool choice. Only strict JSON respond/clarify with a message is accepted; native calls, operation/approval fields, repeated prose, incomplete output and malformed JSON fail closed. Repair messages never enter authoritative history. This is a text formatting step, not authorization or semantic proof of the answer.
+
+The fresh Docker Linux Python 3.13.16 run passed **362 tests and 57 subtests**, with zero failures, errors or skips (65.730 seconds). The four retained Node frontend behavior tests passed. Python compilation and git diff whitespace checks passed. Compose and Render images rebuilt locally; no cloud deployment occurred.
+
+Earlier live QwenCloud qwen3.7-plus evidence demonstrated catalog/slots/referral reads, explicit issued approval, booking commit, resume, and replay without a duplicate. That recorded run remains overall unsuccessful because its later read-only turn returned Markdown. The new repair is verified through scripted real provider HTTP and canonical /api/interactions, but has not been rerun against live Qwen. No paid provider calls were made during this continuation. The local demo remains deterministic at localhost:5173; paid agent mode is disabled pending provider capacity.
+
+The frontend now includes a collapsed, localized accessible text entry that uses the same canonical interaction route and confirmation actions. Default mock slots roll with the Macau date over today and the next three days, skipping elapsed slots; fixed-clock August fixtures remain available to retained tests. Server-owned Macau date is refreshed each turn. Native functions are serialized; protocol-only ponte__respond/ponte__clarify finalizers cannot dispatch MCP operations. Qwen thinking is disabled and completion timeout defaults to 30 seconds.
+
+Limits: history, locks, proposals, attempts and replay remain process-local without durable recovery or distributed exactly-once guarantees. Production authentication, session ownership, CSRF and IAM are not implemented. Referral observations establish an existing mock appointment, not clinical suitability. Only validated medical appointment creation is supported as an agent write. Browser speech fallback remains; no real cloud STT/TTS verification was performed. Summary correctness and universal injection resistance are not guaranteed. Persistent Compose volume was preserved; changes remain uncommitted and unpushed, with no PR.

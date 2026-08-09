@@ -22,16 +22,26 @@ class InteractionCore:
         *,
         intent_recognizer: IntentRecognizer | None = None,
         cash_workflow: Any | None = None,
+        agent_orchestrator: Any | None = None,
     ) -> None:
         self.sessions = sessions
         self.medical_workflow = medical_workflow
         self.cash_workflow = cash_workflow
+        self.agent_orchestrator = agent_orchestrator
         self.intent_recognizer = intent_recognizer or build_intent_recognizer()
 
     def handle(self, envelope: EventEnvelope) -> CanonicalInteractionResult:
         if not isinstance(envelope, EventEnvelope):
             raise ValueError("envelope must be an EventEnvelope")
+        with self.sessions.transaction(envelope.session_id):
+            return self._handle_locked(envelope)
+
+    def _handle_locked(self, envelope: EventEnvelope) -> CanonicalInteractionResult:
         state = self.sessions.get_or_create(envelope.session_id)
+        if self.agent_orchestrator is not None:
+            result = self.agent_orchestrator.handle(state, envelope)
+            self.sessions.save(state)
+            return result
         if envelope.event.get("type") == "user_utterance":
             outcome = self._handle_utterance(state, envelope)
         else:

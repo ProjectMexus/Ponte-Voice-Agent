@@ -355,7 +355,7 @@ def build_registry() -> ToolRegistry:
             "查詢目前病人的預約清單。",
             "GET",
             "/mock/medical/v1/appointments",
-            _envelope_schema({"status": _string(), "appointment_type": _string(), "date_from": _string(), "date_to": _string(), "page": _integer(), "page_size": _integer()}),
+            _envelope_schema({"status": _string("Optional comma-separated stored statuses: booked (outpatient registration), confirmed (examination/treatment), cancelled. Omit to retrieve all appointments, including referral candidates; active is not a stored status."), "appointment_type": _string(), "date_from": _string(), "date_to": _string(), "page": _integer(), "page_size": _integer()}),
             _medical_context(patient=True),
             query_fields=("status", "appointment_type", "date_from", "date_to", "page", "page_size"),
         ),

@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from threading import Lock
+from threading import Lock, RLock
 from typing import Any, Sequence
 
 from .contracts import ToolCall
@@ -29,6 +29,7 @@ class SessionState:
     active_task_id: str | None = None
     task: dict[str, Any] | None = None
     interaction_log: list[dict[str, Any]] = field(default_factory=list)
+    agent_execution: Any | None = None
 
     def reset_for_new_task(self) -> None:
         """Clear the current workflow before handling a new high-level request."""
@@ -45,6 +46,7 @@ class SessionState:
         self.active_task_id = None
         self.task = None
         self.interaction_log.clear()
+        self.agent_execution = None
 
 
 class SessionStore:
@@ -53,6 +55,14 @@ class SessionStore:
     def __init__(self) -> None:
         self._states: dict[str, SessionState] = {}
         self._lock = Lock()
+        self._session_locks: dict[str, Any] = {}
+
+    def transaction(self, session_id: str) -> Any:
+        """Serialize an entire interaction, including model and tool I/O."""
+        if not isinstance(session_id, str) or not session_id.strip():
+            raise ValueError("session_id must be a non-empty string")
+        with self._lock:
+            return self._session_locks.setdefault(session_id.strip(), RLock())
 
     def get_or_create(self, session_id: str) -> SessionState:
         if not isinstance(session_id, str) or not session_id.strip():

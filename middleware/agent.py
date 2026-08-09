@@ -37,6 +37,32 @@ class AgentDecision:
     arguments: Mapping[str, Any] | None = None
 
 
+_FINALIZER_ACTIONS = {"ponte__respond": "respond", "ponte__clarify": "clarify"}
+
+
+def _with_finalizer_tools(catalog: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Append fixed text decisions without changing the MCP service catalog."""
+    for tool in catalog:
+        if tool["function"]["name"] in _FINALIZER_ACTIONS:
+            raise ValueError("service catalog shadows a reserved protocol function")
+    tools = copy.deepcopy(catalog)
+    descriptions = {
+        "respond": "Finish the turn with a response to the user. Use this function instead of plain assistant text. "
+                   "This is text only and cannot execute, approve, or cancel a service operation. "
+                   "Claim a service write succeeded only after a successful tool result.",
+        "clarify": "Ask the user for required information and pause for their answer. Use this function instead of plain assistant text. "
+                   "This is text only and cannot execute, approve, or cancel a service operation.",
+    }
+    for name, action in _FINALIZER_ACTIONS.items():
+        tools.append({"type": "function", "function": {
+            "name": name, "description": descriptions[action], "parameters": {
+                "type": "object", "properties": {"message": {"type": "string"}},
+                "required": ["message"], "additionalProperties": False,
+            },
+        }})
+    return tools
+
+
 def project_registry_tools(registry: ToolRegistry) -> list[dict[str, Any]]:
     """Project every fixed tool while withholding the trusted context schema."""
 
@@ -77,6 +103,10 @@ def _parse_direct_decision(payload: Mapping[str, Any]) -> AgentDecision:
             raise AgentProtocolError("tool_name must be a non-empty string")
         if not isinstance(arguments, Mapping):
             raise AgentProtocolError("tool arguments must be an object")
+        if name.strip() in _FINALIZER_ACTIONS:
+            if set(arguments) != {"message"}:
+                raise AgentProtocolError("text finalizers require only message")
+            return _parse_direct_decision({"action": _FINALIZER_ACTIONS[name.strip()], "message": arguments["message"]})
         return AgentDecision("tool_call", tool_name=name.strip(), arguments=dict(arguments))
     raise AgentProtocolError("unsupported agent action")
 
@@ -88,13 +118,17 @@ def parse_agent_decision(response: Mapping[str, Any]) -> AgentDecision:
         return _parse_direct_decision(response)
     message = assistant_message(response)
     tool_calls = message.get("tool_calls")
-    if tool_calls is not None:
-        if not isinstance(tool_calls, list) or len(tool_calls) != 1:
+    if tool_calls is not None and not isinstance(tool_calls, list):
+        raise AgentProtocolError("tool_calls must be a list")
+    if tool_calls:
+        if len(tool_calls) != 1:
             raise AgentProtocolError("agent must request exactly one tool at a time")
         tool_call = tool_calls[0]
         function = tool_call.get("function") if isinstance(tool_call, Mapping) else None
         if not isinstance(function, Mapping):
             raise AgentProtocolError("tool call has no function")
+        if tool_call.get("type", "function") != "function":
+            raise AgentProtocolError("tool call must have function type")
         name = function.get("name")
         arguments_text = function.get("arguments")
         if not isinstance(name, str) or not name.strip() or not isinstance(arguments_text, str):
@@ -105,7 +139,7 @@ def parse_agent_decision(response: Mapping[str, Any]) -> AgentDecision:
             raise AgentProtocolError("tool arguments must be strict JSON") from error
         if not isinstance(arguments, Mapping):
             raise AgentProtocolError("tool arguments must be an object")
-        return AgentDecision("tool_call", tool_name=name.strip(), arguments=dict(arguments))
+        return _parse_direct_decision({"action": "tool_call", "tool_name": name.strip(), "arguments": dict(arguments)})
     try:
         return _parse_direct_decision(strict_json_content(response))
     except ChatCompletionError as error:
@@ -116,9 +150,13 @@ class RegistryDrivenAgent:
     """Run up to four model decisions, auto-executing only R0 tools."""
 
     SYSTEM_PROMPT = (
-        "You are Ponte's task agent. Return strict JSON with exactly one of: "
+        "You are Ponte's task agent. Call exactly one provided function at a time. "
+        'Prefer ponte__respond with {"message":"..."} to finish the turn, or '
+        'ponte__clarify with {"message":"..."} to ask for required information. '
+        "These fixed functions return text only and cannot approve, cancel, or execute an operation. "
+        "For compatibility, a final response may instead be strict JSON with exactly one of: "
         '{"action":"respond","message":"..."}, '
-        '{"action":"clarify","message":"..."}, or call exactly one provided tool. '
+        '{"action":"clarify","message":"..."}. Never return plain text or Markdown outside these formats. '
         "Never invent tools. Tool parameters contain user input only; trusted identity, "
         "authorization, locale, request IDs, and idempotency values are supplied by the server."
     )
@@ -143,6 +181,54 @@ class RegistryDrivenAgent:
         self.clock = clock
         self.tools = project_registry_tools(registry)
 
+    def decide(self, messages: Sequence[Mapping[str, Any]], *, tools: list[dict[str, Any]] | None = None) -> AgentDecision:
+        """Make one decision; resumable callers retain the authoritative history."""
+        response = self.client.complete(
+            copy.deepcopy(list(messages)),
+            tools=_with_finalizer_tools(self.tools if tools is None else tools),
+            tool_choice="auto", parallel_tool_calls=False,
+            response_format={"type": "json_object"}, temperature=0,
+        )
+        try:
+            return parse_agent_decision(response)
+        except AgentProtocolError:
+            if not getattr(self.client, "normalize_final_response", False):
+                raise
+            message = assistant_message(response)
+            content = message.get("content")
+            calls = message.get("tool_calls")
+            if (response["choices"][0].get("finish_reason") != "stop"
+                    or message.get("role") != "assistant"
+                    or not (calls is None or isinstance(calls, list) and not calls)
+                    or not isinstance(content, str) or not content.strip()
+                    or content.lstrip().startswith(("{", "["))):
+                raise
+            # One formatting completion, isolated from authoritative history and
+            # with no executable functions. Never feed this output to tool parsing.
+            repair_messages = copy.deepcopy(list(messages))
+            repair_messages.extend([
+                {"role": "assistant", "content": content},
+                {"role": "system", "content": (
+                    'Format the preceding answer as strict JSON with exactly '
+                    '{"action":"respond","message":"..."} or '
+                    '{"action":"clarify","message":"..."}. Preserve its meaning. '
+                    'Return only action and a nonempty message. No tools, approvals, '
+                    'operation arguments, or additional fields are permitted.'
+                )},
+            ])
+            repaired = self.client.complete(repair_messages,
+                response_format={"type": "json_object"}, temperature=0)
+            repaired_message = assistant_message(repaired)
+            repaired_calls = repaired_message.get("tool_calls")
+            if (repaired_message.get("role") != "assistant"
+                    or repaired["choices"][0].get("finish_reason") != "stop"
+                    or not (repaired_calls is None or isinstance(repaired_calls, list) and not repaired_calls)):
+                raise AgentProtocolError("normalization must return final JSON text only")
+            payload = strict_json_content(repaired)
+            if payload.get("action") not in ("respond", "clarify"):
+                raise AgentProtocolError("normalization cannot request operations")
+            return _parse_direct_decision(payload)
+
     def run(
         self,
         user_message: str,
@@ -157,13 +243,15 @@ class RegistryDrivenAgent:
         messages.append({"role": "user", "content": user_message.strip()})
         trusted_context = dict(context or {})
         results: list[ToolExecutionResult] = []
+        decision_tools = _with_finalizer_tools(self.tools)
 
         for decision_number in range(1, self.max_decisions + 1):
             try:
                 response = self.client.complete(
                     messages,
-                    tools=self.tools,
+                    tools=copy.deepcopy(decision_tools),
                     tool_choice="auto",
+                    parallel_tool_calls=False,
                     response_format={"type": "json_object"},
                     temperature=0,
                 )

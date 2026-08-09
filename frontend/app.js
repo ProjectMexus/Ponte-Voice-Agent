@@ -53,6 +53,7 @@ const DISPLAY_COPY = {
       error: ["暫時未能完成", "請點按小澳再試一次"],
     },
     captions: { user: "你", assistant: "小澳", separator: "：" },
+    textInput: { summary: "使用文字", label: "你的需要", placeholder: "輸入你的需要…", submit: "送出" },
     system: {
       healthChecking: "正在連線",
       healthOnline: "服務可用",
@@ -103,6 +104,7 @@ const DISPLAY_COPY = {
       error: ["Something went wrong", "Tap Ponte to try again"],
     },
     captions: { user: "You", assistant: "Ponte", separator: ": " },
+    textInput: { summary: "Type instead", label: "Your request", placeholder: "Type what you need…", submit: "Send" },
     system: {
       healthChecking: "Connecting",
       healthOnline: "Service available",
@@ -155,6 +157,9 @@ export function startPonteApp() {
   const voicePathValue = byId("voice-path-value");
   const microphoneStatusLabel = byId("microphone-status-label");
   const microphoneStatusValue = byId("microphone-status-value");
+  const textForm = byId("text-input-form");
+  const textInput = byId("text-transcript");
+  const textSubmit = byId("text-submit");
   let activeAudio = null;
   let activeRequest = null;
   let latestTurn = 0;
@@ -170,6 +175,14 @@ export function startPonteApp() {
 
   function copy() {
     return DISPLAY_COPY[displayLocale];
+  }
+
+  function syncTextInput() {
+    const busy = Boolean(activeRequest) || ["requesting-permission", "listening", "speaking", "stopping", "captured"].includes(currentState)
+      || (recognitionOnly && currentState === "unsupported");
+    textInput.disabled = busy;
+    textSubmit.disabled = busy || !textInput.value.trim();
+    textForm.setAttribute("aria-busy", String(busy));
   }
 
   function renderCaption() {
@@ -249,6 +262,7 @@ export function startPonteApp() {
     voiceStatusLabel.textContent = visibleLabel;
     voiceStatusHint.textContent = visibleHint;
     microphoneStatusValue.textContent = copy().system.microphone[state] || copy().system.microphone.ready;
+    syncTextInput();
     if (level !== null) meterFill.style.transform = `scaleX(${Math.max(0.03, Math.min(1, level))})`;
   }
 
@@ -265,6 +279,10 @@ export function startPonteApp() {
     ponteButton.setAttribute("aria-label", copy().system.avatarAction);
     avatar.alt = displayLocale === "zh-Hant" ? "小澳" : "Ponte";
     byId("avatar-action-label").textContent = copy().system.avatarAction;
+    byId("text-input-summary").textContent = copy().textInput.summary;
+    byId("text-input-label").textContent = copy().textInput.label;
+    textInput.placeholder = copy().textInput.placeholder;
+    textSubmit.textContent = copy().textInput.submit;
     setState(currentState);
     renderSystemStatus();
     renderCaption();
@@ -282,6 +300,7 @@ export function startPonteApp() {
     activeRequest?.abort();
     activeRequest = null;
     stopPlayback();
+    syncTextInput();
   }
 
   async function playResponse(payload, turn) {
@@ -381,7 +400,7 @@ export function startPonteApp() {
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "語音傳送未完成，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; syncTextInput(); }
     }
   }
 
@@ -403,12 +422,13 @@ export function startPonteApp() {
       if (turn !== latestTurn) return;
       exceptions.renderResponse(interactionPayload(payload));
       await playResponse(payload, turn);
+      return true;
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "語音辨識後未能送出，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; syncTextInput(); }
     }
   }
 
@@ -433,7 +453,7 @@ export function startPonteApp() {
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "暫時未能完成這項服務，請重試。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) activeRequest = null;
+      if (turn === latestTurn) { activeRequest = null; syncTextInput(); }
     }
   }
 
@@ -454,6 +474,8 @@ export function startPonteApp() {
     onStateChange(state) {
       if (recognitionOnly && state === "listening") setState("listening");
       if (recognitionOnly && state === "permission-denied") setState("permission-denied");
+      if (recognitionOnly && state === "error") setState("error");
+      if (recognitionOnly && state === "idle" && !activeRequest && ["unsupported", "listening", "speaking"].includes(currentState)) setState("ready");
       if (state === "audio-error" && activeSpeechTurn === latestTurn && document.body.dataset.voiceState === "speaking-response") {
         exceptions.renderError({ message: "瀏覽器未能播放聲音。請檢查系統輸出裝置與音量，然後再試一次。" });
         setState("audio-error");
@@ -523,6 +545,18 @@ export function startPonteApp() {
       return;
     }
     startVoiceTurn();
+  });
+
+  textInput.addEventListener("input", syncTextInput);
+  textForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const transcript = textInput.value.trim();
+    if (textInput.disabled || !transcript) return;
+    speech.unlock?.();
+    interruptCurrentTurn();
+    const delivered = await submitTranscript(transcript);
+    if (delivered && textInput.value.trim() === transcript) textInput.value = "";
+    syncTextInput();
   });
 
   document.querySelectorAll("[data-locale]").forEach((button) => {

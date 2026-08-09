@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
-from urllib.request import ProxyHandler, Request, build_opener
+from urllib.request import Request
+
+from http_policy import fixed_endpoint_opener
 
 
 class ChatCompletionError(RuntimeError):
@@ -32,6 +35,8 @@ class OpenAICompatibleChatClient:
         api_key: str = "",
         model: str = "gpt-4o-mini",
         timeout: float = 8.0,
+        enable_thinking: bool | None = None,
+        normalize_final_response: bool = False,
         transport: Callable[[Request, float], Mapping[str, Any]] | None = None,
     ) -> None:
         if not isinstance(api_url, str) or not api_url.strip():
@@ -44,6 +49,14 @@ class OpenAICompatibleChatClient:
         self.api_key = api_key
         self.model = model.strip()
         self.timeout = float(timeout)
+        if not math.isfinite(self.timeout) or self.timeout <= 0:
+            raise ValueError("timeout must be finite and positive")
+        if enable_thinking is not None and not isinstance(enable_thinking, bool):
+            raise ValueError("enable_thinking must be a boolean or None")
+        self.enable_thinking = enable_thinking
+        if not isinstance(normalize_final_response, bool):
+            raise ValueError("normalize_final_response must be a boolean")
+        self.normalize_final_response = normalize_final_response
         self._transport = transport or self._request_json
 
     def complete(
@@ -56,6 +69,8 @@ class OpenAICompatibleChatClient:
             "messages": [dict(message) for message in messages],
         }
         body.update(options)
+        if self.enable_thinking is not None:
+            body["enable_thinking"] = self.enable_thinking
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
@@ -77,7 +92,7 @@ class OpenAICompatibleChatClient:
 
     @staticmethod
     def _request_json(request: Request, timeout: float) -> Mapping[str, Any]:
-        opener = build_opener(ProxyHandler({}))
+        opener = fixed_endpoint_opener()
         try:
             with opener.open(request, timeout=timeout) as response:
                 raw = response.read()
@@ -99,6 +114,8 @@ def assistant_message(response: Mapping[str, Any]) -> Mapping[str, Any]:
     choice = choices[0]
     if not isinstance(choice, Mapping):
         raise ChatCompletionError("LLM completion choice must be an object")
+    if choice.get("finish_reason") in ("length", "content_filter"):
+        raise ChatCompletionError("LLM completion was truncated or filtered")
     message = choice.get("message")
     if not isinstance(message, Mapping):
         raise ChatCompletionError("LLM completion choice has no message")

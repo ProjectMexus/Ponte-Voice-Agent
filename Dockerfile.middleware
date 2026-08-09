@@ -12,6 +12,7 @@ WORKDIR /app
 # `sys.executable -m MCP` from the project root, so MCP/ and
 # ponte_logging.py must sit next to middleware/.
 COPY ponte_logging.py ./
+COPY http_policy.py ./
 COPY MCP ./MCP
 COPY middleware ./middleware
 COPY mock_backends ./mock_backends

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timedelta
 
 
 DEPARTMENTS = [
@@ -51,13 +52,34 @@ def doctors() -> list[dict]:
     return deepcopy(DOCTORS)
 
 
-def registration_slots() -> list[dict]:
-    return deepcopy(REGISTRATION_SLOTS)
+def _dated_slots(templates: list[dict], now: datetime | None) -> list[dict]:
+    if now is None:
+        return deepcopy(templates)
+    # Offer today's unelapsed times and the next three days. Date-bearing IDs
+    # stay stable when the window rolls, so saved bookings retain capacity.
+    result: dict[str, dict] = {}
+    for offset in range(4):
+        slot_date = now.date() + timedelta(days=offset)
+        for template in templates:
+            item = deepcopy(template)
+            original_date = datetime.fromisoformat(item["start"]).date()
+            shift = slot_date - original_date
+            item["id"] = item["id"].replace(original_date.strftime("%Y%m%d"), slot_date.strftime("%Y%m%d"))
+            for field in ("start", "end"):
+                item[field] = (datetime.fromisoformat(item[field]) + shift).isoformat()
+            if datetime.fromisoformat(item["start"]) <= now:
+                continue
+            result.setdefault(item["id"], item)
+    return list(result.values())
+
+
+def registration_slots(now: datetime | None = None) -> list[dict]:
+    return _dated_slots(REGISTRATION_SLOTS, now)
 
 
 def appointment_services() -> list[dict]:
     return deepcopy(APPOINTMENT_SERVICES)
 
 
-def appointment_slots() -> list[dict]:
-    return deepcopy(APPOINTMENT_SLOTS)
+def appointment_slots(now: datetime | None = None) -> list[dict]:
+    return _dated_slots(APPOINTMENT_SLOTS, now)

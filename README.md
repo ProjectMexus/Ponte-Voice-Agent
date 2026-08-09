@@ -69,7 +69,27 @@ Frontend ──► Middleware（意圖辨識、流程、確認、任務狀態）
 Mock Backends（醫療／一戶通／社會福利）
 ```
 
-此分層架構確保 LLM 僅專注於意圖理解與結果解釋，嚴格限制其自行跳過確認步驟、變更任務狀態或直接存取下游服務的權限（Guardrails）。所有實際執行均受限於 Middleware 的受控工作流與 MCP 工具註冊表。
+預設使用 deterministic workflow；啟用 `PONTE_AGENT_ENABLED=true` 後，LLM 可在 `/api/interactions` 中迭代選擇已授權的固定工具並讀取結果。Middleware 保存對話與工具歷史，驗證參數及醫療前置條件，並要求使用者提交 server-issued confirmation action 才能建立預約。詳見 [已實作的 Agent execution 架構](docs/AGENT_EXECUTION.md)。這是 mock-service prototype，並不代表完整自主性或生產級安全。
+
+## Resumable agent execution
+
+Set `PONTE_AGENT_ENABLED=true` and configure `PONTE_LLM_API_URL`, `PONTE_LLM_MODEL`, and a local `PONTE_LLM_API_KEY`. The flag defaults to `false` for compatibility. Enabled mode requires an available configured model; provider failures pause safely rather than silently switching execution modes.
+
+The same `/api/interactions` event contract handles text, browser transcripts, voice-provider transcripts, and frontend approval buttons. The agent can choose registered read tools and propose `medical.create_appointment`. Other writes are denied until they have domain validators. Approval uses the exact action returned in `workspace.actions`; saying “yes” does not authorize a write. Changed requests withdraw pending proposals. Execution uses a server-generated idempotency key and resumes with the recorded tool result.
+
+State and replay receipts survive turns within one middleware process. They do **not** survive middleware restart and are not shared between workers. Successful approvals dispatch once in that process; an ambiguous network failure is recorded without automatic retry. Authentication, distributed durability, privacy controls, and broader write workflows remain design goals. See [runtime behavior, tests, and limitations](docs/AGENT_EXECUTION.md).
+
+Run all suites with `python -m pytest -q`, or the existing unittest discovery commands below. The scripted agent tests do not need a paid API key. `tests/test_agent_full_stack.py` exercises real HTTP, the actual chat HTTP client with a local native-function provider, the MCP subprocess, approval, backend persistence, replay, and resumed model decisions. Set `PONTE_TEST_TRACE_PATH` to an output JSON path to save its sanitized runtime trace. Task-budget exhaustion permits a fresh task, while cancellation of a later proposal preserves earlier committed receipts.
+
+### Terminal logs
+
+```bash
+PONTE_LOG_LEVEL=INFO python scripts/run_stack.py
+PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py
+rg '\[(frontend|middleware|llm|mcp|backend)\]' ponte-terminal.log
+```
+
+INFO uses `[frontend]`, `[middleware]`, `[llm]`, `[mcp]`, and `[backend]` summaries. Existing DEBUG instrumentation can show 完整 LLM prompt/response and MCP request/response, including medical data; provider error response bodies are logged when available, otherwise `response_unavailable` is recorded. JSON uses multi-line formatting, 每行 retaining its component prefix. HTTP body logging stays excluded; API key and credentials are masked. Agent execution traces record decisions, tool names, approval states, and outcomes without arguments, messages, or result payloads. Use DEBUG only with controlled mock data.
 
 ## 快速開始 (Quick Start)
 
@@ -165,3 +185,15 @@ Ponte 僅作為展示用途的本機／雲端原型，**不會**連接真實的�
 即使在 Demo 中，涉及變更的流程仍需明確確認。此設計旨在實踐 Ponte 的核心治理原則：
 
 > **AI 可以輔助操作，但使用者必須「看得見、聽得懂」，並始終保有確認、修正與終止流程的絕對權利。**
+
+## Current verification — 13 October 2026
+
+The canonical agent path now supports bounded Qwen final-response normalization. Qwen configuration opts in; generic clients remain strict. After a protocol parse failure, only an assistant message with explicit stop, absent/empty tool calls, and nonempty prose not beginning with { or [ is eligible. Exactly one additional completion receives a copied history, the prose, and a server-owned formatting instruction. It has no tools or tool choice. Only strict JSON respond/clarify with a message is accepted; native calls, operation/approval fields, repeated prose, incomplete output and malformed JSON fail closed. Repair messages never enter authoritative history. This is a text formatting step, not authorization or semantic proof of the answer.
+
+The fresh Docker Linux Python 3.13.16 run passed **362 tests and 57 subtests**, with zero failures, errors or skips (65.730 seconds). The four retained Node frontend behavior tests passed. Python compilation and git diff whitespace checks passed. Compose and Render images rebuilt locally; no cloud deployment occurred.
+
+Earlier live QwenCloud qwen3.7-plus evidence demonstrated catalog/slots/referral reads, explicit issued approval, booking commit, resume, and replay without a duplicate. That recorded run remains overall unsuccessful because its later read-only turn returned Markdown. The new repair is verified through scripted real provider HTTP and canonical /api/interactions, but has not been rerun against live Qwen. No paid provider calls were made during this continuation. The local demo remains deterministic at localhost:5173; paid agent mode is disabled pending provider capacity.
+
+The frontend now includes a collapsed, localized accessible text entry that uses the same canonical interaction route and confirmation actions. Default mock slots roll with the Macau date over today and the next three days, skipping elapsed slots; fixed-clock August fixtures remain available to retained tests. Server-owned Macau date is refreshed each turn. Native functions are serialized; protocol-only ponte__respond/ponte__clarify finalizers cannot dispatch MCP operations. Qwen thinking is disabled and completion timeout defaults to 30 seconds.
+
+Limits: history, locks, proposals, attempts and replay remain process-local without durable recovery or distributed exactly-once guarantees. Production authentication, session ownership, CSRF and IAM are not implemented. Referral observations establish an existing mock appointment, not clinical suitability. Only validated medical appointment creation is supported as an agent write. Browser speech fallback remains; no real cloud STT/TTS verification was performed. Summary correctness and universal injection resistance are not guaranteed. Persistent Compose volume was preserved; changes remain uncommitted and unpushed, with no PR.

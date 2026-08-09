@@ -42,6 +42,14 @@
           <span class="status-chip"><span id="voice-path-label" class="status-chip-label">語音</span><strong id="voice-path-value">檢查中</strong></span>
           <span class="status-chip"><span id="microphone-status-label" class="status-chip-label">麥克風</span><strong id="microphone-status-value">待命</strong></span>
         </div>
+        <details class="text-fallback">
+          <summary id="text-input-summary">使用文字</summary>
+          <form id="text-input-form" class="text-input-form">
+            <label id="text-input-label" class="sr-only" for="text-transcript">你的需要</label>
+            <input id="text-transcript" name="transcript" type="text" autocomplete="off" placeholder="輸入你的需要…" required />
+            <button id="text-submit" type="submit" disabled>送出</button>
+          </form>
+        </details>
       </section>
 
       <section id="voice-exceptions" class="voice-exceptions" aria-live="polite" aria-label="Approval, receipt, and recovery messages">

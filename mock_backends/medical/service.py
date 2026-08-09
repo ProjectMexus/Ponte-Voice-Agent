@@ -23,12 +23,20 @@ class MedicalService:
         appointment_repository: RecordRepository,
         task_repository: RecordRepository,
         idempotency: IdempotencyStore,
+        rolling_slots: bool = False,
     ) -> None:
         self.clock = clock
         self.ids = ids
         self.appointment_repository = appointment_repository
         self.task_repository = task_repository
         self.idempotency = idempotency
+        self.rolling_slots = rolling_slots
+
+    def _registration_slots(self) -> list[dict]:
+        return registration_slots(self.clock.now() if self.rolling_slots else None)
+
+    def _appointment_slots(self) -> list[dict]:
+        return appointment_slots(self.clock.now() if self.rolling_slots else None)
 
     def _response(self, request_id: str, status: int, data: Any, meta: dict[str, Any] | None = None) -> BackendResponse:
         body = success_body(request_id, data)
@@ -88,7 +96,7 @@ class MedicalService:
         return self._response(request_id, 200, result, {"total": len(result)})
 
     def _registration_slot(self, slot_id: str) -> dict[str, Any] | None:
-        for base in registration_slots():
+        for base in self._registration_slots():
             if base["id"] == slot_id:
                 item = base
                 used = len(self.appointment_repository.find(lambda record: record.get("slot_id") == slot_id))
@@ -99,7 +107,7 @@ class MedicalService:
         return None
 
     def _appointment_slot(self, slot_id: str) -> dict[str, Any] | None:
-        for base in appointment_slots():
+        for base in self._appointment_slots():
             if base["id"] == slot_id:
                 item = base
                 used = len(self.appointment_repository.find(lambda record: record.get("slot_id") == slot_id))
@@ -127,7 +135,7 @@ class MedicalService:
         session = self._value(query, "session")
         location_id = self._value(query, "location_id")
         result = []
-        for base in registration_slots():
+        for base in self._registration_slots():
             item = self._registration_slot(base["id"])
             if item["department_id"] != department_id or item["start"][:10] != raw_date:
                 continue
@@ -252,7 +260,7 @@ class MedicalService:
     def _has_available_appointment_slot(self, service_id: str) -> bool:
         today = self.clock.now().date()
         latest = today + timedelta(days=14)
-        for base in appointment_slots():
+        for base in self._appointment_slots():
             item = self._appointment_slot(base["id"])
             slot_date = date.fromisoformat(item["start"][:10])
             if (
@@ -287,7 +295,7 @@ class MedicalService:
         doctor_id = self._value(query, "doctor_id")
         location_id = self._value(query, "location_id")
         result = []
-        for base in appointment_slots():
+        for base in self._appointment_slots():
             item = self._appointment_slot(base["id"])
             if item["service_id"] != service["id"] or not (date_from <= date.fromisoformat(item["start"][:10]) <= date_to):
                 continue

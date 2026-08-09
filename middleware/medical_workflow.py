@@ -44,6 +44,57 @@ class MedicalWorkflow:
         self.mock_user_id = _required(mock_user_id, "mock_user_id")
         self._retry_calls: dict[str, dict[str, Any]] = {}
 
+    def validate_agent_booking(self, arguments: Mapping[str, Any], observations: Mapping[str, Any]) -> dict[str, Any]:
+        """Validate model-selected booking against server-observed catalog and slots.
+
+        Identity and consent fields are constructed by the server. Consent becomes
+        effective only after the orchestrator verifies the explicit approval action.
+        """
+        service_id = _required(arguments.get("service_id"), "service_id")
+        slot_id = _required(arguments.get("slot_id"), "slot_id")
+        services = observations.get("medical.list_appointment_services", {}).get("data", {}).get("data", [])
+        searched = observations.get("medical.search_appointment_slots", {})
+        slots = searched.get("data", {}).get("data", [])
+        service = next((s for s in services if isinstance(s, Mapping) and s.get("id") == service_id), None)
+        slot = next((s for s in slots if isinstance(s, Mapping) and s.get("id") == slot_id), None)
+        if not isinstance(service, Mapping) or not isinstance(slot, Mapping):
+            raise ValueError("booking requires a server-observed service and slot")
+        if searched.get("arguments", {}).get("service_id") != service_id or slot.get("service_id") != service_id:
+            raise ValueError("slot does not belong to the selected service")
+        if service.get("active") is not True or not isinstance(service.get("requires_referral"), bool) or slot.get("status") not in {"free", "available"}:
+            raise ValueError("service or slot is unavailable")
+        remaining = slot.get("remaining")
+        if isinstance(remaining, bool) or not isinstance(remaining, int) or remaining < 1:
+            raise ValueError("slot has no remaining capacity")
+        start = datetime.fromisoformat(_required(slot.get("start"), "slot.start"))
+        if start.tzinfo is None or start.utcoffset() is None:
+            raise ValueError("slot timestamp must include its timezone")
+        referral_id = arguments.get("referring_appointment_id")
+        if service.get("requires_referral"):
+            appointments = observations.get("medical.get_my_appointments", {}).get("data", {}).get("data", [])
+            detail = observations.get("medical.get_appointment", {}).get("data", {}).get("data")
+            if isinstance(detail, Mapping):
+                appointments = [*appointments, detail]
+            if not referral_id or not any(isinstance(a, Mapping) and a.get("id") == referral_id for a in appointments):
+                raise ValueError("referral requires a server-observed patient appointment")
+        return {**deepcopy(dict(arguments)), "patient_id": self.patient_id, "consent": True}
+
+    def verify_agent_booking_result(self, result: ToolExecutionResult, arguments: Mapping[str, Any], observations: Mapping[str, Any]) -> dict[str, Any]:
+        """Bind a backend success receipt to the exact patient and approved slot."""
+        verified = _verify_medical_result(result)
+        appointment = result.data["data"]
+        if appointment.get("patient_id") != self.patient_id or appointment.get("slot_id") != arguments["slot_id"]:
+            raise ValueError("receipt patient or slot differs from the approved operation")
+        if verified["appointment"]["service_id"] != arguments["service_id"] or appointment.get("status") not in {"confirmed", "booked"}:
+            raise ValueError("receipt does not describe a successful approved booking")
+        slots = observations["medical.search_appointment_slots"]["data"]["data"]
+        slot = next(s for s in slots if isinstance(s, Mapping) and s.get("id") == arguments["slot_id"])
+        if datetime.fromisoformat(appointment["start"]) != datetime.fromisoformat(slot["start"]):
+            raise ValueError("receipt time differs from the approved slot")
+        if slot.get("location_id") and appointment["location"].get("id") != slot["location_id"]:
+            raise ValueError("receipt location differs from the approved slot")
+        return verified
+
     def start(self, envelope: EventEnvelope, intent: IntentDecision) -> WorkflowResult:
         """Start one medical workflow from a classified user utterance."""
         _require_envelope(envelope)
@@ -430,9 +481,20 @@ class MedicalWorkflow:
         task_id = task.get("task_id")
         facts = task.get("facts") if isinstance(task.get("facts"), Mapping) else {}
         actions: list[dict[str, Any]] = []
-        # select_service and select_slot actions are now embedded in field rows
-        # No separate action buttons needed for these intents
-        if response_intent == "request_confirmation":
+        if response_intent == "select_service":
+            for service in facts.get("services", []):
+                actions.append(self._action(str(service.get("name", "Select service")), {
+                    "type": "service_selected", "action_id": _identifier("ACT"), "task_id": task_id,
+                    "service_id": service["id"], "date_from": facts.get("date_from") or _today(),
+                    "date_to": facts.get("date_to") or _date_plus(14),
+                }))
+        elif response_intent == "select_slot":
+            for slot in facts.get("slots", []):
+                actions.append(self._action(str(slot.get("start", "Select slot")), {
+                    "type": "slot_selected", "action_id": _identifier("ACT"), "task_id": task_id,
+                    "slot_id": slot["id"],
+                }))
+        elif response_intent == "request_confirmation":
             confirmation = task.get("pending_confirmation")
             if isinstance(confirmation, Mapping):
                 for decision, label in (
@@ -527,8 +589,11 @@ def _date_plus(days: int) -> str:
 
 def _demo_now() -> datetime:
     if ZoneInfo is not None:
-        return datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Macau"))
-    return datetime.now(timezone.utc)
+        try:
+            return datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Macau"))
+        except (KeyError, OSError):
+            pass
+    return datetime.now(timezone(timedelta(hours=8)))
 
 
 def _data_list(result: ToolExecutionResult, noun: str) -> list[dict[str, Any]]:

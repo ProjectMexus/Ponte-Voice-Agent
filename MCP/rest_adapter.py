@@ -10,7 +10,9 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import ProxyHandler, Request, build_opener
+from urllib.request import Request
+
+from http_policy import fixed_endpoint_opener
 
 from .errors import (
     AdapterError,
@@ -42,7 +44,7 @@ class UrllibTransport:
         self.base_url = base_url.rstrip("/")
         # Mock backends are addressed directly; environment proxies must not
         # intercept local fixture or Ponte backend requests.
-        self.opener = build_opener(ProxyHandler({}))
+        self.opener = fixed_endpoint_opener()
 
     def request(self, request: RestRequest, timeout: float) -> HttpResponse:
         query = urlencode(list(request.query.items()))

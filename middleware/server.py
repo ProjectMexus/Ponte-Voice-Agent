@@ -21,7 +21,10 @@ from .config import load_dotenv
 from .cash_sharing_workflow import CashSharingWorkflow
 from .controller import InteractionController, LegacyInteractionContractError
 from .diagnostics import DiagnosticCommandError
-from .execution import ExecutionPipeline, McpExecutionStage
+from .execution import ContextualExecutionPipeline, ExecutionPipeline, McpExecutionStage
+from .agent_orchestrator import AgentOrchestrator
+from .llm_transport import ChatCompletionClient, OpenAICompatibleChatClient
+from .llm_configuration import agent_chat_client_from_environment
 from .intent import IntentRecognizer
 from .interaction_contracts import EventEnvelope
 from .interaction_core import InteractionCore
@@ -75,6 +78,9 @@ class MiddlewareApplication:
         intent_recognizer: IntentRecognizer | None = None,
         recovery_interpreter: TaskRecoveryInterpreter | None = None,
         voice_turn_provider: VoiceTurnProvider | None = None,
+        agent_enabled: bool = False,
+        agent_client: ChatCompletionClient | None = None,
+        agent_authorized_tools: tuple[str, ...] | None = None,
     ) -> None:
         self.backend_url = backend_url.rstrip("/")
         self.patient_id = patient_id
@@ -82,9 +88,10 @@ class MiddlewareApplication:
         self.mock_user_id = mock_user_id
         self.frontend_origins = frontend_origins
         self._closed = False
+        if agent_enabled and agent_client is None:
+            raise ValueError("agent execution requires a configured model client")
         self.registry = build_registry()
         self.mcp_client = mcp_client or McpStdioClient(self.backend_url)
-        self.mcp_client.start()
         self.pipeline = ExecutionPipeline([
             McpExecutionStage(self.registry, self.mcp_client),
         ])
@@ -106,6 +113,13 @@ class MiddlewareApplication:
             self.medical_workflow,
             intent_recognizer=intent_recognizer,
             cash_workflow=self.cash_workflow,
+            agent_orchestrator=AgentOrchestrator(
+                self.registry, agent_client, ContextualExecutionPipeline(self.pipeline),
+                self.medical_workflow,
+                {"patient_id": patient_id, "authorization": authorization,
+                 "mock_user_id": mock_user_id, "accept_language": "zh-TW"},
+                authorized_tools=agent_authorized_tools,
+            ) if agent_enabled else None,
         )
         self.delivery_orchestrator = DeliveryOrchestrator()
         self.voice_turn_provider = voice_turn_provider or UnavailableVoiceTurnProvider()
@@ -120,6 +134,16 @@ class MiddlewareApplication:
             registry=self.registry,
             recovery_interpreter=recovery_interpreter or build_task_recovery_interpreter(),
         )
+        # Validate these local dependencies and policy before starting the child.
+        try:
+            self.mcp_client.start()
+        except Exception:
+            self._closed = True
+            try:
+                self.mcp_client.close()
+            except Exception:
+                pass
+            raise
 
     def close(self) -> None:
         """Release the MCP child process owned by this application."""
@@ -152,10 +176,20 @@ def create_application(
     intent_recognizer: IntentRecognizer | None = None,
     recovery_interpreter: TaskRecoveryInterpreter | None = None,
     voice_turn_provider: VoiceTurnProvider | None = None,
+    agent_enabled: bool | None = None,
+    agent_client: ChatCompletionClient | None = None,
+    agent_authorized_tools: tuple[str, ...] | None = None,
 ) -> MiddlewareApplication:
     """Create one isolated middleware application with in-memory sessions."""
 
     load_dotenv()
+    if agent_enabled is None:
+        flag = os.environ.get("PONTE_AGENT_ENABLED", "false").strip().casefold()
+        if flag not in {"true", "false", "1", "0"}:
+            raise ValueError("PONTE_AGENT_ENABLED must be true or false")
+        agent_enabled = flag in {"true", "1"}
+    if agent_enabled and agent_client is None:
+        agent_client = agent_chat_client_from_environment()
     origins = _frontend_origins(os.environ.get("PONTE_FRONTEND_ORIGINS"))
     application = MiddlewareApplication(
         backend_url,
@@ -167,11 +201,21 @@ def create_application(
         intent_recognizer=intent_recognizer,
         recovery_interpreter=recovery_interpreter,
         voice_turn_provider=voice_turn_provider,
+        agent_enabled=agent_enabled,
+        agent_client=agent_client,
+        agent_authorized_tools=agent_authorized_tools,
     )
-    if voice_turn_provider is None:
-        configured = _configured_voice_provider(application)
-        if configured is not None:
-            application.voice_turn_provider = configured
+    try:
+        if voice_turn_provider is None:
+            configured = _configured_voice_provider(application)
+            if configured is not None:
+                application.voice_turn_provider = configured
+    except Exception:
+        try:
+            application.close()
+        except Exception:
+            pass
+        raise
     return application
 
 

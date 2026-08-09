@@ -2,12 +2,15 @@ import json
 import tempfile
 import threading
 import unittest
+from datetime import datetime
+from unittest.mock import patch
 from pathlib import Path
 from urllib.request import ProxyHandler, Request, build_opener
 
 from middleware.intent import KeywordIntentRecognizer
 from middleware.server import create_application, create_http_server
 from mock_backends.server import create_http_server as create_backend_http_server
+from mock_backends.core.clock import FixedClock, MACAU_TZ
 
 
 def post_json(opener, url, body):
@@ -18,8 +21,12 @@ def post_json(opener, url, body):
 
 class InteractionHttpTests(unittest.TestCase):
     def setUp(self):
+        fixture_now = datetime(2026, 8, 6, 9, tzinfo=MACAU_TZ)
+        clock_patch = patch("middleware.medical_workflow._demo_now", return_value=fixture_now)
+        clock_patch.start()
+        self.addCleanup(clock_patch.stop)
         self.tempdir = tempfile.TemporaryDirectory()
-        self.backend = create_backend_http_server("127.0.0.1", 0, Path(self.tempdir.name))
+        self.backend = create_backend_http_server("127.0.0.1", 0, Path(self.tempdir.name), clock=FixedClock(fixture_now))
         self.backend_thread = threading.Thread(target=self.backend.serve_forever, daemon=True)
         self.backend_thread.start()
         application = create_application(

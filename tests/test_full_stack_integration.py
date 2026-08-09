@@ -2,6 +2,8 @@ import json
 import tempfile
 import threading
 import unittest
+from datetime import datetime
+from unittest.mock import patch
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import ProxyHandler, Request, build_opener
@@ -10,6 +12,7 @@ from frontend.server import create_http_server as create_frontend_http_server
 from middleware.intent import KeywordIntentRecognizer
 from middleware.server import create_application, create_http_server
 from mock_backends.server import create_http_server as create_backend_http_server
+from mock_backends.core.clock import FixedClock, MACAU_TZ
 
 
 def interaction_body(session_id, interaction_id, event):
@@ -55,11 +58,18 @@ def recovery_event(response, action):
 
 class FullStackIntegrationTests(unittest.TestCase):
     def setUp(self):
+        # Catalog fixtures are dated August 2026; keep the backend and UI clock
+        # aligned so this regression does not expire with the wall clock.
+        fixture_now = datetime(2026, 8, 6, 9, tzinfo=MACAU_TZ)
+        clock_patch = patch("middleware.medical_workflow._demo_now", return_value=fixture_now)
+        clock_patch.start()
+        self.addCleanup(clock_patch.stop)
         self.tempdir = tempfile.TemporaryDirectory()
         self.backend = create_backend_http_server(
             "127.0.0.1",
             0,
             Path(self.tempdir.name),
+            clock=FixedClock(fixture_now),
         )
         self.backend_thread = threading.Thread(
             target=self.backend.serve_forever,

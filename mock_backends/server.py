@@ -57,6 +57,8 @@ def create_application(data_dir: str | Path, clock: Clock | None = None) -> Mock
         appointment_repository=JsonLinesTextRepository(medical_root / "appointments.txt"),
         task_repository=JsonLinesTextRepository(medical_root / "tasks.txt"),
         idempotency=RepositoryIdempotencyStore(JsonLinesTextRepository(medical_root / "idempotency.txt")),
+        # Injected clocks retain the original deterministic fixture catalogue.
+        rolling_slots=clock is None,
     )
 
     welfare_root = root / "social_welfare"
