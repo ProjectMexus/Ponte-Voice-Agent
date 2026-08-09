@@ -1,0 +1,1607 @@
+{
+  "track": "real_model",
+  "model": "gpt-4.1-mini",
+  "passed": false,
+  "turns": [
+    {
+      "input": {
+        "routing": {
+          "session_id": "S-DEMO-E2E",
+          "interaction_id": "INT-DEMO-1"
+        },
+        "event": {
+          "type": "user_utterance",
+          "task_id": null,
+          "content": "Book a cardiology appointment next Tuesday afternoon"
+        },
+        "audit": {
+          "source": "text"
+        }
+      },
+      "http_status": 200,
+      "response": {
+        "interaction_id": "INT-DEMO-1",
+        "locale": "en",
+        "task": {
+          "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+          "type": "medical_demo_agent",
+          "status": "awaiting_input",
+          "current_step": "select_slot",
+          "facts": {
+            "engine": "demo_agent",
+            "model_mode": "real",
+            "intent_revision": 1,
+            "requested_date": "2026-10-20",
+            "response_locale": "en",
+            "time_constraint": {
+              "kind": "afternoon"
+            },
+            "department": {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true,
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "description": "Ponte 模擬醫療服務：心臟科；非真實醫院資料。",
+              "synthetic": true
+            },
+            "service": {
+              "id": "DEPT-CARDIO",
+              "name": "心臟科"
+            },
+            "slots": [
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T14:00:00+08:00",
+                "end": "2026-10-20T14:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1500",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T15:00:00+08:00",
+                "end": "2026-10-20T15:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T15:30:00+08:00",
+                "end": "2026-10-20T15:45:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1600",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T16:00:00+08:00",
+                "end": "2026-10-20T16:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              }
+            ],
+            "options_presentation": {
+              "presentation_id": "PRESENT-0E3DDCB5C59D4F969C2346AD861BB783",
+              "revision": 1,
+              "ordered_slot_ids": [
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1500",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+              ],
+              "visible_times": [
+                "14:00",
+                "15:00",
+                "15:30",
+                "16:00"
+              ],
+              "source_request_id": "REQ-18783885E8B3"
+            },
+            "candidate_id": "P1",
+            "selected_slot": {
+              "resourceType": "Slot",
+              "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "doctor": {
+                "id": "DOC-002",
+                "display": "李醫生（模擬）"
+              },
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T14:00:00+08:00",
+              "end": "2026-10-20T14:15:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon",
+              "instructions": [
+                "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+              ],
+              "synthetic": true
+            },
+            "slot_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+            "response_kind": "draft",
+            "phase": "awaiting_selection",
+            "appointments_snapshot": null,
+            "conflict_result": {
+              "status": "unknown",
+              "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+              "snapshot_request_id": null,
+              "conflicts": []
+            },
+            "round2_message": "這是候選草稿，尚未掛號；請選定時段才建立正式確認卡。",
+            "response_reason": null,
+            "response_message": "這是候選草稿，尚未掛號；請選定時段才建立正式確認卡。",
+            "clarification_message": null,
+            "service_events": [
+              {
+                "id": "E1",
+                "kind": "service_lookup",
+                "operation": "departments",
+                "title": "查詢可用科室",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E2",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              }
+            ]
+          },
+          "pending_confirmation": null,
+          "recovery": null,
+          "receipt": null
+        },
+        "response": {
+          "display_text": "This is a draft; no appointment has been booked. Select a time to request a formal confirmation card. Available times: option 1: 14:00; option 2: 15:00; option 3: 15:30; option 4: 16:00.",
+          "speech_text": "This is a draft; no appointment has been booked. Select a time to request a formal confirmation card. Available times: option 1: 14:00; option 2: 15:00; option 3: 15:30; option 4: 16:00."
+        },
+        "workspace": {
+          "view": "appointment_draft",
+          "title": "Appointment draft (not booked)",
+          "fields": [
+            {
+              "key": "service",
+              "label": "Service",
+              "value": "Cardiology"
+            },
+            {
+              "key": "date",
+              "label": "Date",
+              "value": "2026-10-20"
+            },
+            {
+              "key": "time",
+              "label": "Time",
+              "value": "14:00"
+            },
+            {
+              "key": "location",
+              "label": "Location",
+              "value": "Main outpatient clinic"
+            },
+            {
+              "key": "candidate_id",
+              "label": "Draft candidate",
+              "value": "P1"
+            },
+            {
+              "key": "booking_status",
+              "label": "Booking status",
+              "value": "Not booked"
+            },
+            {
+              "key": "conflict_result",
+              "label": "Time overlap check",
+              "value": {
+                "status": "unknown",
+                "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+                "snapshot_request_id": null,
+                "conflicts": []
+              }
+            },
+            {
+              "key": "slot_0",
+              "label": "Option 1: 2026-10-20 14:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_1",
+              "label": "Option 2: 2026-10-20 15:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_2",
+              "label": "Option 3: 2026-10-20 15:30",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_3",
+              "label": "Option 4: 2026-10-20 16:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            }
+          ],
+          "actions": [],
+          "activity": [
+            {
+              "id": "E1",
+              "kind": "service_lookup",
+              "title": "Looked up departments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "departments"
+            },
+            {
+              "id": "E2",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            }
+          ],
+          "options_presentation": {
+            "presentation_id": "PRESENT-0E3DDCB5C59D4F969C2346AD861BB783",
+            "revision": 1,
+            "ordered_slot_ids": [
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1400",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1500",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+            ],
+            "visible_times": [
+              "14:00",
+              "15:00",
+              "15:30",
+              "16:00"
+            ],
+            "source_request_id": "REQ-18783885E8B3"
+          },
+          "artifact": null
+        },
+        "confirmation": null,
+        "recovery": null,
+        "receipt": null,
+        "speech_audio": {
+          "status": "unavailable"
+        }
+      }
+    },
+    {
+      "input": {
+        "routing": {
+          "session_id": "S-DEMO-E2E",
+          "interaction_id": "INT-DEMO-2"
+        },
+        "event": {
+          "type": "user_utterance",
+          "task_id": null,
+          "content": "Only after 3 PM"
+        },
+        "audit": {
+          "source": "text"
+        }
+      },
+      "http_status": 200,
+      "response": {
+        "interaction_id": "INT-DEMO-2",
+        "locale": "en",
+        "task": {
+          "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+          "type": "medical_demo_agent",
+          "status": "awaiting_input",
+          "current_step": "select_slot",
+          "facts": {
+            "engine": "demo_agent",
+            "model_mode": "real",
+            "intent_revision": 2,
+            "requested_date": "2026-10-20",
+            "response_locale": "en",
+            "time_constraint": {
+              "kind": "lower_bound",
+              "time": "15:00",
+              "inclusive": false
+            },
+            "department": {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true,
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "description": "Ponte 模擬醫療服務：心臟科；非真實醫院資料。",
+              "synthetic": true
+            },
+            "service": {
+              "id": "DEPT-CARDIO",
+              "name": "心臟科"
+            },
+            "slots": [
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T15:30:00+08:00",
+                "end": "2026-10-20T15:45:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1600",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T16:00:00+08:00",
+                "end": "2026-10-20T16:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              }
+            ],
+            "response_kind": "draft",
+            "phase": "awaiting_selection",
+            "appointments_snapshot": null,
+            "conflict_result": {
+              "status": "unknown",
+              "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "snapshot_request_id": null,
+              "conflicts": []
+            },
+            "round2_message": "這是候選草稿，尚未掛號；請選定時段才建立正式確認卡。",
+            "response_reason": null,
+            "response_message": "這是候選草稿，尚未掛號；請選定時段才建立正式確認卡。",
+            "clarification_message": null,
+            "options_presentation": {
+              "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+              "revision": 2,
+              "ordered_slot_ids": [
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+              ],
+              "visible_times": [
+                "15:30",
+                "16:00"
+              ],
+              "source_request_id": "REQ-606E35E0201C"
+            },
+            "candidate_id": "P2",
+            "selected_slot": {
+              "resourceType": "Slot",
+              "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "doctor": {
+                "id": "DOC-002",
+                "display": "李醫生（模擬）"
+              },
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T15:30:00+08:00",
+              "end": "2026-10-20T15:45:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon",
+              "instructions": [
+                "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+              ],
+              "synthetic": true
+            },
+            "slot_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+            "service_events": [
+              {
+                "id": "E1",
+                "kind": "service_lookup",
+                "operation": "departments",
+                "title": "查詢可用科室",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E2",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E3",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              }
+            ]
+          },
+          "pending_confirmation": null,
+          "recovery": null,
+          "receipt": null
+        },
+        "response": {
+          "display_text": "This is a draft; no appointment has been booked. Select a time to request a formal confirmation card. Available times: option 1: 15:30; option 2: 16:00.",
+          "speech_text": "This is a draft; no appointment has been booked. Select a time to request a formal confirmation card. Available times: option 1: 15:30; option 2: 16:00."
+        },
+        "workspace": {
+          "view": "appointment_draft",
+          "title": "Appointment draft (not booked)",
+          "fields": [
+            {
+              "key": "service",
+              "label": "Service",
+              "value": "Cardiology"
+            },
+            {
+              "key": "date",
+              "label": "Date",
+              "value": "2026-10-20"
+            },
+            {
+              "key": "time",
+              "label": "Time",
+              "value": "15:30"
+            },
+            {
+              "key": "location",
+              "label": "Location",
+              "value": "Main outpatient clinic"
+            },
+            {
+              "key": "candidate_id",
+              "label": "Draft candidate",
+              "value": "P2"
+            },
+            {
+              "key": "booking_status",
+              "label": "Booking status",
+              "value": "Not booked"
+            },
+            {
+              "key": "conflict_result",
+              "label": "Time overlap check",
+              "value": {
+                "status": "unknown",
+                "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "snapshot_request_id": null,
+                "conflicts": []
+              }
+            },
+            {
+              "key": "slot_0",
+              "label": "Option 1: 2026-10-20 15:30",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_1",
+              "label": "Option 2: 2026-10-20 16:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            }
+          ],
+          "actions": [],
+          "activity": [
+            {
+              "id": "E1",
+              "kind": "service_lookup",
+              "title": "Looked up departments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "departments"
+            },
+            {
+              "id": "E2",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            },
+            {
+              "id": "E3",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            }
+          ],
+          "options_presentation": {
+            "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+            "revision": 2,
+            "ordered_slot_ids": [
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+            ],
+            "visible_times": [
+              "15:30",
+              "16:00"
+            ],
+            "source_request_id": "REQ-606E35E0201C"
+          },
+          "artifact": null
+        },
+        "confirmation": null,
+        "recovery": null,
+        "receipt": null,
+        "speech_audio": {
+          "status": "unavailable"
+        }
+      }
+    },
+    {
+      "input": {
+        "routing": {
+          "session_id": "S-DEMO-E2E",
+          "interaction_id": "INT-DEMO-3"
+        },
+        "event": {
+          "type": "user_utterance",
+          "task_id": null,
+          "content": "Wait, do I have any other appointments?"
+        },
+        "audit": {
+          "source": "text"
+        }
+      },
+      "http_status": 200,
+      "response": {
+        "interaction_id": "INT-DEMO-3",
+        "locale": "en",
+        "task": {
+          "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+          "type": "medical_demo_agent",
+          "status": "awaiting_input",
+          "current_step": "select_slot",
+          "facts": {
+            "engine": "demo_agent",
+            "model_mode": "real",
+            "intent_revision": 2,
+            "requested_date": "2026-10-20",
+            "response_locale": "en",
+            "time_constraint": {
+              "kind": "lower_bound",
+              "time": "15:00",
+              "inclusive": false
+            },
+            "department": {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true,
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "description": "Ponte 模擬醫療服務：心臟科；非真實醫院資料。",
+              "synthetic": true
+            },
+            "service": {
+              "id": "DEPT-CARDIO",
+              "name": "心臟科"
+            },
+            "slots": [
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T15:30:00+08:00",
+                "end": "2026-10-20T15:45:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1600",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T16:00:00+08:00",
+                "end": "2026-10-20T16:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              }
+            ],
+            "response_kind": "draft",
+            "phase": "inquiry",
+            "appointments_snapshot": {
+              "records": [
+                {
+                  "appointment_type": "examination",
+                  "booking_source": "ponte_mock_seed",
+                  "department": {
+                    "display": "影像科",
+                    "id": "DEPT-IMAGING"
+                  },
+                  "doctor": null,
+                  "end": "2026-10-20T15:15:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-IMAGING-20261020",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。",
+                    "請攜帶轉介資料；檢查或治療準備以院方正式通知為準。"
+                  ],
+                  "location": {
+                    "display": "影像中心",
+                    "id": "LOC-IMAGING-CENTER"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "service": {
+                    "display": "腹部超聲波檢查",
+                    "id": "SERVICE-US-001"
+                  },
+                  "start": "2026-10-20T14:45:00+08:00",
+                  "status": "booked",
+                  "synthetic": true
+                },
+                {
+                  "appointment_type": "treatment",
+                  "booking_source": "ponte_mock_seed",
+                  "department": {
+                    "display": "復康治療科",
+                    "id": "DEPT-REHAB"
+                  },
+                  "doctor": {
+                    "display": "周醫生（模擬）",
+                    "id": "DOC-003"
+                  },
+                  "end": "2026-10-14T10:45:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-REHAB-20261014",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。",
+                    "請攜帶轉介資料；檢查或治療準備以院方正式通知為準。"
+                  ],
+                  "location": {
+                    "display": "復康治療室",
+                    "id": "LOC-REHAB-01"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "service": {
+                    "display": "物理治療",
+                    "id": "SERVICE-PT-001"
+                  },
+                  "start": "2026-10-14T10:00:00+08:00",
+                  "status": "confirmed",
+                  "synthetic": true
+                },
+                {
+                  "appointment_type": "outpatient_registration",
+                  "booking_source": "ponte_mock_seed",
+                  "cancellation_reason": "模擬病人已取消；不應佔用時段或視作撞期。",
+                  "department": {
+                    "display": "心臟科",
+                    "id": "DEPT-CARDIO"
+                  },
+                  "doctor": {
+                    "display": "李醫生（模擬）",
+                    "id": "DOC-002"
+                  },
+                  "end": "2026-10-20T15:45:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-CANCELLED-CARDIO-20261020",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                  ],
+                  "location": {
+                    "display": "第一門診",
+                    "id": "LOC-MAIN-OPD"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "start": "2026-10-20T15:30:00+08:00",
+                  "status": "cancelled",
+                  "synthetic": true
+                }
+              ],
+              "fetched_at": 1791853200.0,
+              "patient_id": "PAT-DEMO-AGENT-E2E",
+              "request_id": "REQ-2ABFD7B01027",
+              "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+              "revision": 2,
+              "source": "medical.get_my_appointments"
+            },
+            "conflict_result": {
+              "status": "clear",
+              "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "snapshot_request_id": "REQ-2ABFD7B01027",
+              "conflicts": []
+            },
+            "round2_message": "目前查詢的時間區間沒有重疊。",
+            "response_reason": null,
+            "response_message": "目前查詢的時間區間沒有重疊。",
+            "clarification_message": null,
+            "options_presentation": {
+              "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+              "revision": 2,
+              "ordered_slot_ids": [
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+              ],
+              "visible_times": [
+                "15:30",
+                "16:00"
+              ],
+              "source_request_id": "REQ-606E35E0201C"
+            },
+            "candidate_id": "P2",
+            "selected_slot": {
+              "resourceType": "Slot",
+              "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "doctor": {
+                "id": "DOC-002",
+                "display": "李醫生（模擬）"
+              },
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T15:30:00+08:00",
+              "end": "2026-10-20T15:45:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon",
+              "instructions": [
+                "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+              ],
+              "synthetic": true
+            },
+            "slot_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+            "service_events": [
+              {
+                "id": "E1",
+                "kind": "service_lookup",
+                "operation": "departments",
+                "title": "查詢可用科室",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E2",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E3",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E4",
+                "kind": "service_lookup",
+                "operation": "appointments",
+                "title": "查詢現有預約",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              }
+            ]
+          },
+          "pending_confirmation": null,
+          "recovery": null,
+          "receipt": null
+        },
+        "response": {
+          "display_text": "I found 3 appointment records, including any cancellations. The selected time does not overlap the active appointments in this lookup. Available times: option 1: 15:30; option 2: 16:00.",
+          "speech_text": "I found 3 appointment records, including any cancellations. The selected time does not overlap the active appointments in this lookup. Available times: option 1: 15:30; option 2: 16:00."
+        },
+        "workspace": {
+          "view": "appointment_draft",
+          "title": "Appointment draft (not booked)",
+          "fields": [
+            {
+              "key": "service",
+              "label": "Service",
+              "value": "Cardiology"
+            },
+            {
+              "key": "date",
+              "label": "Date",
+              "value": "2026-10-20"
+            },
+            {
+              "key": "time",
+              "label": "Time",
+              "value": "15:30"
+            },
+            {
+              "key": "location",
+              "label": "Location",
+              "value": "Main outpatient clinic"
+            },
+            {
+              "key": "candidate_id",
+              "label": "Draft candidate",
+              "value": "P2"
+            },
+            {
+              "key": "booking_status",
+              "label": "Booking status",
+              "value": "Not booked"
+            },
+            {
+              "key": "appointment_0",
+              "label": "Abdominal ultrasound",
+              "value": "2026-10-20 · 14:45 · Imaging centre · booked"
+            },
+            {
+              "key": "appointment_1",
+              "label": "Physical therapy",
+              "value": "2026-10-14 · 10:00 · Rehabilitation room · confirmed"
+            },
+            {
+              "key": "appointment_2",
+              "label": "Cardiology",
+              "value": "2026-10-20 · 15:30 · Main outpatient clinic · cancelled"
+            },
+            {
+              "key": "appointments_fetched_at",
+              "label": "Appointments checked at",
+              "value": 1791853200.0
+            },
+            {
+              "key": "conflict_result",
+              "label": "Time overlap check",
+              "value": {
+                "status": "clear",
+                "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "snapshot_request_id": "REQ-2ABFD7B01027",
+                "conflicts": []
+              }
+            },
+            {
+              "key": "slot_0",
+              "label": "Option 1: 2026-10-20 15:30",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_1",
+              "label": "Option 2: 2026-10-20 16:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            }
+          ],
+          "actions": [
+            {
+              "label": "Resume booking",
+              "event": {
+                "type": "recovery_action",
+                "action": "resume_booking",
+                "action_id": "ACT-2EFE3C4A596B4A64BB21F7405C1B2B70",
+                "task_id": "TASK-A30E633387744D959698D1EC214E7A52"
+              }
+            }
+          ],
+          "activity": [
+            {
+              "id": "E1",
+              "kind": "service_lookup",
+              "title": "Looked up departments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "departments"
+            },
+            {
+              "id": "E2",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            },
+            {
+              "id": "E3",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            },
+            {
+              "id": "E4",
+              "kind": "service_lookup",
+              "title": "Looked up existing appointments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "appointments"
+            }
+          ],
+          "options_presentation": {
+            "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+            "revision": 2,
+            "ordered_slot_ids": [
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+            ],
+            "visible_times": [
+              "15:30",
+              "16:00"
+            ],
+            "source_request_id": "REQ-606E35E0201C"
+          },
+          "artifact": null
+        },
+        "confirmation": null,
+        "recovery": null,
+        "receipt": null,
+        "speech_audio": {
+          "status": "unavailable"
+        }
+      }
+    },
+    {
+      "input": {
+        "routing": {
+          "session_id": "S-DEMO-E2E",
+          "interaction_id": "INT-DEMO-4"
+        },
+        "event": {
+          "type": "user_utterance",
+          "task_id": null,
+          "content": "Will that clash with my existing appointments?"
+        },
+        "audit": {
+          "source": "text"
+        }
+      },
+      "http_status": 200,
+      "response": {
+        "interaction_id": "INT-DEMO-4",
+        "locale": "en",
+        "task": {
+          "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+          "type": "medical_demo_agent",
+          "status": "awaiting_input",
+          "current_step": "select_slot",
+          "facts": {
+            "engine": "demo_agent",
+            "model_mode": "real",
+            "intent_revision": 2,
+            "requested_date": "2026-10-20",
+            "response_locale": "en",
+            "time_constraint": {
+              "kind": "lower_bound",
+              "time": "15:00",
+              "inclusive": false
+            },
+            "department": {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true,
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "description": "Ponte 模擬醫療服務：心臟科；非真實醫院資料。",
+              "synthetic": true
+            },
+            "service": {
+              "id": "DEPT-CARDIO",
+              "name": "心臟科"
+            },
+            "slots": [
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T15:30:00+08:00",
+                "end": "2026-10-20T15:45:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              },
+              {
+                "resourceType": "Slot",
+                "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1600",
+                "status": "free",
+                "slot_type": "outpatient_registration",
+                "department_id": "DEPT-CARDIO",
+                "doctor_id": "DOC-002",
+                "doctor": {
+                  "id": "DOC-002",
+                  "display": "李醫生（模擬）"
+                },
+                "location_id": "LOC-MAIN-OPD",
+                "location": {
+                  "id": "LOC-MAIN-OPD",
+                  "display": "第一門診"
+                },
+                "start": "2026-10-20T16:00:00+08:00",
+                "end": "2026-10-20T16:15:00+08:00",
+                "capacity": 1,
+                "remaining": 1,
+                "session": "afternoon",
+                "instructions": [
+                  "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                  "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                ],
+                "synthetic": true
+              }
+            ],
+            "response_kind": "draft",
+            "phase": "inquiry",
+            "appointments_snapshot": {
+              "records": [
+                {
+                  "appointment_type": "examination",
+                  "booking_source": "ponte_mock_seed",
+                  "department": {
+                    "display": "影像科",
+                    "id": "DEPT-IMAGING"
+                  },
+                  "doctor": null,
+                  "end": "2026-10-20T15:15:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-IMAGING-20261020",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。",
+                    "請攜帶轉介資料；檢查或治療準備以院方正式通知為準。"
+                  ],
+                  "location": {
+                    "display": "影像中心",
+                    "id": "LOC-IMAGING-CENTER"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "service": {
+                    "display": "腹部超聲波檢查",
+                    "id": "SERVICE-US-001"
+                  },
+                  "start": "2026-10-20T14:45:00+08:00",
+                  "status": "booked",
+                  "synthetic": true
+                },
+                {
+                  "appointment_type": "treatment",
+                  "booking_source": "ponte_mock_seed",
+                  "department": {
+                    "display": "復康治療科",
+                    "id": "DEPT-REHAB"
+                  },
+                  "doctor": {
+                    "display": "周醫生（模擬）",
+                    "id": "DOC-003"
+                  },
+                  "end": "2026-10-14T10:45:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-REHAB-20261014",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。",
+                    "請攜帶轉介資料；檢查或治療準備以院方正式通知為準。"
+                  ],
+                  "location": {
+                    "display": "復康治療室",
+                    "id": "LOC-REHAB-01"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "service": {
+                    "display": "物理治療",
+                    "id": "SERVICE-PT-001"
+                  },
+                  "start": "2026-10-14T10:00:00+08:00",
+                  "status": "confirmed",
+                  "synthetic": true
+                },
+                {
+                  "appointment_type": "outpatient_registration",
+                  "booking_source": "ponte_mock_seed",
+                  "cancellation_reason": "模擬病人已取消；不應佔用時段或視作撞期。",
+                  "department": {
+                    "display": "心臟科",
+                    "id": "DEPT-CARDIO"
+                  },
+                  "doctor": {
+                    "display": "李醫生（模擬）",
+                    "id": "DOC-002"
+                  },
+                  "end": "2026-10-20T15:45:00+08:00",
+                  "id": "APT-DEMO-SEED-82FEE074DA39-CANCELLED-CARDIO-20261020",
+                  "instructions": [
+                    "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                    "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+                  ],
+                  "location": {
+                    "display": "第一門診",
+                    "id": "LOC-MAIN-OPD"
+                  },
+                  "patient": {
+                    "display": "陳先生（模擬病人）",
+                    "id": "PAT-DEMO-AGENT-E2E"
+                  },
+                  "resourceType": "Appointment",
+                  "start": "2026-10-20T15:30:00+08:00",
+                  "status": "cancelled",
+                  "synthetic": true
+                }
+              ],
+              "fetched_at": 1791853200.0,
+              "patient_id": "PAT-DEMO-AGENT-E2E",
+              "request_id": "REQ-286F22F69B6A",
+              "task_id": "TASK-A30E633387744D959698D1EC214E7A52",
+              "revision": 2,
+              "source": "medical.get_my_appointments"
+            },
+            "conflict_result": {
+              "status": "clear",
+              "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "snapshot_request_id": "REQ-286F22F69B6A",
+              "conflicts": []
+            },
+            "round2_message": "目前查詢的時間區間沒有重疊。",
+            "response_reason": null,
+            "response_message": "目前查詢的時間區間沒有重疊。",
+            "clarification_message": null,
+            "options_presentation": {
+              "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+              "revision": 2,
+              "ordered_slot_ids": [
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+              ],
+              "visible_times": [
+                "15:30",
+                "16:00"
+              ],
+              "source_request_id": "REQ-606E35E0201C"
+            },
+            "candidate_id": "P2",
+            "selected_slot": {
+              "resourceType": "Slot",
+              "id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "status": "free",
+              "slot_type": "outpatient_registration",
+              "department_id": "DEPT-CARDIO",
+              "doctor_id": "DOC-002",
+              "doctor": {
+                "id": "DOC-002",
+                "display": "李醫生（模擬）"
+              },
+              "location_id": "LOC-MAIN-OPD",
+              "location": {
+                "id": "LOC-MAIN-OPD",
+                "display": "第一門診"
+              },
+              "start": "2026-10-20T15:30:00+08:00",
+              "end": "2026-10-20T15:45:00+08:00",
+              "capacity": 1,
+              "remaining": 1,
+              "session": "afternoon",
+              "instructions": [
+                "本資料只供 Ponte 模擬示範，並非真實醫院預約。",
+                "請攜帶有效身份證明，於預約前 15 分鐘到接待處報到。"
+              ],
+              "synthetic": true
+            },
+            "slot_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+            "service_events": [
+              {
+                "id": "E1",
+                "kind": "service_lookup",
+                "operation": "departments",
+                "title": "查詢可用科室",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E2",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E3",
+                "kind": "service_lookup",
+                "operation": "slots",
+                "title": "查詢可用時段",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E4",
+                "kind": "service_lookup",
+                "operation": "appointments",
+                "title": "查詢現有預約",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              },
+              {
+                "id": "E5",
+                "kind": "service_lookup",
+                "operation": "appointments",
+                "title": "查詢現有預約",
+                "detail": "已收到服務回覆。",
+                "status": "completed"
+              }
+            ]
+          },
+          "pending_confirmation": null,
+          "recovery": null,
+          "receipt": null
+        },
+        "response": {
+          "display_text": "I found 3 appointment records, including any cancellations. The selected time does not overlap the active appointments in this lookup. Available times: option 1: 15:30; option 2: 16:00.",
+          "speech_text": "I found 3 appointment records, including any cancellations. The selected time does not overlap the active appointments in this lookup. Available times: option 1: 15:30; option 2: 16:00."
+        },
+        "workspace": {
+          "view": "appointment_draft",
+          "title": "Appointment draft (not booked)",
+          "fields": [
+            {
+              "key": "service",
+              "label": "Service",
+              "value": "Cardiology"
+            },
+            {
+              "key": "date",
+              "label": "Date",
+              "value": "2026-10-20"
+            },
+            {
+              "key": "time",
+              "label": "Time",
+              "value": "15:30"
+            },
+            {
+              "key": "location",
+              "label": "Location",
+              "value": "Main outpatient clinic"
+            },
+            {
+              "key": "candidate_id",
+              "label": "Draft candidate",
+              "value": "P2"
+            },
+            {
+              "key": "booking_status",
+              "label": "Booking status",
+              "value": "Not booked"
+            },
+            {
+              "key": "appointment_0",
+              "label": "Abdominal ultrasound",
+              "value": "2026-10-20 · 14:45 · Imaging centre · booked"
+            },
+            {
+              "key": "appointment_1",
+              "label": "Physical therapy",
+              "value": "2026-10-14 · 10:00 · Rehabilitation room · confirmed"
+            },
+            {
+              "key": "appointment_2",
+              "label": "Cardiology",
+              "value": "2026-10-20 · 15:30 · Main outpatient clinic · cancelled"
+            },
+            {
+              "key": "appointments_fetched_at",
+              "label": "Appointments checked at",
+              "value": 1791853200.0
+            },
+            {
+              "key": "conflict_result",
+              "label": "Time overlap check",
+              "value": {
+                "status": "clear",
+                "candidate_id": "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+                "snapshot_request_id": "REQ-286F22F69B6A",
+                "conflicts": []
+              }
+            },
+            {
+              "key": "slot_0",
+              "label": "Option 1: 2026-10-20 15:30",
+              "value": "Main outpatient clinic · 1 places remaining"
+            },
+            {
+              "key": "slot_1",
+              "label": "Option 2: 2026-10-20 16:00",
+              "value": "Main outpatient clinic · 1 places remaining"
+            }
+          ],
+          "actions": [
+            {
+              "label": "Resume booking",
+              "event": {
+                "type": "recovery_action",
+                "action": "resume_booking",
+                "action_id": "ACT-6058B7351D1042AB8FAB0AC343D56D18",
+                "task_id": "TASK-A30E633387744D959698D1EC214E7A52"
+              }
+            }
+          ],
+          "activity": [
+            {
+              "id": "E1",
+              "kind": "service_lookup",
+              "title": "Looked up departments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "departments"
+            },
+            {
+              "id": "E2",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            },
+            {
+              "id": "E3",
+              "kind": "service_lookup",
+              "title": "Looked up appointment times",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "slots"
+            },
+            {
+              "id": "E4",
+              "kind": "service_lookup",
+              "title": "Looked up existing appointments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "appointments"
+            },
+            {
+              "id": "E5",
+              "kind": "service_lookup",
+              "title": "Looked up existing appointments",
+              "detail": "Received the service response.",
+              "status": "completed",
+              "operation": "appointments"
+            }
+          ],
+          "options_presentation": {
+            "presentation_id": "PRESENT-E2D5D8A1B4734F1998ED76E0807CBA98",
+            "revision": 2,
+            "ordered_slot_ids": [
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1530",
+              "SLOT-LIVE-V2-REG-20261020-CARDIO-1600"
+            ],
+            "visible_times": [
+              "15:30",
+              "16:00"
+            ],
+            "source_request_id": "REQ-606E35E0201C"
+          },
+          "artifact": null
+        },
+        "confirmation": null,
+        "recovery": null,
+        "receipt": null,
+        "speech_audio": {
+          "status": "unavailable"
+        }
+      }
+    }
+  ],
+  "scenario": "Seven English turns: draft, constraints, inquiry, conflict, resume, selection, approval, verified receipt and replay",
+  "source_hashes": {
+    "middleware\\demo_medical_workflow.py": "b46158d1772c228c6524f25624e6be28d4b86cf40d0bd6b2e5ee8301bca25835",
+    "middleware\\interaction_core.py": "eb00d6e6459fce03e9091891d1c2c06718a80ad3aa49ecefe5f16e5e97fd7c3f",
+    "middleware\\interaction_delivery.py": "d4eb4c8f37108b1e4f2e5a8ddf891790e5777a1fc0d9b4ab898669dca81938ba"
+  },
+  "error_type": "AssertionError",
+  "assertion": "{'rec[2033 chars]REQ-286F22F69B6A', 'task_id': 'TASK-A30E633387[75 chars]nts'} != {'rec[2033 chars]REQ-2ABFD7B01027', 'task_id': 'TASK-A30E633387[75 chars]nts'}\nDiff is 3041 characters long. Set self.maxDiff to None to see it."
+}

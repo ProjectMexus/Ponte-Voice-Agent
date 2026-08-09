@@ -1,0 +1,1526 @@
+{
+  "case_id": "MT02",
+  "track": "scripted",
+  "observations": [
+    {
+      "task_id": "TASK-719E3F4C20784B61ACF30C036E8DAE43",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "time_constraint": {
+          "kind": "afternoon"
+        }
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "eligible_slot_set": [
+        "S1400",
+        "S1500",
+        "S1515",
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.list_departments",
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": null,
+      "grounded_in": null,
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": false,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.list_departments",
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": false,
+        "candidate_id": true,
+        "constraints": false
+      },
+      "old_candidate": "valid",
+      "rejected_unavailable": false,
+      "candidate_target": null,
+      "candidate_target_state": null,
+      "invalidation_states": {},
+      "unavailability_evidence": {
+        "successful_search": false,
+        "target_available": null,
+        "invalidation_metadata": false,
+        "selection_state": false,
+        "no_candidate": true
+      },
+      "min_time": null,
+      "exact_time": null,
+      "needs_clarification": false,
+      "response_kind": "recovery",
+      "response_reason": "backend_unavailable",
+      "response_message": "查詢暫時未能完成；沒有提交掛號。請稍後重新提出要求。",
+      "approval_registry": {},
+      "manual_review": [
+        "visible_slot_order"
+      ],
+      "revalidated_candidate": null,
+      "approval_target": null,
+      "approval_target_state": null,
+      "approval_invalidation_states": {}
+    },
+    {
+      "task_id": "TASK-719E3F4C20784B61ACF30C036E8DAE43",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "time_constraint": {
+          "kind": "lower_bound",
+          "time": "15:30",
+          "inclusive": true
+        }
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "eligible_slot_set": [
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": null,
+      "grounded_in": null,
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": false,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": true,
+        "constraints": false
+      },
+      "old_candidate": "valid",
+      "rejected_unavailable": false,
+      "candidate_target": null,
+      "candidate_target_state": null,
+      "invalidation_states": {},
+      "unavailability_evidence": {
+        "successful_search": false,
+        "target_available": null,
+        "invalidation_metadata": false,
+        "selection_state": false,
+        "no_candidate": true
+      },
+      "min_time": {
+        "value": "15:30",
+        "inclusive": true
+      },
+      "exact_time": null,
+      "needs_clarification": false,
+      "response_kind": "recovery",
+      "response_reason": "backend_unavailable",
+      "response_message": "查詢暫時未能完成；沒有提交掛號。請稍後重新提出要求。",
+      "approval_registry": {},
+      "manual_review": [
+        "visible_slot_order"
+      ],
+      "revalidated_candidate": null,
+      "approval_target": null,
+      "approval_target_state": null,
+      "approval_invalidation_states": {}
+    },
+    {
+      "task_id": "TASK-719E3F4C20784B61ACF30C036E8DAE43",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "time_constraint": {
+          "kind": "lower_bound",
+          "time": "15:00",
+          "inclusive": true
+        }
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "eligible_slot_set": [
+        "S1500",
+        "S1515",
+        "S1530"
+      ],
+      "tools_called": [
+        "medical.search_registration_slots"
+      ],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": null,
+      "grounded_in": null,
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": false,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [
+        "medical.search_registration_slots"
+      ],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": true,
+        "constraints": false
+      },
+      "old_candidate": "valid",
+      "rejected_unavailable": false,
+      "candidate_target": null,
+      "candidate_target_state": null,
+      "invalidation_states": {},
+      "unavailability_evidence": {
+        "successful_search": false,
+        "target_available": null,
+        "invalidation_metadata": false,
+        "selection_state": false,
+        "no_candidate": true
+      },
+      "min_time": {
+        "value": "15:00",
+        "inclusive": true
+      },
+      "exact_time": null,
+      "needs_clarification": false,
+      "response_kind": "recovery",
+      "response_reason": "backend_unavailable",
+      "response_message": "查詢暫時未能完成；沒有提交掛號。請稍後重新提出要求。",
+      "approval_registry": {},
+      "manual_review": [
+        "visible_slot_order"
+      ],
+      "revalidated_candidate": null,
+      "approval_target": null,
+      "approval_target_state": null,
+      "approval_invalidation_states": {}
+    },
+    {
+      "task_id": "TASK-719E3F4C20784B61ACF30C036E8DAE43",
+      "candidate_id": null,
+      "constraints": {
+        "department": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "time_constraint": {
+          "kind": "lower_bound",
+          "time": "15:00",
+          "inclusive": true
+        }
+      },
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "candidate": null,
+      "candidate_slot": null,
+      "approval": "none",
+      "approval_consumed": false,
+      "eligible_slot_set": [
+        "S1500",
+        "S1515",
+        "S1530"
+      ],
+      "tools_called": [],
+      "write_delta": 0,
+      "booking_delta": 0,
+      "conflict": null,
+      "grounded_in": null,
+      "receipt_slot": null,
+      "receipt_verified": false,
+      "reported_booked": false,
+      "needs_reselection": false,
+      "approval_for_slot_S1530": false,
+      "rejected": false,
+      "one_idempotency_key": false,
+      "already_processed_or_same_receipt": false,
+      "tool_called": [],
+      "preserve": {
+        "task_id": true,
+        "candidate_id": true,
+        "constraints": true
+      },
+      "old_candidate": "valid",
+      "rejected_unavailable": false,
+      "candidate_target": null,
+      "candidate_target_state": null,
+      "invalidation_states": {},
+      "unavailability_evidence": {
+        "successful_search": false,
+        "target_available": null,
+        "invalidation_metadata": false,
+        "selection_state": false,
+        "no_candidate": true
+      },
+      "min_time": {
+        "value": "15:00",
+        "inclusive": true
+      },
+      "exact_time": null,
+      "needs_clarification": true,
+      "response_kind": "clarification",
+      "response_reason": "needs_clarification",
+      "response_message": "所選時段已失效，請重新選擇。",
+      "approval_registry": {},
+      "manual_review": [
+        "visible_slot_order"
+      ],
+      "revalidated_candidate": null,
+      "approval_target": null,
+      "approval_target_state": null,
+      "approval_invalidation_states": {}
+    }
+  ],
+  "dispatches": [],
+  "backend_effects": [],
+  "coverage": {
+    "dispatch_trace": true,
+    "backend_effects": true
+  },
+  "final": {
+    "task_id": "TASK-719E3F4C20784B61ACF30C036E8DAE43",
+    "candidate_id": null,
+    "constraints": {
+      "department": "DEPT-CARDIO",
+      "date": "2026-10-20",
+      "time_constraint": {
+        "kind": "lower_bound",
+        "time": "15:00",
+        "inclusive": true
+      }
+    },
+    "department": "DEPT-CARDIO",
+    "date": "2026-10-20",
+    "candidate": null,
+    "candidate_slot": null,
+    "approval": "none",
+    "approval_consumed": false,
+    "eligible_slot_set": [
+      "S1500",
+      "S1515",
+      "S1530"
+    ],
+    "tools_called": [
+      "medical.list_departments",
+      "medical.search_registration_slots",
+      "medical.search_registration_slots",
+      "medical.search_registration_slots"
+    ],
+    "write_delta": 0,
+    "booking_delta": 0,
+    "conflict": null,
+    "grounded_in": null,
+    "receipt_slot": null,
+    "receipt_verified": false,
+    "reported_booked": false,
+    "needs_reselection": false,
+    "approval_for_slot_S1530": false,
+    "rejected": false,
+    "one_idempotency_key": false,
+    "already_processed_or_same_receipt": false,
+    "tool_called": [],
+    "preserve": {
+      "task_id": true,
+      "candidate_id": true,
+      "constraints": true
+    },
+    "old_candidate": "valid",
+    "rejected_unavailable": false,
+    "candidate_target": null,
+    "candidate_target_state": null,
+    "invalidation_states": {},
+    "unavailability_evidence": {
+      "successful_search": false,
+      "target_available": null,
+      "invalidation_metadata": false,
+      "selection_state": false,
+      "no_candidate": true
+    },
+    "min_time": {
+      "value": "15:00",
+      "inclusive": true
+    },
+    "exact_time": null,
+    "needs_clarification": true,
+    "response_kind": "clarification",
+    "response_reason": "needs_clarification",
+    "response_message": "所選時段已失效，請重新選擇。",
+    "approval_registry": {},
+    "manual_review": [
+      "visible_slot_order"
+    ],
+    "revalidated_candidate": null,
+    "approval_target": null,
+    "approval_target_state": null,
+    "approval_invalidation_states": {},
+    "booking_count": 0,
+    "write_count": 0,
+    "constraints_preserved": false
+  },
+  "metadata": {
+    "model": "queued-native-decisions",
+    "temperature": 0,
+    "prompt_config": "DemoMedicalWorkflow.SYSTEM_PROMPT/runtime-control",
+    "fixture_version": 1,
+    "dataset_hash": "fbad57d1bc3991523b4f33d1fd81e201715c2aa01329a4f7c740703716544a15"
+  },
+  "calls": [
+    {
+      "id": "1",
+      "tool": "medical.list_departments",
+      "call_id": "eval-depts",
+      "input": {
+        "keyword": "Cardiology",
+        "active_only": true
+      },
+      "result": {
+        "tool_name": "medical.list_departments",
+        "step_id": "eval-depts",
+        "ok": true,
+        "request_id": "REQ-B134E0BFAA81",
+        "data": {
+          "request_id": "REQ-B134E0BFAA81",
+          "data": [
+            {
+              "resourceType": "Organization",
+              "id": "DEPT-CARDIO",
+              "name": "心臟科",
+              "name_en": "Cardiology",
+              "location_id": "LOC-MAIN-OPD",
+              "active": true
+            }
+          ],
+          "meta": {
+            "total": 1
+          }
+        },
+        "error": null
+      }
+    },
+    {
+      "id": "2",
+      "tool": "medical.search_registration_slots",
+      "call_id": "eval-search-1",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "eval-search-1",
+        "ok": false,
+        "request_id": "REQ-MW-D6289A6E1442",
+        "data": null,
+        "error": {
+          "code": "MOCK_SERVICE_ERROR",
+          "message": "Mock 醫療服務暫時不可用。",
+          "status": 500,
+          "details": {
+            "code": "MOCK_SERVICE_ERROR",
+            "message": "Mock 醫療服務暫時不可用。",
+            "status": 500,
+            "details": {
+              "code": "MOCK_SERVICE_ERROR",
+              "message": "Mock 醫療服務暫時不可用。",
+              "details": {},
+              "retryable": true,
+              "timestamp": "2026-10-13T09:00:00+08:00"
+            },
+            "retryable": true
+          },
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "3",
+      "tool": "medical.search_registration_slots",
+      "call_id": "eval-search-2",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "eval-search-2",
+        "ok": false,
+        "request_id": "REQ-MW-3A77830BFC9D",
+        "data": null,
+        "error": {
+          "code": "MOCK_SERVICE_ERROR",
+          "message": "Mock 醫療服務暫時不可用。",
+          "status": 500,
+          "details": {
+            "code": "MOCK_SERVICE_ERROR",
+            "message": "Mock 醫療服務暫時不可用。",
+            "status": 500,
+            "details": {
+              "code": "MOCK_SERVICE_ERROR",
+              "message": "Mock 醫療服務暫時不可用。",
+              "details": {},
+              "retryable": true,
+              "timestamp": "2026-10-13T09:00:00+08:00"
+            },
+            "retryable": true
+          },
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "4",
+      "tool": "medical.search_registration_slots",
+      "call_id": "eval-search-3",
+      "input": {
+        "department_id": "DEPT-CARDIO",
+        "date": "2026-10-20",
+        "session": "afternoon"
+      },
+      "result": {
+        "tool_name": "medical.search_registration_slots",
+        "step_id": "eval-search-3",
+        "ok": false,
+        "request_id": "REQ-MW-07A003287AFB",
+        "data": null,
+        "error": {
+          "code": "MOCK_SERVICE_ERROR",
+          "message": "Mock 醫療服務暫時不可用。",
+          "status": 500,
+          "details": {
+            "code": "MOCK_SERVICE_ERROR",
+            "message": "Mock 醫療服務暫時不可用。",
+            "status": 500,
+            "details": {
+              "code": "MOCK_SERVICE_ERROR",
+              "message": "Mock 醫療服務暫時不可用。",
+              "details": {},
+              "retryable": true,
+              "timestamp": "2026-10-13T09:00:00+08:00"
+            },
+            "retryable": true
+          },
+          "retryable": true
+        }
+      }
+    }
+  ],
+  "model_exchanges": [
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Ponte's bounded cardiology demonstration agent. Use only provided tools, exactly one call per decision. First call medical.list_departments with exactly {\"keyword\":\"Cardiology\",\"active_only\":true}. Keep the literal English keyword \"Cardiology\" even when the user writes Chinese; do not translate tool arguments. Then call medical.search_registration_slots for DEPT-CARDIO on the server's next_tuesday date with session=afternoon. Select the earliest returned available slot matching the user's latest intent. An afternoon request already provides enough information: choose 14:00 if available; do not ask whether the user prefers after 3 PM unless they request that change. When a matching slot exists, your next decision must call medical.create_registration with department_id, slot_id, consent=true and optionally the matching doctor_id. Do not ask for patient_id or additional confirmation in text before proposing. For 'after 3 PM' use timezone-aware slot times strictly after 15:00. There is no after_time search parameter. A create_registration call is only a draft proposal: the server waits for explicit slot selection before a confirmation button. Patient identity, trusted context and idempotency are injected by the server. Never infer approval from user text, speech, consent, or model output. Never claim a booking succeeded. If a proposal's tool result is SUPERSEDED, follow the new user intent. If a slot is unavailable, search again and propose a different returned slot. If no slot matches, return strict JSON {\"action\":\"clarify\",\"message\":\"...\"}. Any respond/clarify decision must have exactly action and message keys.Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text. \nDEMO_SERVER_CONTEXT={\"today\": \"2026-10-13\", \"next_tuesday\": \"2026-10-20\", \"timezone\": \"Asia/Macau\"}"
+        },
+        {
+          "role": "user",
+          "content": "幫我預約下星期二的心臟科"
+        },
+        {
+          "role": "system",
+          "content": "Planning mode: do not classify again. Call the next catalogue/search/create draft tool using current server constraints. If current_verified_slots is empty, previous search results are invalid for this revision: search again before create. Only propose slots in current_verified_slots. SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"afternoon\"}, \"options_presentation\": null, \"intent_revision\": 1, \"conflict_result\": null}"
+        }
+      ],
+      "options": {
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.list_departments",
+              "description": "查詢可網上辦理的醫療科室。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "location_id": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "active_only": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.search_registration_slots",
+              "description": "搜尋門診掛號可用時段。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon"
+                    ]
+                  },
+                  "location_id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "date"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.create_registration",
+              "description": "建立門診掛號。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "type": "string"
+                  },
+                  "visit_reason": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "slot_id",
+                  "consent"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.get_my_appointments",
+              "description": "查詢目前病人的預約清單。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "Optional comma-separated stored statuses: booked (outpatient registration), confirmed (examination/treatment), cancelled. Omit to retrieve all appointments, including referral candidates; active is not a stored status."
+                  },
+                  "appointment_type": {
+                    "type": "string"
+                  },
+                  "date_from": {
+                    "type": "string"
+                  },
+                  "date_to": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "page_size": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0
+      },
+      "response": {
+        "choices": [
+          {
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "eval-depts",
+                  "type": "function",
+                  "function": {
+                    "name": "medical.list_departments",
+                    "arguments": "{\"keyword\": \"Cardiology\", \"active_only\": true}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Ponte's bounded cardiology demonstration agent. Use only provided tools, exactly one call per decision. First call medical.list_departments with exactly {\"keyword\":\"Cardiology\",\"active_only\":true}. Keep the literal English keyword \"Cardiology\" even when the user writes Chinese; do not translate tool arguments. Then call medical.search_registration_slots for DEPT-CARDIO on the server's next_tuesday date with session=afternoon. Select the earliest returned available slot matching the user's latest intent. An afternoon request already provides enough information: choose 14:00 if available; do not ask whether the user prefers after 3 PM unless they request that change. When a matching slot exists, your next decision must call medical.create_registration with department_id, slot_id, consent=true and optionally the matching doctor_id. Do not ask for patient_id or additional confirmation in text before proposing. For 'after 3 PM' use timezone-aware slot times strictly after 15:00. There is no after_time search parameter. A create_registration call is only a draft proposal: the server waits for explicit slot selection before a confirmation button. Patient identity, trusted context and idempotency are injected by the server. Never infer approval from user text, speech, consent, or model output. Never claim a booking succeeded. If a proposal's tool result is SUPERSEDED, follow the new user intent. If a slot is unavailable, search again and propose a different returned slot. If no slot matches, return strict JSON {\"action\":\"clarify\",\"message\":\"...\"}. Any respond/clarify decision must have exactly action and message keys.Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text. \nDEMO_SERVER_CONTEXT={\"today\": \"2026-10-13\", \"next_tuesday\": \"2026-10-20\", \"timezone\": \"Asia/Macau\"}"
+        },
+        {
+          "role": "user",
+          "content": "幫我預約下星期二的心臟科"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-depts",
+              "type": "function",
+              "function": {
+                "name": "medical.list_departments",
+                "arguments": "{\"keyword\": \"Cardiology\", \"active_only\": true}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-depts",
+          "content": "{\"tool_name\": \"medical.list_departments\", \"step_id\": \"eval-depts\", \"ok\": true, \"request_id\": \"REQ-B134E0BFAA81\", \"data\": {\"request_id\": \"REQ-B134E0BFAA81\", \"data\": [{\"resourceType\": \"Organization\", \"id\": \"DEPT-CARDIO\", \"name\": \"心臟科\", \"name_en\": \"Cardiology\", \"location_id\": \"LOC-MAIN-OPD\", \"active\": true}], \"meta\": {\"total\": 1}}, \"error\": null}"
+        },
+        {
+          "role": "system",
+          "content": "Planning mode: do not classify again. Call the next catalogue/search/create draft tool using current server constraints. If current_verified_slots is empty, previous search results are invalid for this revision: search again before create. Only propose slots in current_verified_slots. SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"afternoon\"}, \"options_presentation\": null, \"intent_revision\": 1, \"conflict_result\": null}"
+        }
+      ],
+      "options": {
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.list_departments",
+              "description": "查詢可網上辦理的醫療科室。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "location_id": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "active_only": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.search_registration_slots",
+              "description": "搜尋門診掛號可用時段。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon"
+                    ]
+                  },
+                  "location_id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "date"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.create_registration",
+              "description": "建立門診掛號。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "type": "string"
+                  },
+                  "visit_reason": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "slot_id",
+                  "consent"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.get_my_appointments",
+              "description": "查詢目前病人的預約清單。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "Optional comma-separated stored statuses: booked (outpatient registration), confirmed (examination/treatment), cancelled. Omit to retrieve all appointments, including referral candidates; active is not a stored status."
+                  },
+                  "appointment_type": {
+                    "type": "string"
+                  },
+                  "date_from": {
+                    "type": "string"
+                  },
+                  "date_to": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "page_size": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0
+      },
+      "response": {
+        "choices": [
+          {
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "eval-search-1",
+                  "type": "function",
+                  "function": {
+                    "name": "medical.search_registration_slots",
+                    "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text.   SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"afternoon\"}, \"options_presentation\": null, \"intent_revision\": 1, \"conflict_result\": null}"
+        },
+        {
+          "role": "user",
+          "content": "三點半先得"
+        }
+      ],
+      "options": {
+        "tools": [],
+        "tool_choice": "none",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "demo_control": true
+      },
+      "response": {
+        "action": "update_constraints",
+        "time_constraint": {
+          "kind": "lower_bound",
+          "time": "15:30",
+          "inclusive": true
+        }
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Ponte's bounded cardiology demonstration agent. Use only provided tools, exactly one call per decision. First call medical.list_departments with exactly {\"keyword\":\"Cardiology\",\"active_only\":true}. Keep the literal English keyword \"Cardiology\" even when the user writes Chinese; do not translate tool arguments. Then call medical.search_registration_slots for DEPT-CARDIO on the server's next_tuesday date with session=afternoon. Select the earliest returned available slot matching the user's latest intent. An afternoon request already provides enough information: choose 14:00 if available; do not ask whether the user prefers after 3 PM unless they request that change. When a matching slot exists, your next decision must call medical.create_registration with department_id, slot_id, consent=true and optionally the matching doctor_id. Do not ask for patient_id or additional confirmation in text before proposing. For 'after 3 PM' use timezone-aware slot times strictly after 15:00. There is no after_time search parameter. A create_registration call is only a draft proposal: the server waits for explicit slot selection before a confirmation button. Patient identity, trusted context and idempotency are injected by the server. Never infer approval from user text, speech, consent, or model output. Never claim a booking succeeded. If a proposal's tool result is SUPERSEDED, follow the new user intent. If a slot is unavailable, search again and propose a different returned slot. If no slot matches, return strict JSON {\"action\":\"clarify\",\"message\":\"...\"}. Any respond/clarify decision must have exactly action and message keys.Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text. \nDEMO_SERVER_CONTEXT={\"today\": \"2026-10-13\", \"next_tuesday\": \"2026-10-20\", \"timezone\": \"Asia/Macau\"}"
+        },
+        {
+          "role": "user",
+          "content": "幫我預約下星期二的心臟科"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-depts",
+              "type": "function",
+              "function": {
+                "name": "medical.list_departments",
+                "arguments": "{\"keyword\": \"Cardiology\", \"active_only\": true}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-depts",
+          "content": "{\"tool_name\": \"medical.list_departments\", \"step_id\": \"eval-depts\", \"ok\": true, \"request_id\": \"REQ-B134E0BFAA81\", \"data\": {\"request_id\": \"REQ-B134E0BFAA81\", \"data\": [{\"resourceType\": \"Organization\", \"id\": \"DEPT-CARDIO\", \"name\": \"心臟科\", \"name_en\": \"Cardiology\", \"location_id\": \"LOC-MAIN-OPD\", \"active\": true}], \"meta\": {\"total\": 1}}, \"error\": null}"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-search-1",
+              "type": "function",
+              "function": {
+                "name": "medical.search_registration_slots",
+                "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-search-1",
+          "content": "{\"tool_name\": \"medical.search_registration_slots\", \"step_id\": \"eval-search-1\", \"ok\": false, \"request_id\": \"REQ-MW-D6289A6E1442\", \"data\": null, \"error\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"details\": {}, \"retryable\": true, \"timestamp\": \"2026-10-13T09:00:00+08:00\"}, \"retryable\": true}, \"retryable\": true}}"
+        },
+        {
+          "role": "user",
+          "content": "三點半先得"
+        },
+        {
+          "role": "assistant",
+          "content": "{\"action\": \"update_constraints\", \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:30\", \"inclusive\": true}}"
+        },
+        {
+          "role": "system",
+          "content": "Planning mode: do not classify again. Call the next catalogue/search/create draft tool using current server constraints. If current_verified_slots is empty, previous search results are invalid for this revision: search again before create. Only propose slots in current_verified_slots. SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:30\", \"inclusive\": true}, \"options_presentation\": null, \"intent_revision\": 2, \"conflict_result\": null}"
+        }
+      ],
+      "options": {
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.list_departments",
+              "description": "查詢可網上辦理的醫療科室。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "location_id": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "active_only": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.search_registration_slots",
+              "description": "搜尋門診掛號可用時段。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon"
+                    ]
+                  },
+                  "location_id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "date"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.create_registration",
+              "description": "建立門診掛號。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "type": "string"
+                  },
+                  "visit_reason": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "slot_id",
+                  "consent"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.get_my_appointments",
+              "description": "查詢目前病人的預約清單。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "Optional comma-separated stored statuses: booked (outpatient registration), confirmed (examination/treatment), cancelled. Omit to retrieve all appointments, including referral candidates; active is not a stored status."
+                  },
+                  "appointment_type": {
+                    "type": "string"
+                  },
+                  "date_from": {
+                    "type": "string"
+                  },
+                  "date_to": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "page_size": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0
+      },
+      "response": {
+        "choices": [
+          {
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "eval-search-2",
+                  "type": "function",
+                  "function": {
+                    "name": "medical.search_registration_slots",
+                    "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text.   SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:30\", \"inclusive\": true}, \"options_presentation\": null, \"intent_revision\": 2, \"conflict_result\": null}"
+        },
+        {
+          "role": "user",
+          "content": "改成唔好三點前就得"
+        }
+      ],
+      "options": {
+        "tools": [],
+        "tool_choice": "none",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "demo_control": true
+      },
+      "response": {
+        "action": "update_constraints",
+        "time_constraint": {
+          "kind": "lower_bound",
+          "time": "15:00",
+          "inclusive": true
+        }
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Ponte's bounded cardiology demonstration agent. Use only provided tools, exactly one call per decision. First call medical.list_departments with exactly {\"keyword\":\"Cardiology\",\"active_only\":true}. Keep the literal English keyword \"Cardiology\" even when the user writes Chinese; do not translate tool arguments. Then call medical.search_registration_slots for DEPT-CARDIO on the server's next_tuesday date with session=afternoon. Select the earliest returned available slot matching the user's latest intent. An afternoon request already provides enough information: choose 14:00 if available; do not ask whether the user prefers after 3 PM unless they request that change. When a matching slot exists, your next decision must call medical.create_registration with department_id, slot_id, consent=true and optionally the matching doctor_id. Do not ask for patient_id or additional confirmation in text before proposing. For 'after 3 PM' use timezone-aware slot times strictly after 15:00. There is no after_time search parameter. A create_registration call is only a draft proposal: the server waits for explicit slot selection before a confirmation button. Patient identity, trusted context and idempotency are injected by the server. Never infer approval from user text, speech, consent, or model output. Never claim a booking succeeded. If a proposal's tool result is SUPERSEDED, follow the new user intent. If a slot is unavailable, search again and propose a different returned slot. If no slot matches, return strict JSON {\"action\":\"clarify\",\"message\":\"...\"}. Any respond/clarify decision must have exactly action and message keys.Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text. \nDEMO_SERVER_CONTEXT={\"today\": \"2026-10-13\", \"next_tuesday\": \"2026-10-20\", \"timezone\": \"Asia/Macau\"}"
+        },
+        {
+          "role": "user",
+          "content": "幫我預約下星期二的心臟科"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-depts",
+              "type": "function",
+              "function": {
+                "name": "medical.list_departments",
+                "arguments": "{\"keyword\": \"Cardiology\", \"active_only\": true}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-depts",
+          "content": "{\"tool_name\": \"medical.list_departments\", \"step_id\": \"eval-depts\", \"ok\": true, \"request_id\": \"REQ-B134E0BFAA81\", \"data\": {\"request_id\": \"REQ-B134E0BFAA81\", \"data\": [{\"resourceType\": \"Organization\", \"id\": \"DEPT-CARDIO\", \"name\": \"心臟科\", \"name_en\": \"Cardiology\", \"location_id\": \"LOC-MAIN-OPD\", \"active\": true}], \"meta\": {\"total\": 1}}, \"error\": null}"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-search-1",
+              "type": "function",
+              "function": {
+                "name": "medical.search_registration_slots",
+                "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-search-1",
+          "content": "{\"tool_name\": \"medical.search_registration_slots\", \"step_id\": \"eval-search-1\", \"ok\": false, \"request_id\": \"REQ-MW-D6289A6E1442\", \"data\": null, \"error\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"details\": {}, \"retryable\": true, \"timestamp\": \"2026-10-13T09:00:00+08:00\"}, \"retryable\": true}, \"retryable\": true}}"
+        },
+        {
+          "role": "user",
+          "content": "三點半先得"
+        },
+        {
+          "role": "assistant",
+          "content": "{\"action\": \"update_constraints\", \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:30\", \"inclusive\": true}}"
+        },
+        {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "eval-search-2",
+              "type": "function",
+              "function": {
+                "name": "medical.search_registration_slots",
+                "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "eval-search-2",
+          "content": "{\"tool_name\": \"medical.search_registration_slots\", \"step_id\": \"eval-search-2\", \"ok\": false, \"request_id\": \"REQ-MW-3A77830BFC9D\", \"data\": null, \"error\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"status\": 500, \"details\": {\"code\": \"MOCK_SERVICE_ERROR\", \"message\": \"Mock 醫療服務暫時不可用。\", \"details\": {}, \"retryable\": true, \"timestamp\": \"2026-10-13T09:00:00+08:00\"}, \"retryable\": true}, \"retryable\": true}}"
+        },
+        {
+          "role": "user",
+          "content": "改成唔好三點前就得"
+        },
+        {
+          "role": "assistant",
+          "content": "{\"action\": \"update_constraints\", \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:00\", \"inclusive\": true}}"
+        },
+        {
+          "role": "system",
+          "content": "Planning mode: do not classify again. Call the next catalogue/search/create draft tool using current server constraints. If current_verified_slots is empty, previous search results are invalid for this revision: search again before create. Only propose slots in current_verified_slots. SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:00\", \"inclusive\": true}, \"options_presentation\": null, \"intent_revision\": 3, \"conflict_result\": null}"
+        }
+      ],
+      "options": {
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.list_departments",
+              "description": "查詢可網上辦理的醫療科室。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "location_id": {
+                    "type": "string"
+                  },
+                  "keyword": {
+                    "type": "string"
+                  },
+                  "active_only": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.search_registration_slots",
+              "description": "搜尋門診掛號可用時段。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "type": "string",
+                    "enum": [
+                      "morning",
+                      "afternoon"
+                    ]
+                  },
+                  "location_id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "date"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.create_registration",
+              "description": "建立門診掛號。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string"
+                  },
+                  "doctor_id": {
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "type": "string"
+                  },
+                  "visit_reason": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "department_id",
+                  "slot_id",
+                  "consent"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "medical.get_my_appointments",
+              "description": "查詢目前病人的預約清單。",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "Optional comma-separated stored statuses: booked (outpatient registration), confirmed (examination/treatment), cancelled. Omit to retrieve all appointments, including referral candidates; active is not a stored status."
+                  },
+                  "appointment_type": {
+                    "type": "string"
+                  },
+                  "date_from": {
+                    "type": "string"
+                  },
+                  "date_to": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "page_size": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0
+      },
+      "response": {
+        "choices": [
+          {
+            "message": {
+              "role": "assistant",
+              "content": null,
+              "tool_calls": [
+                {
+                  "id": "eval-search-3",
+                  "type": "function",
+                  "function": {
+                    "name": "medical.search_registration_slots",
+                    "arguments": "{\"department_id\": \"DEPT-CARDIO\", \"date\": \"2026-10-20\", \"session\": \"afternoon\"}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "Control mode: return exactly one JSON object. action enum: query_appointments, answer_question, resume_booking, select_slot, update_constraints, clarify. Query/answer/resume have only action. clarify has action and message (a question for the user). update_constraints has action and time_constraint: {\"kind\":\"afternoon\"} or {\"kind\":\"lower_bound\",\"time\":\"HH:MM\",\"inclusive\":true|false} or {\"kind\":\"exact\",\"time\":\"HH:MM\"}. New requirements replace previous constraints. select_slot MUST have target: {\"kind\":\"time\",\"time\":\"HH:MM\"}, {\"kind\":\"ordinal\",\"ordinal\":1,\"presentation_id\":\"the published ID\"}, {\"kind\":\"slot_id\",\"slot_id\":\"...\"}, or {\"kind\":\"current\"} for explicit this/that draft. A named time or ordinal selection is select_slot even after an inquiry; never resume_booking. An ambiguous yes/OK is clarify. Resume requests revalidation, not selection or approval. query_appointments means retrieve whether/what other appointments the patient has, even if phrased as a question. answer_question is only a follow-up comparison or overlap question in phase inquiry; the server answers from its snapshot. update_constraints means a new time requirement, including minimum acceptable time, not-earlier-than (inclusive), strictly after (exclusive), and a reversal to a specific time (exact). A requirement is not selection of a returned slot. Cantonese time + 先得 describes a minimum acceptable time, inclusive unless 後 explicitly excludes the boundary. Negated before means inclusive lower bound; a return/reversal naming a new time replaces the old constraint with exact. select_slot means choosing a displayed option by named clock time, ordinal, ID or explicitly this draft. A brief named-time choice is selection. Resume is only returning to the booking flow without choosing a named time or option. For update_constraints never substitute the earliest available slot for the requested boundary. Tool names are never control actions. Do not infer approval from text.   SERVER_STATE={\"phase\": \"planning\", \"candidate_id\": null, \"candidate\": null, \"current_verified_slots\": [], \"time_constraint\": {\"kind\": \"lower_bound\", \"time\": \"15:00\", \"inclusive\": true}, \"options_presentation\": null, \"intent_revision\": 3, \"conflict_result\": null}"
+        },
+        {
+          "role": "user",
+          "content": "就15:00嗰個"
+        }
+      ],
+      "options": {
+        "tools": [],
+        "tool_choice": "none",
+        "response_format": {
+          "type": "json_object"
+        },
+        "temperature": 0,
+        "demo_control": true
+      },
+      "response": {
+        "action": "clarify",
+        "message": "所選時段已失效，請重新選擇。"
+      }
+    }
+  ],
+  "fixture": {
+    "slots": {
+      "S1400": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT02-S1400",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T14:00:00+08:00",
+        "end": "2026-10-20T14:15:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      },
+      "S1500": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT02-S1500",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T15:00:00+08:00",
+        "end": "2026-10-20T15:15:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      },
+      "S1515": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT02-S1515",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T15:15:00+08:00",
+        "end": "2026-10-20T15:30:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      },
+      "S1530": {
+        "resourceType": "Slot",
+        "id": "SLOT-EVAL-MT02-S1530",
+        "status": "free",
+        "slot_type": "outpatient_registration",
+        "department_id": "DEPT-CARDIO",
+        "doctor_id": "DOC-002",
+        "location_id": "LOC-MAIN-OPD",
+        "location": {
+          "id": "LOC-MAIN-OPD",
+          "display": "第一門診"
+        },
+        "start": "2026-10-20T15:30:00+08:00",
+        "end": "2026-10-20T15:45:00+08:00",
+        "capacity": 1,
+        "remaining": 1,
+        "session": "afternoon"
+      }
+    },
+    "appointments": [],
+    "intervention_ids": []
+  },
+  "error": {
+    "category": "approval",
+    "type": "server_approval_unavailable"
+  }
+}

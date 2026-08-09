@@ -1,0 +1,32 @@
+{
+  "started_at_utc": "2026-10-14T03:03:51.287300+00:00",
+  "app_revision": "53520f74461387e4c924e8b83295ba0a4bb70c90",
+  "app_source_hashes": {
+    "middleware\\demo_medical_workflow.py": "10cabb31d4ed224fe0b676b368fd49d709a26248642de72acae347a36854c3ed",
+    "middleware\\demo_time.py": "f13c1df2c465ca661f779228b8469374a6d219aa9c5332c4fc0182d4946faeb6",
+    "middleware\\demo_model.py": "6985b6c226324bb053d969cb7c6a9fb23b43a6f73e5c944e0dda35f7a6850443",
+    "middleware\\interaction_delivery.py": "d4eb4c8f37108b1e4f2e5a8ddf891790e5777a1fc0d9b4ab898669dca81938ba",
+    "middleware\\server.py": "b2ea74e1dea7e8cfeeaa314d0d707e12d74c5bdc355e3184b6542bd0e7127503",
+    "middleware\\execution.py": "6164fe60d0c80076fc463b9610a66ad03c443ac10b27f603097796ff2d3fcf6f"
+  },
+  "harness_source_hashes": {
+    "adapter.py": "8c06b73cfd4e44ca5e8c57bded39cd90b4edac085c9ba2aade2c4c3f41e23a77",
+    "audit.py": "212c7082dc512f8b989e5d3d4427334ca2f7c6f78238f207716bc28a584e6706",
+    "compare.py": "c4fae3c0361c2d9e3090b0928c8a7d20df27db86a36a641d6fe7f8a62b78004d",
+    "harmonized_audit.py": "3d795e434f2b65eea706b3393cc8f33a96562557cdfbd59f5c8275dad62ffade",
+    "observer_facts.py": "812e71a2b3d42837eb0c8f54ad37ff741769c668449306db960356cee6b8a29a",
+    "runner.py": "df59f8986303aad15bd043b25d0bd0cc978e9ec1483fcac1e5daf19f1036f1b4",
+    "scoring.py": "108c718e4ac52ce873aeab3c9a90e3a495cbb0e3abba5e72aa9f7ca2f3eaa0f5",
+    "test_observer_facts.py": "962a83130ecdd37f3b1eeb53e4457d15a96a10e4f086aeca2838b840677ed006",
+    "test_scoring.py": "b4c80f454264fa7c05fbbc4062cdbe75104cac03daa4dcfb0b61078e0110227a"
+  },
+  "dataset_hash": "3c7f2b7c62af0aec5abc688f9f0d7e6b646237c5893038082990a8131344b326",
+  "clock": "2026-10-13T09:00:00+08:00",
+  "timezone": "Asia/Macau",
+  "model": "gpt-4.1-mini",
+  "endpoint_type": "https://api.openai.com",
+  "prompt_hash": "040557deb66614a15c6bbdb7b32e022d8e8e3aaa8b68ebde6dd5cb05262c7dc2",
+  "temperature": 0,
+  "max_decisions": 4,
+  "runner_version": 1
+}

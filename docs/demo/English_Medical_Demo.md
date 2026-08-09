@@ -1,6 +1,6 @@
 # English medical demo
 
-The seven-turn workflow is now integrated with main's current UI and general agent. Use the [current runbook](../CARDIOLOGY_DEMO.md) for startup and routing. The real-model integration rehearsal at [20261014T031039Z](../../outputs/evaluation/integration-english-real-20261014T031039Z/evidence.json) completed the original seven-turn assertions, verified the 15:30 receipt and replay, and produced one write dispatch. Earlier failed attempts are retained separately. A single successful rehearsal does not establish general English reliability.
+The seven-turn workflow is now integrated with main's current UI and general agent. Use the [current runbook](../CARDIOLOGY_DEMO.md) for startup and routing. The real-model integration rehearsal at [20261014T052159Z](../../outputs/evaluation/integration-english-real_model-20261014T052159Z/evidence.json) completed the original seven-turn assertions, verified the 15:30 receipt and replay, and produced one write dispatch. Earlier failed attempts are retained separately. A single successful rehearsal does not establish general English reliability.
 
 The bounded cardiology demo supports English text input and English delivery: conversation responses, ordered time options, appointment history, confirmation labels and receipt display. Backend records and task facts remain canonical; localized presentation does not change the server-issued approval event, proposal binding, identity or idempotency key.
 

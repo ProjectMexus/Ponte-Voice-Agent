@@ -56,6 +56,8 @@ The listed times assume a fresh `live-demo-v2` dataset. The service clock determ
 
 ## Verification
 
+See the [integration results](CARDIOLOGY_INTEGRATION_RESULTS.md) for separate scripted/real-model scores and all retained attempts.
+
 ```powershell
 python -m unittest tests.test_demo_agent_e2e tests.test_demo_round2_e2e tests.test_live_medical_demo_e2e tests.test_english_medical_demo_e2e tests.test_integrated_cardiology_routing -q
 python -m unittest tests.test_agent_full_stack tests.test_english_interactions -q
@@ -63,6 +65,8 @@ python -m unittest discover -s evals/multi_turn -p 'test_*.py' -q
 python -m evals.multi_turn.runner --track both
 ```
 
-The last command makes billable provider calls for the real-model track. Each run creates a new directory. The original eight cases and historical records are retained; scripted, live-model, calibration and failed attempts remain separate. A passing single rehearsal is not a reliability estimate.
+An isolated English rehearsal is also available locally: `python scripts/rehearse_english.py --track scripted` or `--track real_model`. This helper uses the retained acceptance fixture and its fixed service clock, rather than your running browser dataset. The real-model variant is billable.
+
+The eight-case runner makes billable provider calls for the real-model track. Each run creates a new directory. The original eight cases and historical records are retained; scripted, live-model, calibration and failed attempts remain separate. A passing single rehearsal is not a reliability estimate.
 
 Supplementary diagrams of the bounded cardiology path: [Chinese SVG](architecture/Ponte_Demo_Architecture.svg) · [English SVG](architecture/Ponte_Demo_Architecture.en.svg). These describe that domain path, not the entire general-agent capability set. General runtime details remain in [AGENT_EXECUTION.md](AGENT_EXECUTION.md).
