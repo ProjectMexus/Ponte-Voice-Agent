@@ -5,6 +5,38 @@ This is a delivery audit, not model reasoning or an alternative approval path.
 from collections.abc import Mapping
 
 
+_TOOL_OPERATIONS = {
+    "medical.list_departments": ("查詢可用科室", "departments"),
+    "medical.search_registration_slots": ("查詢可用時段", "slots"),
+    "medical.get_my_appointments": ("查詢現有預約", "appointments"),
+    "medical.create_registration": ("提交掛號要求", "booking"),
+    "medical.list_appointment_services": ("查詢醫療服務", "services"),
+    "medical.search_appointment_slots": ("查詢可用時段", "slots"),
+    "medical.create_appointment": ("提交預約要求", "booking"),
+    "one_account.get_cash_sharing_plan": ("查詢現金分享計劃", "cash"),
+}
+
+
+def record_tool_events(logs, *, at, offset=0):
+    """Describe only observed allowlisted dispatches, without raw results or inferred milestones."""
+    events = []
+    for log in logs:
+        if not isinstance(log, Mapping) or log.get("type") != "tool_execution":
+            continue
+        tool = log.get("tool")
+        entry = _TOOL_OPERATIONS.get(tool) if isinstance(tool, str) else None
+        if entry is None:
+            continue
+        title, operation = entry
+        ok = log.get("ok") is True
+        events.append({"id": f"E{offset + len(events) + 1}",
+                       "kind": "booking_submitted" if operation == "booking" else "service_lookup",
+                       "operation": operation, "title": title,
+                       "detail": "已收到服務回覆。" if ok else "查詢或提交未能完成；以後續核對結果為準。",
+                       "status": "completed" if ok else "failed", "at": at})
+    return events
+
+
 def constraint_text(value):
     if not isinstance(value, Mapping):
         return ""
@@ -38,17 +70,11 @@ def record_service_events(facts, logs, previous, *, phase, confirmation, receipt
         add("draft_invalidated", "先前的候選草稿已撤銷", f"{previous['candidate']} 不再可用；請以目前的時段與草稿為準。")
     if previous.get("confirmation") and current["confirmation"] != previous["confirmation"] and not receipt:
         add("approval_invalidated", "先前的確認已失效", "舊確認不能提交掛號；請以最新資料重新確認。")
-    labels = {
-        "medical.list_departments": "查詢可用科室",
-        "medical.search_registration_slots": "查詢可用時段",
-        "medical.get_my_appointments": "查詢現有預約",
-        "medical.create_registration": "提交掛號要求",
-    }
     for log in logs:
-        if log.get("type") == "tool_execution" and log.get("tool") in labels:
-            ok = log.get("ok") is True
-            add("service_lookup" if log["tool"] != "medical.create_registration" else "booking_submitted",
-                labels[log["tool"]], "已收到服務回覆。" if ok else "查詢或提交未能完成；以後續核對結果為準。", "completed" if ok else "failed")
+        if not isinstance(log, Mapping):
+            continue
+        if log.get("type") == "tool_execution":
+            events.extend(record_tool_events([log], at=at, offset=offset + len(events)))
         elif log.get("type") == "selection_resolved":
             reference = {"current": "目前候選草稿", "time": "指定的時間", "slot_id": "指定的時段編號", "ordinal": f"本次清單第 {log.get('ordinal', '')} 個時段"}.get(log.get("kind"), "你指定的時段")
             add("selection_resolved", "已理解所選時段", f"{reference}；會重新核對可用性，尚未提交。")

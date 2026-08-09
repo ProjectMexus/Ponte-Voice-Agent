@@ -555,8 +555,16 @@ def _service_activity(facts):
     events = facts.get("service_events")
     if not isinstance(events, list):
         return []
-    return [{key: event[key] for key in ("id", "kind", "title", "detail", "status", "at") if isinstance(event.get(key), str)}
-            for event in events if isinstance(event, Mapping) and isinstance(event.get("id"), str) and isinstance(event.get("title"), str)]
+    projected = []
+    for event in events:
+        if not isinstance(event, Mapping) or not isinstance(event.get("id"), str) or not isinstance(event.get("title"), str):
+            continue
+        public = {key: event[key] for key in ("id", "kind", "title", "detail", "status", "at") if isinstance(event.get(key), str)}
+        operation = event.get("operation")
+        if isinstance(operation, str) and operation in {"departments", "slots", "appointments", "booking", "services", "cash"}:
+            public["operation"] = operation
+        projected.append(public)
+    return projected
 
 
 def _agent_context(facts):

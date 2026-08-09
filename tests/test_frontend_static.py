@@ -98,7 +98,7 @@ class FrontendStaticTests(unittest.TestCase):
             self.assertIn(marker, source)
 
     def test_required_voice_assets_are_served_without_a_cache(self):
-        for path in ("app.js", "demo-console.js", "interaction-view.js", "styles.css", "voice-capture.js", "voice-exceptions.js", "mcp-client.js", "ponte2.jpg"):
+        for path in ("app.js", "demo-console.js", "agent-motion.js", "interaction-view.js", "styles.css", "voice-capture.js", "voice-exceptions.js", "mcp-client.js", "ponte2.jpg"):
             with self.opener.open(self.base_url + "/" + path) as response:
                 self.assertEqual(response.headers.get("Cache-Control"), "no-store")
 

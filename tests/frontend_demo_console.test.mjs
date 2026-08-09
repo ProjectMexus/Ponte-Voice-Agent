@@ -56,6 +56,55 @@ test("a scenario previews its phrase so a presenter can review before sending", 
   assert.equal(fixture.document.activeElement, nodes["message-input"]);
 });
 
+test("composer feedback follows text, exact shortcut selection, busy state and reset", () => {
+  const input = nodes["message-input"];
+  const form = nodes["message-form"];
+  const send = nodes["send-button"];
+  const suggestion = nodes["medical-scenario"];
+  assert.equal(send.disabled, true);
+  assert.equal(form.classList.contains("has-content"), false);
+  assert.equal(form.getAttribute("aria-busy"), "false");
+  assert.equal(suggestion.getAttribute("aria-pressed"), "false");
+
+  suggestion.click();
+  assert.equal(form.classList.contains("has-content"), true);
+  assert.equal(send.disabled, false);
+  assert.equal(suggestion.classList.contains("is-selected"), true);
+  assert.equal(suggestion.getAttribute("aria-pressed"), "true");
+
+  input.value += "明天下午";
+  input.dispatchEvent(createEvent("input"));
+  assert.equal(suggestion.classList.contains("is-selected"), false);
+  assert.equal(suggestion.getAttribute("aria-pressed"), "false");
+  assert.equal(send.disabled, false);
+
+  ui.preview(" 我想預約醫療服務 ");
+  assert.equal(suggestion.getAttribute("aria-pressed"), "false");
+  ui.setBusy(true);
+  assert.equal(send.disabled, true);
+  assert.equal(form.getAttribute("aria-busy"), "true");
+  ui.setBusy(false);
+  assert.equal(send.disabled, false);
+  assert.equal(form.getAttribute("aria-busy"), "false");
+
+  input.value = " \n ";
+  input.dispatchEvent(createEvent("input"));
+  assert.equal(send.disabled, true);
+  assert.equal(form.classList.contains("has-content"), false);
+  ui.setBusy(true);
+  ui.setBusy(false);
+  assert.equal(send.disabled, true);
+
+  ui.preview("我想預約醫療服務");
+  ui.reset();
+  assert.equal(send.disabled, true);
+  assert.equal(form.classList.contains("has-content"), false);
+  assert.equal(form.getAttribute("aria-busy"), "false");
+  assert.equal(suggestion.classList.contains("is-selected"), false);
+  assert.equal(suggestion.getAttribute("aria-pressed"), "false");
+  assert.deepEqual(submissions, []);
+});
+
 test("the composer trims a request and ignores whitespace-only submissions", () => {
   nodes["message-input"].value = "   ";
   const blank = createEvent("submit");

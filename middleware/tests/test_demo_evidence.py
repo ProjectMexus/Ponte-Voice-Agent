@@ -1,5 +1,5 @@
 import unittest
-from middleware.demo_evidence import constraint_text, record_service_events
+from middleware.demo_evidence import constraint_text, record_service_events, record_tool_events
 from middleware.interaction_delivery import WorkspaceProjector
 from middleware.tests.test_interaction_delivery import result_for
 
@@ -28,6 +28,50 @@ class DemoEvidenceTests(unittest.TestCase):
         self.assertEqual(events[0]["status"],"failed")
         self.assertNotIn("SECRET",str(events))
         self.assertNotIn("invented.tool",str(events))
+
+    def test_observed_tools_have_distinct_stable_operations(self):
+        tools = ["medical.list_departments", "medical.search_registration_slots",
+                 "medical.get_my_appointments", "medical.create_registration"]
+        events, _ = self.events(logs=[{"type": "tool_execution", "tool": tool, "ok": True} for tool in tools])
+        self.assertEqual([event["operation"] for event in events],
+                         ["departments", "slots", "appointments", "booking"])
+        self.assertEqual([event["kind"] for event in events],
+                         ["service_lookup", "service_lookup", "service_lookup", "booking_submitted"])
+        failed, _ = self.events(logs=[{"type": "tool_execution", "tool": tools[1], "ok": False}])
+        self.assertEqual(failed[0]["operation"], "slots")
+        self.assertEqual(failed[0]["status"], "failed")
+        changed, _ = self.events({"intent_revision": 2}, previous={"revision": 1})
+        self.assertNotIn("operation", changed[0])
+
+    def test_projection_preserves_only_allowlisted_operation_values(self):
+        allowed = ["departments", "slots", "appointments", "booking", "services", "cash"]
+        operations = allowed + ["confirm_automatically",
+                      {"authorization": "NESTED-SECRET"}, ["slots"], None]
+        events = [{"id": f"E{i}", "title": "服務回覆", "operation": operation,
+                   "authorization": "RAW-SECRET", "result": {"call_id": "PRIVATE-CALL"}}
+                  for i, operation in enumerate(operations)]
+        projection = WorkspaceProjector.project(result_for("select_slot", facts={"service_events": events}))
+        public = projection["activity"]
+        self.assertEqual([event.get("operation") for event in public[:len(allowed)]], allowed)
+        self.assertTrue(all("operation" not in event for event in public[len(allowed):]))
+        self.assertNotIn("confirm_automatically", str(public))
+        self.assertNotIn("SECRET", str(public))
+        self.assertNotIn("PRIVATE-CALL", str(public))
+        self.assertTrue(all(set(event) <= {"id", "title", "operation"} for event in public))
+
+    def test_common_tool_evidence_does_not_invent_workflow_milestones(self):
+        tools = ["medical.list_appointment_services", "medical.search_appointment_slots",
+                 "medical.create_appointment", "one_account.get_cash_sharing_plan"]
+        logs = [{"type": "tool_execution", "tool": tool, "ok": True,
+                 "authorization": "SECRET", "result": {"token": "PRIVATE"}} for tool in tools]
+        logs.extend([{"type": "tool_selected", "tool": tools[0]},
+                     {"type": "tool_execution", "tool": "unknown.tool", "ok": True}, None])
+        events = record_tool_events(logs, at="2026-10-14T00:00:00Z", offset=5)
+        self.assertEqual([event["operation"] for event in events], ["services", "slots", "booking", "cash"])
+        self.assertEqual([event["id"] for event in events], ["E6", "E7", "E8", "E9"])
+        self.assertEqual({event["kind"] for event in events}, {"service_lookup", "booking_submitted"})
+        self.assertNotIn("SECRET", str(events))
+        self.assertNotIn("PRIVATE", str(events))
 
     def test_revisions_revoke_previous_approval_in_the_evidence(self):
         events,_=self.events({"intent_revision":2,"time_constraint":{"kind":"exact","time":"14:00"}}, previous={"revision":1,"confirmation":"OLD"})

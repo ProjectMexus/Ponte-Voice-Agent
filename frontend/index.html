@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#f5f5f7" /><meta name="color-scheme" content="light" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#eef4fa" /><meta name="color-scheme" content="light" />
   <title>聆澳 Ponte · 你的公共服務助手</title><link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="voice-app">
   <a class="skip-link" href="#message-input">跳至輸入需求</a>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="icon-bridge" viewBox="0 0 32 32"><path d="M3 24h26M6 24V8m20 16V8M6 10c4 11 16 11 20 0M11 18v6m5-4v4m5-6v6" /></symbol>
+    <symbol id="icon-conversation" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-3 3v-9a8 8 0 0 1 8-8h2.5a7.5 7.5 0 0 1 7.5 6.5Z" /><path d="M7 10h8m-8 4h5" /></symbol>
     <symbol id="icon-medical" viewBox="0 0 24 24"><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z" /></symbol>
     <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M19 8V5H6a3 3 0 0 0 0 6h14v9H6a3 3 0 0 1-3-3V8m13 6h5v3h-5z" /></symbol>
     <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3" /><path d="M8 3v4m8-4v4M4 11h16m-11 4h2m3 0h2" /></symbol>
@@ -20,24 +21,24 @@
     <symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM8 12l3 3 5-6" /></symbol>
   </svg>
   <header class="voice-header">
-    <a class="brand-block" href="/" aria-label="聆澳 Ponte 首頁"><span class="brand-symbol"><svg class="icon"><use href="#icon-bridge" /></svg></span><span class="brand-name">Ponte<span>聆澳</span></span></a>
-    <div class="header-controls"><div class="connection-stack sr-only"><span id="health-status" class="health-status" role="status" aria-live="polite">正在連線</span><span id="connection-label" class="connection-label">正在檢查語音服務</span></div><div id="language-toggle" class="language-toggle" role="group" aria-label="顯示語言"><button class="language-option is-active" type="button" data-locale="zh-Hant" aria-pressed="true">繁中</button><button class="language-option" type="button" data-locale="en" aria-pressed="false">EN</button></div><button id="new-session" class="quiet-button" type="button"><svg class="icon"><use href="#icon-refresh" /></svg><span data-copy="newSession">重新開始</span></button></div>
+    <a class="brand-block" href="/" aria-label="聆澳 Ponte 首頁"><span class="brand-symbol"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-bridge" /></svg></span><span class="brand-name">Ponte<span>聆澳</span></span></a>
+    <div class="header-controls"><div class="connection-stack sr-only"><span id="health-status" class="health-status" role="status" aria-live="polite">正在連線</span><span id="connection-label" class="connection-label">正在檢查語音服務</span></div><div id="language-toggle" class="language-toggle" role="group" aria-label="顯示語言"><button class="language-option is-active" type="button" data-locale="zh-Hant" aria-pressed="true">繁中</button><button class="language-option" type="button" data-locale="en" aria-pressed="false">EN</button></div><button id="new-session" class="quiet-button" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-refresh" /></svg><span data-copy="newSession">重新開始</span></button></div>
   </header>
   <main class="voice-shell">
     <section class="page-intro" aria-labelledby="voice-title"><h1 id="voice-title" data-copy="greeting">今天想辦甚麼？</h1></section>
     <div class="demo-layout">
       <section class="conversation-panel panel" aria-labelledby="companion-heading">
-        <header class="panel-heading"><h2 id="companion-heading"><span data-copy="companion">對話</span></h2><button id="speech-toggle" class="sound-toggle" type="button" aria-pressed="true" aria-label="關閉自動朗讀"><svg class="icon"><use href="#icon-sound" /></svg><span data-copy="soundOn">朗讀開啟</span></button></header>
-        <div class="ponte-stage"><div class="avatar-orbit"><button id="ponte-button" class="ponte-button" type="button" aria-label="點按小澳開始說話" aria-pressed="false" aria-describedby="voice-state"><img id="ponte-avatar" src="/ponte2.jpg" alt="小澳" data-default-avatar="/ponte2.jpg" /><span id="avatar-action-label" class="sr-only">點按開始或停止語音</span><span class="avatar-mic" aria-hidden="true"><svg class="icon"><use href="#icon-mic" /></svg></span></button></div><p id="voice-state" class="sr-only" role="status" aria-live="polite">準備好了。點按小澳開始說話。</p><div class="voice-status-panel" aria-hidden="true"><span id="voice-status-label" class="voice-status-label">準備好了</span><span id="voice-status-hint" class="voice-status-hint">點按小澳開始說話</span></div><div class="voice-meter" aria-hidden="true"><span id="voice-meter-fill"></span></div></div>
+        <header class="panel-heading"><h2 id="companion-heading"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-conversation" /></svg><span data-copy="companion">對話</span></h2><button id="speech-toggle" class="sound-toggle" type="button" aria-pressed="true" aria-label="關閉自動朗讀"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-sound" /></svg><span data-copy="soundOn">朗讀開啟</span></button></header>
+        <div class="ponte-stage"><div class="avatar-orbit"><button id="ponte-button" class="ponte-button" type="button" aria-label="點按小澳開始說話" aria-pressed="false" aria-describedby="voice-state"><img id="ponte-avatar" src="/ponte2.jpg" alt="小澳" data-default-avatar="/ponte2.jpg" /><span id="avatar-action-label" class="sr-only">點按開始或停止語音</span><span class="avatar-mic" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mic" /></svg></span></button></div><p id="voice-state" class="sr-only" role="status" aria-live="polite">準備好了。點按小澳開始說話。</p><div class="voice-status-panel" aria-hidden="true"><span id="voice-status-label" class="voice-status-label">準備好了</span><span id="voice-status-hint" class="voice-status-hint">點按小澳開始說話</span></div><div class="voice-meter" aria-hidden="true"><span id="voice-meter-fill"></span></div></div>
         <div class="conversation-heading"><span id="turn-count" class="count-label">0 則訊息</span></div>
         <div id="conversation-log" class="conversation-log" role="log" aria-label="對話紀錄" aria-live="polite" aria-relevant="additions"><div id="conversation-empty" class="conversation-empty"></div></div>
         <div id="conversation-caption" class="conversation-caption" role="status" aria-live="off"><span id="caption-line" class="caption-line"></span></div>
         <div class="conversation-suggestions" role="group" aria-labelledby="suggestions-label"><span id="suggestions-label" class="sr-only" data-copy="services">常用服務</span>
-          <button class="request-suggestion" type="button" data-prompt="我想預約醫療服務"><span data-copy="medical">醫療預約</span></button>
-          <button class="request-suggestion" type="button" data-prompt="我想查現金分享計劃"><span data-copy="cash">現金分享</span></button>
-          <button class="request-suggestion" type="button" data-prompt="我想查詢已有預約"><span data-copy="appointments">我的預約</span></button>
+          <button class="request-suggestion" type="button" data-prompt="我想預約醫療服務" aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-medical" /></svg><span data-copy="medical">醫療預約</span></button>
+          <button class="request-suggestion" type="button" data-prompt="我想查現金分享計劃" aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wallet" /></svg><span data-copy="cash">現金分享</span></button>
+          <button class="request-suggestion" type="button" data-prompt="我想查詢已有預約" aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-calendar" /></svg><span data-copy="appointments">我的預約</span></button>
         </div>
-        <form id="message-form" class="message-form"><label for="message-input" class="sr-only" data-copy="inputLabel">輸入你的需求</label><textarea id="message-input" rows="2" maxlength="2000" placeholder="例如：我想預約醫療服務" data-placeholder="inputPlaceholder"></textarea><div class="composer-footer"><span data-copy="inputHint">Enter 送出 · Shift + Enter 換行</span><button id="send-button" class="send-button" type="submit"><span data-copy="send">送出</span><svg class="icon"><use href="#icon-arrow" /></svg></button></div></form>
+        <form id="message-form" class="message-form"><label for="message-input" class="sr-only" data-copy="inputLabel">輸入你的需求</label><textarea id="message-input" rows="2" maxlength="2000" placeholder="例如：我想預約醫療服務" data-placeholder="inputPlaceholder"></textarea><div class="composer-footer"><span data-copy="inputHint">Enter 送出 · Shift + Enter 換行</span><button id="send-button" class="send-button" type="submit"><span data-copy="send">送出</span><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow" /></svg></button></div></form>
         <details class="connection-details"><summary><span data-copy="connectionInfo">連線與語音</span><span id="service-status-value">連線中</span></summary><div id="operational-status" class="operational-status"><span id="service-status-label" class="sr-only">服務</span><span class="status-chip"><span id="voice-path-label" class="status-chip-label">語音</span><strong id="voice-path-value">檢查中</strong></span><span class="status-chip"><span id="microphone-status-label" class="status-chip-label">麥克風</span><strong id="microphone-status-value">待命</strong></span></div></details>
       </section>
       <div class="workspace-column">
@@ -47,11 +48,13 @@
           <div id="global-error" class="voice-error" role="alert" hidden></div>
           <section id="service-workspace" class="service-workspace panel" aria-labelledby="workspace-heading" hidden>
             <header class="workspace-panel-header"><h2 id="workspace-heading" tabindex="-1"></h2><span id="task-status" class="task-status" role="status" hidden></span></header>
+            <div id="operation-replay" class="operation-replay" role="status" aria-live="polite" hidden><div><p><span data-copy="operationReplay">操作回放</span><strong id="operation-title"></strong></p><p id="operation-detail"></p></div><button id="operation-skip" class="text-button" type="button" data-copy="skipReplay">略過</button></div>
             <div id="approval-region"></div>
-            <footer class="workspace-footer"><button id="last-receipt" class="text-button" type="button" hidden><svg class="icon"><use href="#icon-receipt" /></svg><span data-copy="lastReceipt">查看回執</span></button></footer>
+            <div id="agent-cursor" class="agent-cursor" aria-hidden="true" hidden><svg viewBox="0 0 24 28"><path d="M3 2 20 17l-8 1-4 7Z" /></svg><span>Ponte</span></div>
+            <footer class="workspace-footer"><button id="last-receipt" class="text-button" type="button" hidden><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-receipt" /></svg><span data-copy="lastReceipt">查看回執</span></button></footer>
           </section>
         </section>
-        <details id="activity-panel" class="activity-panel" hidden><summary id="activity-heading" data-copy="activity">處理紀錄</summary><ol id="activity-log" class="activity-log"></ol></details>
+        <details id="activity-panel" class="activity-panel" hidden><summary id="activity-heading" data-copy="activity">處理紀錄</summary><button id="replay-operations" class="text-button activity-replay" type="button" data-copy="replayOperations" hidden>重播本輪操作</button><ol id="activity-log" class="activity-log"></ol></details>
       </div>
     </div>
     <footer class="page-footer"><span>Ponte · 聆澳</span><span data-copy="mockNote">使用模擬資料。</span></footer>

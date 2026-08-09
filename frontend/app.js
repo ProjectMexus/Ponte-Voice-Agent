@@ -3,6 +3,7 @@ import { createSpeechController } from "./speech.js";
 import { createVoiceCapture } from "./voice-capture.js";
 import { createVoiceExceptions } from "./voice-exceptions.js";
 import { createDemoConsole } from "./demo-console.js";
+import { createAgentMotion } from "./agent-motion.js";
 
 function makeSessionId() {
   return `S-${Date.now().toString(36)}`;
@@ -281,6 +282,7 @@ export function startPonteApp() {
     setState(currentState);
     renderSystemStatus();
     renderCaption();
+    agentMotion.cancel();
     consoleView.setLocale(locale);
     if (lastResponse) exceptions.renderResponse(lastResponse);
   }
@@ -294,6 +296,7 @@ export function startPonteApp() {
   }
 
   function interruptCurrentTurn() {
+    agentMotion.cancel();
     activeRequest?.abort();
     activeRequest = null;
     stopPlayback();
@@ -372,6 +375,7 @@ export function startPonteApp() {
   }
 
   async function submitVoice(clip, transcript = "") {
+    agentMotion.cancel();
     const turn = ++latestTurn;
     activeRequest?.abort();
     const controller = new AbortController();
@@ -410,6 +414,7 @@ export function startPonteApp() {
   async function submitTranscript(text) {
     const transcript = String(text || "").trim();
     if (!transcript) return;
+    agentMotion.cancel();
     recognitionOnly = false;
     capture.cancel();
     speech.stop();
@@ -484,6 +489,16 @@ export function startPonteApp() {
     }
   }
 
+  const agentMotion = createAgentMotion({
+    root: byId("service-workspace"),
+    strip: byId("operation-replay"),
+    title: byId("operation-title"),
+    detail: byId("operation-detail"),
+    pointer: byId("agent-cursor"),
+    skipButton: byId("operation-skip"),
+    replayButton: byId("replay-operations"),
+  });
+
   const exceptions = createVoiceExceptions({
     approvalRoot: byId("approval-region"),
     errorRoot: byId("global-error"),
@@ -515,6 +530,7 @@ export function startPonteApp() {
     exceptions.renderResponse(lastResponse);
     consoleView.updateWorkspace(lastResponse);
     consoleView.setBusy(true);
+    agentMotion.play(lastResponse);
     healthSnapshot.reachable = true;
     renderSystemStatus();
   }
@@ -543,6 +559,7 @@ export function startPonteApp() {
     lastResponse = null;
     exceptions.reset();
     consoleView.reset();
+    agentMotion.reset();
     setCaption(null, "");
     setState("ready");
     byId("reset-dialog").close();

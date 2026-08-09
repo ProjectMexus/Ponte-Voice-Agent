@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
+from dataclasses import replace
+from datetime import datetime, timezone
 from threading import Lock, RLock
 from typing import Any
 
+from .demo_evidence import record_tool_events
 from .intent import IntentDecision, IntentRecognizer, KeywordIntentRecognizer, build_intent_recognizer
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope
 from .medical_workflow import MedicalWorkflow, WorkflowResult
@@ -120,6 +123,18 @@ class InteractionCore:
         task, result, log_entries = outcome
         if not isinstance(task, dict) or not isinstance(result, CanonicalInteractionResult):
             raise ValueError("workflow returned an invalid result")
+        if task.get("type") in {"medical_appointment", "cash_sharing_query"}:
+            # Domain workflows own every transition and action. This delivery
+            # evidence adds only operations that their dispatch logs observed.
+            previous = state.task if isinstance(state.task, Mapping) and state.task.get("task_id") == task.get("task_id") else {}
+            previous_facts = previous.get("facts", {})
+            prior = previous_facts.get("service_events", []) if isinstance(previous_facts, Mapping) else []
+            prior = deepcopy(prior) if isinstance(prior, list) else []
+            events = prior + record_tool_events(log_entries, at=datetime.now(timezone.utc).isoformat(), offset=len(prior))
+            if events:
+                task = deepcopy(task)
+                task["facts"] = {**task.get("facts", {}), "service_events": deepcopy(events)}
+                result = replace(result, task=deepcopy(task), facts={**result.facts, "service_events": deepcopy(events)})
         state.active_task_id = task.get("task_id")
         state.task = deepcopy(task)
         state.interaction_log.extend(deepcopy(log_entries))

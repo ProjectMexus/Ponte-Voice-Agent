@@ -37,16 +37,22 @@ function appendWorkspaceFields(container, fields, onAction) {
       if (actionId) embeddedActionIds.add(actionId);
       const row = createElement("button", "workspace-field workspace-field-action");
       row.type = "button";
+      if (typeof field.key === "string") row.dataset.fieldKey = field.key;
       const copy = createElement("span", "workspace-option-copy");
       copy.append(createElement("span", "workspace-field-label", label));
       if (value) copy.append(createElement("span", "workspace-field-value", value));
       const mark = createElement("span", "workspace-option-mark", "›");
       mark.setAttribute("aria-hidden", "true");
       row.append(copy, mark);
-      row.addEventListener("click", () => onAction?.(field.action.event));
+      row.addEventListener("click", () => {
+        row.classList.add("is-submitting");
+        row.setAttribute("aria-busy", "true");
+        onAction?.(field.action.event);
+      });
       options.append(row);
     } else {
       const row = createElement("div", "workspace-field");
+      if (typeof field.key === "string") row.dataset.fieldKey = field.key;
       row.append(createElement("dt", "", label), createElement("dd", "", value));
       list.append(row);
     }
@@ -119,7 +125,11 @@ export function renderWorkspace(container, workspace, onAction, { headingId } = 
     if (action.event.decision === "approve") button.classList.add("is-primary");
     if (action.event.decision === "reject") button.classList.add("is-destructive");
     // Preserve the complete event issued by the server, including identifiers.
-    button.addEventListener("click", () => onAction?.(action.event));
+    button.addEventListener("click", () => {
+      button.classList.add("is-submitting");
+      button.setAttribute("aria-busy", "true");
+      onAction?.(action.event);
+    });
     actions.append(button);
   });
   if (actions.children.length) {

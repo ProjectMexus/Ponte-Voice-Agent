@@ -1,10 +1,10 @@
 // This module presents server state. It never constructs service actions.
 export const UI_COPY = {
   "zh-Hant": {
-    newSession: "重新開始", connectionInfo: "連線與語音", greeting: "今天想辦甚麼？", companion: "對話", soundOn: "朗讀開啟", soundOff: "朗讀關閉", conversation: "對話紀錄", inputLabel: "輸入你的需求", inputPlaceholder: "例如：我想預約醫療服務", inputHint: "Enter 送出 · Shift + Enter 換行", send: "送出", services: "常用服務", medical: "醫療預約", cash: "現金分享", appointments: "我的預約", loading: "處理中…", mockNote: "使用模擬資料。", lastReceipt: "查看回執", activity: "處理紀錄", resetHeading: "開始新的對話？", resetBody: "畫面上的對話和服務足跡會清除。已提交的模擬預約會保留；未提交的選項不會執行。", resetCancel: "繼續這次對話", resetConfirm: "開始新對話", receiptEyebrow: "服務回執", receiptHeading: "預約回執", print: "列印", download: "下載", user: "你", assistant: "小澳", count: "則訊息", awaitingInput: "待選擇", awaitingConfirmation: "待確認", completed: "已完成", cancelled: "已取消", failed: "需要處理", processing: "正在處理", recovery: "請補充資料", turnOffSound: "關閉自動朗讀", turnOnSound: "開啟自動朗讀",
+    operationReplay: "操作回放", skipReplay: "略過", replayOperations: "重播本輪操作", newSession: "重新開始", connectionInfo: "連線與語音", greeting: "今天想辦甚麼？", companion: "對話", soundOn: "朗讀開啟", soundOff: "朗讀關閉", conversation: "對話紀錄", inputLabel: "輸入你的需求", inputPlaceholder: "例如：我想預約醫療服務", inputHint: "Enter 送出 · Shift + Enter 換行", send: "送出", services: "常用服務", medical: "醫療預約", cash: "現金分享", appointments: "我的預約", loading: "處理中…", mockNote: "使用模擬資料。", lastReceipt: "查看回執", activity: "處理紀錄", resetHeading: "開始新的對話？", resetBody: "畫面上的對話和服務足跡會清除。已提交的模擬預約會保留；未提交的選項不會執行。", resetCancel: "繼續這次對話", resetConfirm: "開始新對話", receiptEyebrow: "服務回執", receiptHeading: "預約回執", print: "列印", download: "下載", user: "你", assistant: "小澳", count: "則訊息", awaitingInput: "待選擇", awaitingConfirmation: "待確認", completed: "已完成", cancelled: "已取消", failed: "需要處理", processing: "正在處理", recovery: "請補充資料", turnOffSound: "關閉自動朗讀", turnOnSound: "開啟自動朗讀",
   },
   en: {
-    newSession: "Start over", connectionInfo: "Connection and voice", greeting: "What do you need today?", companion: "Conversation", soundOn: "Voice on", soundOff: "Voice off", conversation: "Conversation", inputLabel: "Describe what you need", inputPlaceholder: "For example: 我想預約醫療服務", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "Quick requests", medical: "Book a visit", cash: "Cash sharing", appointments: "My appointments", loading: "Processing…", mockNote: "Uses simulated data.", lastReceipt: "View receipt", activity: "Activity", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Appointment receipt", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Awaiting selection", awaitingConfirmation: "Awaiting confirmation", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "More information needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
+    operationReplay: "Operation replay", skipReplay: "Skip", replayOperations: "Replay this turn", newSession: "Start over", connectionInfo: "Connection and voice", greeting: "What do you need today?", companion: "Conversation", soundOn: "Voice on", soundOff: "Voice off", conversation: "Conversation", inputLabel: "Describe what you need", inputPlaceholder: "For example: 我想預約醫療服務", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "Quick requests", medical: "Book a visit", cash: "Cash sharing", appointments: "My appointments", loading: "Processing…", mockNote: "Uses simulated data.", lastReceipt: "View receipt", activity: "Activity", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Appointment receipt", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Awaiting selection", awaitingConfirmation: "Awaiting confirmation", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "More information needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
   },
 };
 
@@ -37,6 +37,20 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     if (counter) counter.textContent = `${messageCount} ${copy().count}`;
   }
 
+  function renderComposer() {
+    const value = String(input?.value || "");
+    const hasContent = Boolean(value.trim());
+    form?.classList.toggle("has-content", hasContent);
+    form?.setAttribute("aria-busy", String(busy));
+    const send = byId("send-button");
+    if (send) send.disabled = busy || !hasContent;
+    document.querySelectorAll("[data-prompt]").forEach((node) => {
+      const selected = value === node.dataset.prompt;
+      node.classList.toggle("is-selected", selected);
+      node.setAttribute("aria-pressed", String(selected));
+    });
+  }
+
   function setLocale(value) {
     if (!UI_COPY[value]) return;
     locale = value;
@@ -51,6 +65,7 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     document.querySelectorAll(".message-speaker").forEach((node) => { node.textContent = copy()[node.dataset.role] || copy().assistant; });
     renderCount();
     renderMute();
+    renderComposer();
     if (latestWorkspace) renderWorkspaceMeta(latestWorkspace);
   }
 
@@ -174,13 +189,21 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     const loader = byId("workspace-loading");
     if (loader) loader.hidden = !busy || !workspace?.hidden;
     if (input) input.readOnly = busy;
-    document.querySelectorAll("#send-button, #new-session, [data-prompt]").forEach((node) => { node.disabled = busy; });
-    byId("approval-region")?.querySelectorAll("button").forEach((node) => { node.disabled = busy; });
+    document.querySelectorAll("#new-session, [data-prompt]").forEach((node) => { node.disabled = busy; });
+    byId("approval-region")?.querySelectorAll("button").forEach((node) => {
+      node.disabled = busy;
+      if (!busy) {
+        node.classList.remove("is-submitting");
+        node.removeAttribute("aria-busy");
+      }
+    });
+    renderComposer();
   }
 
   function preview(prompt) {
     if (busy || !input) return;
     input.value = prompt;
+    renderComposer();
     input.focus();
   }
 
@@ -192,6 +215,7 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     onSubmit?.(text);
   }
   form?.addEventListener("submit", submit);
+  input?.addEventListener("input", renderComposer);
   input?.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing) submit(event);
   });

@@ -74,7 +74,7 @@ PowerShell 可先設定 `$env:PONTE_LOG_LEVEL='INFO'` 再啟動。
 
 ## Apple-inspired visual refinement
 
-This branch keeps the existing conversation and service workflow, with neutral paper surfaces, a deliberate system font stack, subtle layered shadows, and one blue action color. Shared presentation tokens live at the top of `styles.css`. Interactive controls have at least 44px touch targets; reduced motion, keyboard focus, and receipt printing remain supported.
+This branch keeps the existing conversation and service workflow, with pale blue gradients, frosted panels, a deliberate system font stack, and one blue action color. Glass has an opaque fallback; reduce-transparency and reduce-motion preferences are supported. Shared presentation tokens live at the top of `styles.css`. Interactive controls have at least 44px touch targets; reduced motion, keyboard focus, and receipt printing remain supported.
 
 The layout stacks on phones. The service workspace stays hidden until the agent returns service content, recovery guidance, or a receipt. The service trail appears only after an actual service event. Conversation-only turns preserve existing results; an explicit workspace clear or session reset closes the panel. There is no preset booking introduction or forecast of future steps. Errors remain visible outside the workspace, including before any service starts.
 
@@ -91,3 +91,5 @@ The bounded cardiology agent now projects actual service events and current time
 The simplified interface uses one service heading and one task state. Secondary connection details and processing history use native expandable sections. The workspace remains response-driven; receipt access, server-issued actions and confirmation requirements are preserved.
 
 Quick request suggestions live inside the conversation above the composer. They prefill a request without sending or clearing the current task, so an appointment lookup can interrupt and resume a draft. The right column contains only response-driven service content and its processing history.
+
+The operation replay is a nonblocking visual layer over the current canonical result. It follows only newly observed service events, with an inert pointer highlighting read-only fields. It is labeled as replay because HTTP returns a completed turn; the animation does not reconstruct historical screens or represent live tool timing. Controls remain usable, user interaction cancels the replay, and no action, focus change or automatic scroll is generated. Reduced motion skips animation. The current turn can be replayed from the processing history.

@@ -3,6 +3,7 @@ import test from "node:test";
 import { createDOM, createEvent } from "./helpers/dom-fixture.mjs";
 import { renderWorkspace } from "../frontend/interaction-view.js";
 import { createVoiceExceptions } from "../frontend/voice-exceptions.js";
+import { createDemoConsole } from "../frontend/demo-console.js";
 
 function setup(onAction) {
   const { document, add } = createDOM();
@@ -72,6 +73,63 @@ test("server options preserve exact issued events and avoid duplicate option but
   buttons[0].click();
   assert.equal(selected[0], event);
   assert.equal(document.activeElement, composer);
+});
+
+test("only the clicked server option shows pending feedback and errors allow retry", () => {
+  const { approvalRoot, view } = setup();
+  const consoleView = createDemoConsole();
+  const issued = { type: "service_selected", action_id: "ACT-1", service_id: "SERVICE-1" };
+  const other = { type: "service_selected", action_id: "ACT-2", service_id: "SERVICE-2" };
+  const received = [];
+  renderWorkspace(approvalRoot, {
+    fields: [
+      { label: "腹部超聲波檢查", action: { event: issued } },
+      { label: "其他檢查", action: { event: other } },
+    ],
+  }, (event) => { received.push(event); consoleView.setBusy(true); });
+  const [clicked, sibling] = approvalRoot.querySelectorAll("button");
+  clicked.click();
+  clicked.click();
+  assert.deepEqual(received, [issued]);
+  assert.equal(received[0], issued);
+  assert.equal(clicked.classList.contains("is-submitting"), true);
+  assert.equal(clicked.getAttribute("aria-busy"), "true");
+  assert.equal(sibling.classList.contains("is-submitting"), false);
+  assert.equal(sibling.getAttribute("aria-busy"), null);
+  assert.equal(clicked.disabled, true);
+  assert.equal(sibling.disabled, true);
+
+  view.renderError(new Error("Cannot connect"));
+  consoleView.setBusy(false);
+  assert.equal(clicked.classList.contains("is-submitting"), false);
+  assert.equal(clicked.getAttribute("aria-busy"), null);
+  assert.equal(clicked.disabled, false);
+  assert.equal(sibling.disabled, false);
+  clicked.click();
+  assert.equal(received.length, 2);
+  assert.equal(received[1], issued);
+});
+
+test("confirmation feedback preserves the exact server decision and waits for a click", () => {
+  const { approvalRoot } = setup();
+  const consoleView = createDemoConsole();
+  const approve = { type: "confirmation_decision", decision: "approve", action_id: "APPROVE-1" };
+  const reject = { type: "confirmation_decision", decision: "reject", action_id: "REJECT-1" };
+  const received = [];
+  renderWorkspace(approvalRoot, {
+    actions: [{ label: "確認掛號", event: approve }, { label: "取消", event: reject }],
+  }, (event) => { received.push(event); consoleView.setBusy(true); });
+  const [confirm, cancel] = approvalRoot.querySelectorAll("button");
+  assert.deepEqual(received, []);
+  assert.equal(confirm.classList.contains("is-submitting"), false);
+  confirm.click();
+  assert.equal(received[0], approve);
+  assert.equal(confirm.classList.contains("is-submitting"), true);
+  assert.equal(confirm.getAttribute("aria-busy"), "true");
+  assert.equal(cancel.classList.contains("is-submitting"), false);
+  consoleView.setBusy(false);
+  assert.equal(confirm.classList.contains("is-submitting"), false);
+  assert.equal(confirm.getAttribute("aria-busy"), null);
 });
 
 test("independent actions without identifiers are retained", () => {
