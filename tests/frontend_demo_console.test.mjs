@@ -37,7 +37,7 @@ beforeEach(() => {
   add("button", "speech-toggle");
   add("span", "sound-label", nodes["speech-toggle"]).setAttribute("data-copy", "soundOn");
   add("button", "medical-scenario").setAttribute("data-prompt", "我想預約醫療服務");
-  nodes["medical-scenario"].className = "scenario-card";
+  nodes["medical-scenario"].className = "request-suggestion";
   submissions = [];
   resets = 0;
   resetPrompts = [];
@@ -168,15 +168,16 @@ test("a completed cash query shows its own service title and keeps the dialogue"
   assert.ok(nodes["conversation-log"].textContent.includes("我已查到現金分享計劃資料。"));
 });
 
-test("changing scenario during an active task requests a new session without replacing the draft", () => {
+test("conversation suggestions preserve the active task and wait for an explicit send", () => {
   ui.updateWorkspace({
     task: { task_id: "TASK-1", status: "awaiting_confirmation" },
     workspace: { view: "appointment_confirmation", title: "確認預約", fields: [], actions: [] },
   });
   nodes["message-input"].value = "Keep this draft";
   nodes["medical-scenario"].click();
-  assert.deepEqual(resetPrompts, ["我想預約醫療服務"]);
-  assert.equal(nodes["message-input"].value, "Keep this draft");
+  assert.deepEqual(resetPrompts, []);
+  assert.equal(nodes["message-input"].value, "我想預約醫療服務");
+  assert.equal(fixture.document.activeElement, nodes["message-input"]);
   assert.deepEqual(submissions, []);
   assert.equal(nodes["workspace-heading"].textContent, "確認預約");
 });
@@ -226,8 +227,8 @@ test("omitted workspace preserves the current task and explicit clearing removes
 test("recovery-only responses replace stale workspace metadata", () => {
   ui.updateWorkspace({ workspace: { view: "slot_selection", title: "OLD SLOT TITLE" } });
   ui.updateWorkspace({ recovery: { reason: "請補充資料" } });
-  assert.equal(nodes["workspace-heading"].textContent, "需要你的協助");
-  assert.equal(nodes["task-status"].textContent, "需要你的協助");
+  assert.equal(nodes["workspace-heading"].textContent, "請補充資料");
+  assert.equal(nodes["task-status"].textContent, "請補充資料");
 });
 
 
@@ -245,4 +246,22 @@ test("agent service events preserve details without duplicates or fabricated ste
   ui.reset();
   ui.updateWorkspace(payload);
   assert.equal(nodes["activity-log"].children.length,2);
+});
+
+
+test("one task status follows processing, confirmation and recovery without repeating the title", () => {
+  ui.setBusy(true);
+  assert.equal(nodes["task-status"].dataset.status,"running");
+  assert.equal(nodes["task-status"].textContent,"正在處理");
+  ui.updateWorkspace({task:{status:"awaiting_confirmation"},workspace:{title:"確認掛號"}});
+  ui.setBusy(false);
+  assert.equal(nodes["task-status"].textContent,"待確認");
+  ui.setLocale("en");
+  assert.equal(nodes["task-status"].textContent,"Awaiting confirmation");
+  ui.setLocale("zh-Hant");
+  ui.updateWorkspace({workspace:null,recovery:{message:"請補充資料"}});
+  assert.equal(nodes["workspace-heading"].textContent,"請補充資料");
+  assert.equal(nodes["task-status"].hidden,true);
+  ui.reset();
+  assert.equal(nodes["task-status"].hidden,true);
 });

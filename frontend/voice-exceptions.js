@@ -44,7 +44,7 @@ function appendReceiptFields(container, receipt) {
 function renderWorkspaceCard(container, workspace, onAction) {
   if (!workspace || typeof workspace !== "object") return;
   const childCount = container.children.length;
-  renderCanonicalWorkspace(container, workspace, onAction);
+  renderCanonicalWorkspace(container, workspace, onAction, {headingId: container.closest("#service-workspace") ? "workspace-heading" : undefined});
   const card = container.children[childCount];
   if (!card) return;
   card.classList.add("voice-exception-card");
@@ -54,7 +54,7 @@ function renderRecovery(container, recovery) {
   if (!recovery || typeof recovery !== "object") return;
   const panel = element("section", "recovery-panel voice-exception-card");
   panel.setAttribute("role", "status");
-  panel.append(element("h3", "recovery-title", localCopy("服務需要處理", "Service needs attention")));
+  if (!container.closest("#service-workspace")) panel.append(element("h3", "recovery-title", localCopy("服務需要處理", "Service needs attention")));
   if (recovery.reason) panel.append(element("p", "recovery-explanation", String(recovery.reason)));
   if (recovery.message) panel.append(element("p", "recovery-explanation", String(recovery.message)));
   if (recovery.explanation) panel.append(element("p", "recovery-explanation", String(recovery.explanation)));
@@ -108,7 +108,6 @@ export function createVoiceExceptions({ approvalRoot, errorRoot, artifactRoot, a
     lastReceipt = receipt;
     if (artifactRoot.hidden) lastFocusedElement = document.activeElement;
     artifactContentRoot.replaceChildren();
-    artifactContentRoot.append(element("p", "artifact-status", localCopy("服務回執", "Service receipt")));
     appendReceiptFields(artifactContentRoot, receipt);
     artifactContentRoot.append(element("p", "artifact-reference", `${localCopy("回執編號", "Reference")}: ${receipt.receipt_id || "—"}`));
     artifactRoot.hidden = false;
@@ -138,9 +137,15 @@ export function createVoiceExceptions({ approvalRoot, errorRoot, artifactRoot, a
     if (!approvalRoot || !receipt) return;
     lastReceipt = receipt;
     approvalRoot.querySelectorAll(".receipt-card").forEach((card) => card.remove());
+    const receiptControl = document.getElementById("last-receipt");
+    if (receiptControl) {
+      approvalRoot.querySelectorAll(".receipt-summary").forEach((summary) => summary.remove());
+      receiptControl.hidden = false;
+      if (!approvalRoot.children.length) approvalRoot.append(element("p", "voice-exception-card receipt-reference receipt-summary", `${localCopy("回執編號", "Reference")}: ${receipt.receipt_id || "—"}`));
+      syncExceptionSurface();
+      return;
+    }
     const card = element("section", "voice-exception-card receipt-card");
-    card.append(element("p", "exception-kicker", localCopy("服務回執", "Service receipt")));
-    card.append(element("h2", "", localCopy("回執已準備好", "Your receipt is ready")));
     card.append(element("p", "receipt-reference", `${localCopy("回執編號", "Reference")}: ${receipt.receipt_id || "—"}`));
     const button = element("button", "exception-button is-primary", localCopy("查看回執", "View receipt"));
     button.type = "button";

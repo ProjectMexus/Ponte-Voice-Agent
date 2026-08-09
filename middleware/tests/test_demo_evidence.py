@@ -48,7 +48,8 @@ class DemoEvidenceTests(unittest.TestCase):
         projection=WorkspaceProjector.project(result)
         self.assertNotIn("SECRET",str(projection))
         self.assertNotIn("INTERNAL",str(projection))
-        self.assertIn("腳本模型示範",str(projection["context"]))
+        self.assertNotIn("腳本模型示範",str(projection["context"]))
+        self.assertEqual(result.facts["model_mode"],"scripted")
         self.assertIn("不包含該時間",str(projection["context"]))
         self.assertIn("第 2 版需求",str(projection["context"]))
 

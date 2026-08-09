@@ -40,7 +40,7 @@ function appendWorkspaceFields(container, fields, onAction) {
       const copy = createElement("span", "workspace-option-copy");
       copy.append(createElement("span", "workspace-field-label", label));
       if (value) copy.append(createElement("span", "workspace-field-value", value));
-      const mark = createElement("span", "workspace-option-mark", "↗");
+      const mark = createElement("span", "workspace-option-mark", "›");
       mark.setAttribute("aria-hidden", "true");
       row.append(copy, mark);
       row.addEventListener("click", () => onAction?.(field.action.event));
@@ -51,12 +51,9 @@ function appendWorkspaceFields(container, fields, onAction) {
       list.append(row);
     }
   });
-  if (list.children.length) container.append(createElement("h3", "workspace-section-label", localCopy("詳細資料", "Details")), list);
+  if (list.children.length) container.append(list);
   if (options.children.length) {
-    const heading = createElement("div", "workspace-section-heading");
-    heading.append(createElement("h3", "workspace-section-label", localCopy("選擇項目", "Choose an option")));
-    heading.append(createElement("span", "workspace-option-count", localCopy(`${options.children.length} 個選項`, `${options.children.length} options`)));
-    container.append(heading, options);
+    container.append(options);
   }
   return embeddedActionIds;
 }
@@ -87,14 +84,17 @@ function renderReceiptContent(container, receipt) {
   container.append(list, createElement("p", "artifact-reference", `Reference: ${receipt.receipt_id || "—"}`));
 }
 
-export function renderWorkspace(container, workspace, onAction) {
+export function renderWorkspace(container, workspace, onAction, { headingId } = {}) {
   if (!container || !workspace || typeof workspace !== "object") return false;
   const card = createElement("article", "workspace-card");
   if (workspace.view) card.dataset.view = String(workspace.view);
-  const header = createElement("header", "workspace-header");
-  header.append(createElement("p", "workspace-kicker", localCopy("服務資料", "Service details")));
-  header.append(createElement("h2", "workspace-title", workspace.title ? String(workspace.title) : localCopy("服務工作區", "Service workspace")));
-  card.append(header);
+  if (headingId) {
+    card.setAttribute("aria-labelledby", headingId);
+  } else {
+    const header = createElement("header", "workspace-header");
+    header.append(createElement("h2", "workspace-title", workspace.title ? String(workspace.title) : localCopy("服務資料", "Service details")));
+    card.append(header);
+  }
   if (Array.isArray(workspace.context) && workspace.context.length) {
     const context = createElement("dl", "agent-context");
     workspace.context.forEach((field) => {
@@ -123,8 +123,7 @@ export function renderWorkspace(container, workspace, onAction) {
     actions.append(button);
   });
   if (actions.children.length) {
-    card.append(createElement("h3", "workspace-section-label", localCopy("下一步", "Next action")), actions);
-    card.append(createElement("p", "workspace-action-help", localCopy("選擇後，小澳會更新服務結果。", "Ponte updates the service result after your selection.")));
+    card.append(actions);
   }
   if (workspace.artifact && typeof workspace.artifact === "object" && workspace.artifact.title) {
     card.append(createElement("p", "workspace-artifact", String(workspace.artifact.title)));

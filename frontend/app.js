@@ -46,8 +46,8 @@ const DISPLAY_COPY = {
       speaking: ["小澳正在聆聽", "繼續說話，或點按頭像停止"],
       stopping: ["正在完成這一輪", "正在整理你的語音"],
       captured: ["正在傳送", "小澳正在接收你的語音"],
-      processing: ["小澳在思考中。", "正在整理你的需要"],
-      "speaking-response": ["小澳正在回應。", "點按小澳即可中斷"],
+      processing: ["處理中", "請稍候"],
+      "speaking-response": ["播放中", "點按頭像停止播放"],
       "audio-error": ["未能播放聲音", "請檢查輸出音量後再試"],
       "permission-denied": ["麥克風已被封鎖", "請允許麥克風權限後再試"],
       unsupported: ["正在使用瀏覽器語音", "粵語語音辨識備援已啟用"],
@@ -96,8 +96,8 @@ const DISPLAY_COPY = {
       speaking: ["Ponte is listening", "Keep speaking or tap the avatar to stop"],
       stopping: ["Finishing this turn", "Preparing your voice request"],
       captured: ["Sending", "Ponte is receiving your voice"],
-      processing: ["Ponte is thinking.", "Organising what you need"],
-      "speaking-response": ["Ponte is replying.", "Tap Ponte to interrupt"],
+      processing: ["Processing", "Please wait"],
+      "speaking-response": ["Playing", "Tap the avatar to stop playback"],
       "audio-error": ["Audio unavailable", "Check your output volume and try again"],
       "permission-denied": ["Microphone blocked", "Allow microphone access and try again"],
       unsupported: ["Browser voice active", "Cantonese recognition fallback is enabled"],
@@ -469,8 +469,11 @@ export function startPonteApp() {
       renderDelivery(payload);
       await playResponse(payload, turn);
       if (turn === latestTurn && choice && !choice.isConnected) {
-        const title = byId("approval-region").querySelector(".workspace-title");
-        if (title) { title.tabIndex = -1; title.focus(); }
+        const focused = document.activeElement;
+        if (!focused || focused === document.body || !focused.isConnected) {
+          const title = !byId("service-workspace").hidden ? byId("workspace-heading") : byId("message-input");
+          title?.focus();
+        }
       }
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;

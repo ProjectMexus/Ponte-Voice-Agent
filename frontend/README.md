@@ -86,4 +86,8 @@ python scripts/run_stack.py --backend-port 18185 --middleware-port 18195 --front
 
 Open `http://127.0.0.1:16175/?middleware=http://127.0.0.1:18195`.
 
-The bounded cardiology agent now projects actual service events, current time constraints and model mode. The trail distinguishes lookups, replacement drafts, clarification, revalidation, explicit approval and verified receipts. See `docs/demo/Cardiology_Demo.md` for the six-capability walkthrough and evidence limits.
+The bounded cardiology agent now projects actual service events and current time constraints. The trail distinguishes lookups, replacement drafts, clarification, revalidation, explicit approval and verified receipts. See `docs/demo/Cardiology_Demo.md` for the six-capability walkthrough and evidence limits.
+
+The simplified interface uses one service heading and one task state. Secondary connection details and processing history use native expandable sections. The workspace remains response-driven; receipt access, server-issued actions and confirmation requirements are preserved.
+
+Quick request suggestions live inside the conversation above the composer. They prefill a request without sending or clearing the current task, so an appointment lookup can interrupt and resume a draft. The right column contains only response-driven service content and its processing history.

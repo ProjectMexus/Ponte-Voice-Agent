@@ -563,9 +563,6 @@ def _agent_context(facts):
     if facts.get("engine") != "demo_agent":
         return []
     fields = []
-    mode = facts.get("model_mode")
-    if mode in {"scripted", "real"}:
-        fields.append({"label": "模型模式", "value": "腳本模型示範" if mode == "scripted" else "真實模型決策"})
     constraint = constraint_text(facts.get("time_constraint"))
     if constraint:
         revision = facts.get("intent_revision")

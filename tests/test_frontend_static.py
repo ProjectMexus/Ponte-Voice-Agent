@@ -71,10 +71,10 @@ class FrontendStaticTests(unittest.TestCase):
         self.assertIn('let displayLocale = "zh-Hant"', source)
         for marker in (
             "DISPLAY_COPY",
-            'processing: ["小澳在思考中。"',
-            '"speaking-response": ["小澳正在回應。"',
-            'processing: ["Ponte is thinking."',
-            '"speaking-response": ["Ponte is replying."',
+            'processing: ["處理中"',
+            '"speaking-response": ["播放中"',
+            'processing: ["Processing"',
+            '"speaking-response": ["Playing"',
             'user: "你"',
             'assistant: "小澳"',
             'user: "You"',

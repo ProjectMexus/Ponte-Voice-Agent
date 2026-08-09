@@ -1,14 +1,12 @@
 // This module presents server state. It never constructs service actions.
 export const UI_COPY = {
   "zh-Hant": {
-    tagline: "聆聽澳門，連結日常。", newSession: "重新開始", eyebrow: "你的公共服務助手", greeting: "有咩需要？小澳陪你辦。", intro: "從一句話開始，把每一步交代清楚。", prototype: "模擬服務體驗", companion: "與小澳對話", soundOn: "朗讀開啟", soundOff: "朗讀關閉", cantonese: "粵語也可以", withYou: "一步一步，陪你完成", conversation: "對話紀錄", welcome: "你好，我係小澳。", welcomeHint: "想預約醫療服務，還是查詢福利？你可以說話，或在下方打字。", inputLabel: "輸入你的需求", inputPlaceholder: "例如：我想預約醫療服務", inputHint: "Enter 送出 · Shift + Enter 換行", send: "送出", services: "今天想辦甚麼？", chooseHint: "點選情境，預覽你的需求", medical: "醫療預約", medicalHint: "找服務、選時段、確認預約", cash: "現金分享", cashHint: "查看資格與發放資料", appointments: "我的預約", appointmentsHint: "查看日期、時間與地點", workspaceEyebrow: "服務工作區", loading: "小澳正在整理你的需要…", mockNote: "本次體驗使用模擬資料與服務。", lastReceipt: "查看最近回執", activity: "這次服務的足跡", thisSession: "本次對話", footer: "讓公共服務，從一句話開始。", resetHeading: "開始新的對話？", resetBody: "畫面上的對話和服務足跡會清除。已提交的模擬預約會保留；未提交的選項不會執行。", resetCancel: "繼續這次對話", resetConfirm: "開始新對話", receiptEyebrow: "服務回執", receiptHeading: "你的預約資料", print: "列印", download: "下載", user: "你", assistant: "小澳", count: "則訊息", awaitingInput: "請選擇下一步", awaitingConfirmation: "需要你的確認", completed: "已完成", cancelled: "已取消", failed: "需要處理", processing: "正在處理", recovery: "需要你的協助", turnOffSound: "關閉自動朗讀", turnOnSound: "開啟自動朗讀",
+    newSession: "重新開始", connectionInfo: "連線與語音", greeting: "今天想辦甚麼？", companion: "對話", soundOn: "朗讀開啟", soundOff: "朗讀關閉", conversation: "對話紀錄", inputLabel: "輸入你的需求", inputPlaceholder: "例如：我想預約醫療服務", inputHint: "Enter 送出 · Shift + Enter 換行", send: "送出", services: "常用服務", medical: "醫療預約", cash: "現金分享", appointments: "我的預約", loading: "處理中…", mockNote: "使用模擬資料。", lastReceipt: "查看回執", activity: "處理紀錄", resetHeading: "開始新的對話？", resetBody: "畫面上的對話和服務足跡會清除。已提交的模擬預約會保留；未提交的選項不會執行。", resetCancel: "繼續這次對話", resetConfirm: "開始新對話", receiptEyebrow: "服務回執", receiptHeading: "預約回執", print: "列印", download: "下載", user: "你", assistant: "小澳", count: "則訊息", awaitingInput: "待選擇", awaitingConfirmation: "待確認", completed: "已完成", cancelled: "已取消", failed: "需要處理", processing: "正在處理", recovery: "請補充資料", turnOffSound: "關閉自動朗讀", turnOnSound: "開啟自動朗讀",
   },
   en: {
-    tagline: "Listen to Macau. Connect everyday life.", newSession: "Start over", eyebrow: "Your public service companion", greeting: "What do you need today?", intro: "Start with a conversation. See every step along the way.", prototype: "Simulated services", companion: "Talk with Ponte", soundOn: "Voice on", soundOff: "Voice off", cantonese: "Cantonese welcome", withYou: "One step at a time", conversation: "Conversation", welcome: "Hello, I’m Ponte.", welcomeHint: "Need a medical appointment or benefit information? Speak to me, or type below.", inputLabel: "Describe what you need", inputPlaceholder: "For example: 我想預約醫療服務", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "How can we help today?", chooseHint: "Choose a scenario to preview your request", medical: "Book a visit", medicalHint: "Choose a service, time and confirm", cash: "Cash sharing", cashHint: "Check eligibility and payment details", appointments: "My appointments", appointmentsHint: "See the date, time and location", workspaceEyebrow: "Service workspace", loading: "Ponte is preparing your next step…", mockNote: "This experience uses simulated data and services.", lastReceipt: "View latest receipt", activity: "Your service trail", thisSession: "This conversation", footer: "Public services start with a conversation.", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Your appointment details", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Choose the next step", awaitingConfirmation: "Your confirmation needed", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "Your help is needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
+    newSession: "Start over", connectionInfo: "Connection and voice", greeting: "What do you need today?", companion: "Conversation", soundOn: "Voice on", soundOff: "Voice off", conversation: "Conversation", inputLabel: "Describe what you need", inputPlaceholder: "For example: 我想預約醫療服務", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "Quick requests", medical: "Book a visit", cash: "Cash sharing", appointments: "My appointments", loading: "Processing…", mockNote: "Uses simulated data.", lastReceipt: "View receipt", activity: "Activity", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Appointment receipt", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Awaiting selection", awaitingConfirmation: "Awaiting confirmation", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "More information needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
   },
 };
-
-const TERMINAL = new Set(["completed", "cancelled", "failed"]);
 
 export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
   const byId = (id) => document.getElementById(id);
@@ -89,14 +87,18 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     const task = payload?.task || {};
     const heading = byId("workspace-heading");
     if (heading) heading.textContent = typeof workspace?.title === "string" ? workspace.title : payload?.recovery ? copy().recovery : payload?.receipt ? copy().receiptEyebrow : "";
-    const status = byId("task-status");
-    const statusKeys = { awaiting_input: "awaitingInput", awaiting_confirmation: "awaitingConfirmation", completed: "completed", cancelled: "cancelled", failed: "failed", running: "processing", awaiting_recovery: "recovery", recovery: "recovery" };
-    if (status) {
-      status.textContent = copy()[statusKeys[task.status]] || (payload?.recovery ? copy().recovery : payload?.receipt ? copy().completed : workspace ? copy().awaitingInput : "");
-      status.hidden = !status.textContent;
-      status.dataset.status = task.status || "";
-    }
+    renderTaskStatus(payload);
+  }
 
+  function renderTaskStatus(payload = latestWorkspace) {
+    const status = byId("task-status");
+    if (!status) return;
+    const task = payload?.task || {};
+    const keys = {awaiting_input:"awaitingInput",awaiting_confirmation:"awaitingConfirmation",completed:"completed",cancelled:"cancelled",failed:"failed",running:"processing",awaiting_recovery:"recovery",recovery:"recovery"};
+    const kind = busy ? "running" : payload?.recovery ? "recovery" : task.status || "";
+    status.textContent = busy ? copy().processing : copy()[keys[kind]] || (payload?.receipt ? copy().completed : payload?.workspace ? copy().awaitingInput : "");
+    status.dataset.status = kind;
+    status.hidden = !status.textContent || status.textContent === byId("workspace-heading")?.textContent;
   }
 
   function updateWorkspace(payload) {
@@ -166,10 +168,11 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
 
   function setBusy(value) {
     busy = Boolean(value);
+    renderTaskStatus();
     const workspace = byId("service-workspace");
     workspace?.setAttribute("aria-busy", String(busy));
     const loader = byId("workspace-loading");
-    if (loader) loader.hidden = !busy;
+    if (loader) loader.hidden = !busy || !workspace?.hidden;
     if (input) input.readOnly = busy;
     document.querySelectorAll("#send-button, #new-session, [data-prompt]").forEach((node) => { node.disabled = busy; });
     byId("approval-region")?.querySelectorAll("button").forEach((node) => { node.disabled = busy; });
@@ -177,18 +180,8 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
 
   function preview(prompt) {
     if (busy || !input) return;
-    const status = latestWorkspace?.task?.status;
-    if (status && !TERMINAL.has(status)) {
-      onReset?.(prompt);
-      return;
-    }
     input.value = prompt;
     input.focus();
-    document.querySelectorAll("[data-prompt]").forEach((node) => {
-      const selected = node.dataset.prompt === prompt;
-      node.classList.toggle("is-selected", selected);
-      node.setAttribute("aria-pressed", String(selected));
-    });
   }
 
   function submit(event) {

@@ -13,6 +13,8 @@ function setup(onAction) {
   errorRoot.hidden = true;
   const workspaceSurface = add("section", "service-workspace", surface);
   workspaceSurface.hidden = true;
+  const heading = add("h2", "workspace-heading", workspaceSurface);
+  heading.tabIndex = -1;
   const approvalRoot = add("div", "approval-region", workspaceSurface);
   const artifactRoot = add("aside", "artifact-drawer");
   artifactRoot.hidden = true;
@@ -155,7 +157,8 @@ test("English display localizes labels without changing canonical values", () =>
   const { approvalRoot, document, view } = setup();
   document.documentElement.lang = "en";
   view.renderResponse({ workspace: readonlyWorkspace, receipt });
-  assert.match(approvalRoot.textContent, /Details/);
+  assert.equal(approvalRoot.querySelector(".workspace-section-label"),null);
+  assert.ok(approvalRoot.querySelector("dl"));
   assert.match(approvalRoot.textContent, /View receipt/);
   assert.match(approvalRoot.textContent, /景湖醫療中心/);
   assert.doesNotMatch(approvalRoot.textContent, /appointment_list/);
@@ -194,4 +197,47 @@ test("agent recovery and receipt-only responses can open the workspace, and rese
   assert.equal(workspaceSurface.hidden, false);
   view.reset();
   assert.equal(workspaceSurface.hidden, true);
+});
+
+
+test("embedded workspace uses the outer service title once and preserves option actions", () => {
+  const { approvalRoot, view } = setup();
+  view.renderResponse({workspace:readonlyWorkspace});
+  assert.equal(approvalRoot.querySelector(".workspace-title"),null);
+  assert.equal(approvalRoot.querySelector(".workspace-kicker"),null);
+  assert.equal(approvalRoot.querySelector(".workspace-card").getAttribute("aria-labelledby"),"workspace-heading");
+  approvalRoot.replaceChildren();
+  renderWorkspace(approvalRoot,readonlyWorkspace);
+  assert.equal(approvalRoot.querySelector(".workspace-title").textContent,"我的預約");
+});
+
+test("receipt control replaces the duplicate receipt card and supports receipt-only responses", () => {
+  const { document, add, approvalRoot, artifactRoot, view } = setup();
+  const control=add("button","last-receipt");
+  control.hidden=true;
+  view.renderResponse({workspace:readonlyWorkspace,receipt});
+  view.renderResponse({workspace:readonlyWorkspace,receipt});
+  assert.equal(control.hidden,false);
+  assert.equal(approvalRoot.querySelector(".receipt-card"),null);
+  assert.equal(approvalRoot.children.length,1);
+  view.openArtifact();
+  assert.equal(artifactRoot.hidden,false);
+  view.reset();
+  view.renderResponse({workspace:null,receipt});
+  assert.match(approvalRoot.textContent,/MED-1/);
+  assert.equal(approvalRoot.querySelector("h2"),null);
+});
+
+
+test("successive receipt-only responses keep the visible reference and opened receipt aligned", () => {
+  const { add, approvalRoot, artifactContentRoot, view } = setup();
+  add("button","last-receipt");
+  view.renderResponse({receipt});
+  const next = {...receipt,receipt_id:"MED-2"};
+  view.renderResponse({receipt:next});
+  assert.match(approvalRoot.textContent,/MED-2/);
+  assert.doesNotMatch(approvalRoot.textContent,/MED-1/);
+  assert.equal(approvalRoot.querySelectorAll(".receipt-summary").length,1);
+  view.openArtifact();
+  assert.match(artifactContentRoot.textContent,/MED-2/);
 });
