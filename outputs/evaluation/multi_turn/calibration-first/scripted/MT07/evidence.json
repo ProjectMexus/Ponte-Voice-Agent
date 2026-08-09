@@ -1,0 +1,30 @@
+{
+  "case_id": "MT07",
+  "track": "scripted",
+  "observations": [],
+  "dispatches": [],
+  "backend_effects": [],
+  "coverage": {
+    "dispatch_trace": true,
+    "backend_effects": true
+  },
+  "final": {
+    "booking_count": 0,
+    "write_count": 0,
+    "tools_called": [],
+    "constraints_preserved": false,
+    "rejected_unavailable": false
+  },
+  "error": {
+    "category": "harness",
+    "type": "URLError"
+  },
+  "metadata": {
+    "model": "queued-native-decisions",
+    "temperature": 0,
+    "prompt_config": "DemoMedicalWorkflow.SYSTEM_PROMPT/runtime-control",
+    "fixture_version": 1,
+    "dataset_hash": "ef48caefef33378ec7281c4f7c0b15eadb5e8e274bb1246a20c3153ba5590494"
+  },
+  "calls": []
+}

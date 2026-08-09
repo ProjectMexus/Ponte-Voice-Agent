@@ -1,0 +1,2312 @@
+[
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 7,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 3,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible",
+        "removed": false
+      },
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 7,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 8,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 5,
+    "changes": {
+      "candidate": {
+        "before": "eligible",
+        "after": null,
+        "removed": false
+      },
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [
+          "S1400"
+        ],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "department": {
+        "before": "DEPT-CARDIO",
+        "after": null,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 7,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": true,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": true,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 7,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 3,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible",
+        "removed": false
+      },
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 4,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible",
+        "removed": false
+      },
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT03",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT03",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 7,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 8,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 5,
+    "changes": {
+      "candidate": {
+        "before": "eligible",
+        "after": null,
+        "removed": false
+      },
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [
+          "S1400"
+        ],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "department": {
+        "before": "DEPT-CARDIO",
+        "after": null,
+        "removed": false
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 6,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 1,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 2,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 3,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 4,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 5,
+    "changes": {
+      "approval_target_state": {
+        "before": "invalidated",
+        "after": null,
+        "removed": true
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null,
+        "removed": false
+      },
+      "exact_time": {
+        "before": null,
+        "after": null,
+        "removed": true
+      },
+      "rejected_unavailable": {
+        "before": null,
+        "after": false,
+        "removed": false
+      }
+    }
+  }
+]

@@ -7,7 +7,7 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any
 
-from .intent import IntentDecision, IntentRecognizer, build_intent_recognizer
+from .intent import IntentDecision, IntentRecognizer, KeywordIntentRecognizer, build_intent_recognizer
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope
 from .medical_workflow import MedicalWorkflow, WorkflowResult
 from .session import SessionState, SessionStore
@@ -25,11 +25,13 @@ class InteractionCore:
         intent_recognizer: IntentRecognizer | None = None,
         cash_workflow: Any | None = None,
         agent_orchestrator: Any | None = None,
+        demo_workflow: Any | None = None,
     ) -> None:
         self.sessions = sessions
         self.medical_workflow = medical_workflow
         self.cash_workflow = cash_workflow
         self.agent_orchestrator = agent_orchestrator
+        self.demo_workflow = demo_workflow
         self.intent_recognizer = intent_recognizer or build_intent_recognizer()
 
     def handle(self, envelope: EventEnvelope) -> CanonicalInteractionResult:
@@ -43,6 +45,15 @@ class InteractionCore:
         requested_locale = envelope.audit.get("locale")
         if isinstance(requested_locale, str) and requested_locale in {"en", "en-US", "en-GB", "zh-Hant", "zh-HK", "zh-TW"}:
             state.response_locale = "en" if requested_locale.startswith("en") else "zh-Hant"
+        if self._uses_demo(state, envelope):
+            task = state.task
+            if isinstance(task, Mapping) and task.get("type") == "medical_demo_agent":
+                outcome = self.demo_workflow.handle(deepcopy(dict(task)), envelope)
+            else:
+                outcome = self.demo_workflow.start(envelope, IntentDecision("medical_booking", "keyword", 1.0))
+            result = self._save(state, outcome)
+            state.response_locale = result.facts.get("response_locale", state.response_locale)
+            return result
         if self.agent_orchestrator is not None:
             result = self.agent_orchestrator.handle(state, envelope)
             self.sessions.save(state)
@@ -64,6 +75,49 @@ class InteractionCore:
             raise ValueError("event.content must be a non-empty string")
         decision = self.intent_recognizer.recognize(content.strip())
         return self._workflow_for_intent(decision).start(envelope, decision)
+
+    def _uses_demo(self, state: SessionState, envelope: EventEnvelope) -> bool:
+        if self.demo_workflow is None:
+            return False
+        task = state.task
+        if isinstance(task, Mapping):
+            if task.get("type") == "medical_demo_agent":
+                if envelope.event.get("type") != "user_utterance":
+                    return True
+                if task.get("status") not in {"completed", "cancelled", "failed"}:
+                    return True
+                content = envelope.event.get("content", "")
+                return isinstance(content, str) and (self._is_demo_request(content) or self._is_demo_followup(content))
+            # Never abandon another runtime's active proposal or task.
+            if task.get("status") not in {"completed", "cancelled", "failed"}:
+                return False
+        content = envelope.event.get("content", "")
+        return envelope.event.get("type") == "user_utterance" and isinstance(content, str) and self._is_demo_request(content)
+
+    @staticmethod
+    def _is_demo_followup(content: str) -> bool:
+        text = content.casefold()
+        if any(term in text for term in KeywordIntentRecognizer.DEFAULT_MEDICAL_QUERY_TERMS):
+            return False
+        if any(term in text for term in (
+            "查詢", "查询", "現金分享", "cash sharing", "檢查", "检查", "超聲波", "超声波", "治療", "治疗",
+        )):
+            return False
+        return any(term in text for term in (
+            "心臟科", "心脏科", "cardiology", "改", "取消", "下午", "after", "cancel", "yes", "確認", "确认",
+        ))
+
+    @staticmethod
+    def _is_demo_request(content: str) -> bool:
+        text = content.casefold()
+        if any(term in text for term in KeywordIntentRecognizer.DEFAULT_MEDICAL_QUERY_TERMS):
+            return False
+        return any(term in text for term in ("心臟科", "心脏科", "cardiology")) and not any(
+            term in text for term in (
+                "查詢", "查询", "紀錄", "記錄", "记录", "my appointments",
+                "檢查", "检查", "超聲波", "超声波", "治療", "治疗", "examination", "ultrasound",
+            )
+        )
 
     def _workflow_for_intent(self, decision: IntentDecision) -> Any:
         if decision.is_medical:

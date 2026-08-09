@@ -114,6 +114,8 @@ docker compose up --build
 
 ## 設定 LLM (Configuration)
 
+七輪心臟科流程已接回相同 UI。離線排練可使用 `python scripts/run_stack.py --demo-agent scripted --medical-data-profile live-demo-v2`；已有模型設定時將 `scripted` 改為 `real`。這個受限流程保留時間修改、查詢插話、恢復及正式批准；一般服務仍使用原有路徑。完整啟動指令與中英文台詞見 [心臟科 Demo](docs/CARDIOLOGY_DEMO.md)。
+
 預設工作流在未設定 LLM 時使用內建關鍵字辨識。要啟用多輪 agent，請在本機 `.env` 設定下列欄位，並將範例值換成你的模型服務設定，再執行相同的啟動指令：
 
 ```dotenv

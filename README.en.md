@@ -104,6 +104,8 @@ Open [http://localhost:5173](http://localhost:5173). For hosted setup, see the [
 
 ## LLM configuration
 
+The seven-turn cardiology flow now uses the same UI. Rehearse with `python scripts/run_stack.py --demo-agent scripted --medical-data-profile live-demo-v2`, or replace `scripted` with `real` after configuring your model. This bounded flow preserves time changes, appointment enquiries, resumption, and explicit approval; other services keep their existing routes. See the [cardiology demo runbook](docs/CARDIOLOGY_DEMO.md) for both language scripts and configuration.
+
 The default workflows use keyword recognition when no LLM is configured. To enable the multi-turn agent, set the following fields in your local `.env`, replace the example values with your provider settings, and use the same startup command:
 
 ```dotenv

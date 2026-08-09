@@ -1,0 +1,2 @@
+2026-10-14 02:01:02,494 INFO [mcp] send request_id=MCP-1 operation=initialize input_keys=capabilities,clientInfo,protocolVersion
+2026-10-14 02:01:02,946 INFO [mcp] receive request_id=MCP-1 operation=initialize outcome=success latency_ms=469

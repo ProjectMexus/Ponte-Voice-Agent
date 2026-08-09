@@ -1,0 +1,867 @@
+[
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT01",
+    "step": 7,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "A2"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 3,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible"
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT02",
+    "step": 4,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT03",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT04",
+    "step": 8,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 4,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 5,
+    "changes": {
+      "department": {
+        "before": "DEPT-CARDIO",
+        "after": null
+      },
+      "candidate": {
+        "before": "eligible",
+        "after": null
+      },
+      "grounded_in": {
+        "before": [
+          "S1400"
+        ],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 6,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT05",
+    "step": 7,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "NEW_A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 4,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT06",
+    "step": 6,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT07",
+    "step": 6,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 4,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "scripted",
+    "case_id": "MT08",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT01",
+    "step": 7,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "A2"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 3,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible"
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT02",
+    "step": 4,
+    "changes": {
+      "candidate": {
+        "before": null,
+        "after": "eligible"
+      },
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT03",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT03",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "needs_reselection": {
+        "before": true,
+        "after": false
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT04",
+    "step": 8,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 4,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 5,
+    "changes": {
+      "department": {
+        "before": "DEPT-CARDIO",
+        "after": null
+      },
+      "candidate": {
+        "before": "eligible",
+        "after": null
+      },
+      "grounded_in": {
+        "before": [
+          "S1400"
+        ],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT05",
+    "step": 6,
+    "changes": {
+      "approval_target": {
+        "before": null,
+        "after": "OLD_A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 4,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT06",
+    "step": 6,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "candidate_target": {
+        "before": null,
+        "after": "P2"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT07",
+    "step": 6,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 1,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 2,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 3,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 4,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  },
+  {
+    "track": "real_model",
+    "case_id": "MT08",
+    "step": 5,
+    "changes": {
+      "grounded_in": {
+        "before": [],
+        "after": null
+      },
+      "approval_target": {
+        "before": null,
+        "after": "A"
+      }
+    }
+  }
+]

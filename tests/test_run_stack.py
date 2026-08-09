@@ -81,7 +81,10 @@ class RunStackTests(unittest.TestCase):
 
         self.assertIn("PONTE_LOG_LEVEL=INFO", env_example)
         filter_example = r"rg '\[(frontend|middleware|llm|mcp|backend)\]' ponte-terminal.log"
-        for document in (readme, middleware_readme):
+        self.assertIn("docs/AGENT_EXECUTION.md", readme)
+        # Detailed logging instructions live in the module guide; the product
+        # README links technical documentation instead of duplicating it.
+        for document in (middleware_readme,):
             self.assertIn("PONTE_LOG_LEVEL=INFO python scripts/run_stack.py", document)
             self.assertIn("PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py", document)
             self.assertIn(filter_example, document)

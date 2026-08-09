@@ -3,6 +3,7 @@ from copy import deepcopy
 import re
 
 _COPY = {
+    "提交掛號要求": "Submitted the registration request",
     "我的醫療預約":"My medical appointments", "選擇醫療服務":"Choose a medical service",
     "選擇預約時段":"Choose an appointment time", "確認預約":"Confirm appointment",
     "預約完成":"Appointment confirmed", "處理預約問題":"Review booking issue",

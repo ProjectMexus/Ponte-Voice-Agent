@@ -1,0 +1,1 @@
+{"department":{"id":"DEPT-OTHER","name":"既有預約"},"end":"2026-10-20T15:30:00+08:00","id":"APT-EXIST-1","patient":{"id":"PAT-DEMO-AGENT-E2E"},"patient_id":"PAT-DEMO-AGENT-E2E","start":"2026-10-20T15:00:00+08:00","status":"booked"}

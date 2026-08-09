@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import time
 import uuid
+from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Type
@@ -21,6 +23,7 @@ from mock_backends.core.ids import TextFileIdGenerator
 from mock_backends.core.persistence import JsonLinesTextRepository
 from mock_backends.medical.backend import MedicalBackend
 from mock_backends.medical.service import MedicalService
+from mock_backends.medical.demo_profile import PROFILE_NAME, seed_appointments
 from mock_backends.one_account.backend import OneAccountBackend
 from mock_backends.one_account.service import OneAccountService
 from mock_backends.router import MockRouter
@@ -36,7 +39,32 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_DIR = PROJECT_ROOT / "database"
 
 
-def create_application(data_dir: str | Path, clock: Clock | None = None) -> MockRouter:
+def _seed_medical_profile(root: Path, clock: Clock, patient_id: str) -> None:
+    """Resume an interrupted synthetic seed without resetting any saved record."""
+    metadata = JsonLinesTextRepository(root / "demo_profile.txt")
+    saved = metadata.get("medical-data-profile")
+    if saved is None:
+        if any(root.glob("*.txt")):
+            raise ValueError("live-demo-v2 requires a fresh medical data directory; existing data was not changed")
+        saved = {"id": "medical-data-profile", "profile": PROFILE_NAME,
+                 "reference_date": clock.now().date().isoformat(), "patient_id": patient_id}
+        metadata.insert(saved)
+    if saved.get("profile") != PROFILE_NAME or saved.get("patient_id") != patient_id:
+        raise ValueError("medical demo profile or patient differs from saved seed; use a fresh data directory")
+    appointments = JsonLinesTextRepository(root / "appointments.txt")
+    for record in seed_appointments(date.fromisoformat(saved["reference_date"]), patient_id):
+        if appointments.get(record["id"]) is None:
+            appointments.insert(record)
+
+
+def create_application(
+    data_dir: str | Path, clock: Clock | None = None, *,
+    medical_data_profile: str = "legacy", patient_id: str = "PAT-DEMO-001",
+) -> MockRouter:
+    if medical_data_profile not in {"legacy", PROFILE_NAME}:
+        raise ValueError("medical data profile must be legacy or live-demo-v2")
+    if not patient_id.strip():
+        raise ValueError("demo patient ID must not be empty")
     root = Path(data_dir)
     active_clock = clock or AsiaMacauClock()
     ids = TextFileIdGenerator(JsonLinesTextRepository(root / "id_sequences.txt"))
@@ -51,14 +79,19 @@ def create_application(data_dir: str | Path, clock: Clock | None = None) -> Mock
     )
 
     medical_root = root / "medical"
+    if medical_data_profile == PROFILE_NAME:
+        _seed_medical_profile(medical_root, active_clock, patient_id)
+    elif (medical_root / "demo_profile.txt").exists():
+        raise ValueError("saved live-demo-v2 data requires the matching medical data profile")
+    appointment_repository = JsonLinesTextRepository(medical_root / "appointments.txt")
     medical_service = MedicalService(
         clock=active_clock,
         ids=ids,
-        appointment_repository=JsonLinesTextRepository(medical_root / "appointments.txt"),
+        appointment_repository=appointment_repository,
         task_repository=JsonLinesTextRepository(medical_root / "tasks.txt"),
         idempotency=RepositoryIdempotencyStore(JsonLinesTextRepository(medical_root / "idempotency.txt")),
-        # Injected clocks retain the original deterministic fixture catalogue.
         rolling_slots=clock is None,
+        medical_data_profile=medical_data_profile,
     )
 
     welfare_root = root / "social_welfare"
@@ -205,13 +238,19 @@ def make_request_handler(router: MockRouter) -> Type[BaseHTTPRequestHandler]:
     return MockRequestHandler
 
 
-def create_http_server(host: str, port: int, data_dir: str | Path, clock: Clock | None = None) -> ThreadingHTTPServer:
-    router = create_application(data_dir, clock=clock)
+def create_http_server(
+    host: str, port: int, data_dir: str | Path, clock: Clock | None = None, *,
+    medical_data_profile: str = "legacy", patient_id: str = "PAT-DEMO-001",
+) -> ThreadingHTTPServer:
+    router = create_application(data_dir, clock=clock, medical_data_profile=medical_data_profile, patient_id=patient_id)
     return ThreadingHTTPServer((host, port), make_request_handler(router))
 
 
-def run_server(host: str, port: int, data_dir: str | Path) -> None:
-    server = create_http_server(host, port, data_dir)
+def run_server(
+    host: str, port: int, data_dir: str | Path, *,
+    medical_data_profile: str = "legacy", patient_id: str = "PAT-DEMO-001",
+) -> None:
+    server = create_http_server(host, port, data_dir, medical_data_profile=medical_data_profile, patient_id=patient_id)
     print(f"Ponte mock backends listening on http://{host}:{server.server_port}")
     try:
         server.serve_forever()
@@ -227,8 +266,11 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", default=8080, type=int)
     parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR))
+    parser.add_argument("--medical-data-profile", choices=("legacy", PROFILE_NAME),
+                        default=os.environ.get("PONTE_MEDICAL_DATA_PROFILE", "legacy"))
+    parser.add_argument("--patient-id", default=os.environ.get("PONTE_PATIENT_ID", "PAT-DEMO-001"))
     args = parser.parse_args()
-    run_server(args.host, args.port, args.data_dir)
+    run_server(args.host, args.port, args.data_dir, medical_data_profile=args.medical_data_profile, patient_id=args.patient_id)
 
 
 if __name__ == "__main__":

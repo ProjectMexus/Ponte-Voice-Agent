@@ -1,0 +1,3 @@
+# Evaluation evidence and the frozen dataset must retain their original bytes.
+outputs/evaluation/** -text
+evals/multi_turn/cases.json -text

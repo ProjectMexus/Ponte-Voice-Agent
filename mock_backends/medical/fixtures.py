@@ -3,7 +3,14 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+
+
+LOCATION_DISPLAYS = {
+    "LOC-MAIN-OPD": "第一門診",
+    "LOC-IMAGING-CENTER": "影像中心",
+    "LOC-REHAB-01": "復康治療室",
+}
 
 
 DEPARTMENTS = [
@@ -52,6 +59,35 @@ def doctors() -> list[dict]:
     return deepcopy(DOCTORS)
 
 
+def next_tuesday(reference_date: date) -> date:
+    """Resolve 'next Tuesday' strictly after the service's reference day."""
+    return reference_date + timedelta(days=(1 - reference_date.weekday()) % 7 or 7)
+
+
+def cardiology_demo_slots(selected_date: date) -> list[dict]:
+    """Isolated inventory: dated IDs never rebase or replace legacy bookings."""
+    result = []
+    for hour, minute in ((14, 0), (15, 30)):
+        start = f"{selected_date.isoformat()}T{hour:02d}:{minute:02d}:00+08:00"
+        end = f"{selected_date.isoformat()}T{hour:02d}:{minute + 15:02d}:00+08:00"
+        result.append({
+            "resourceType": "Slot",
+            "id": f"SLOT-DEMO-REG-{selected_date:%Y%m%d}-CARDIO-{hour:02d}{minute:02d}",
+            "status": "free",
+            "slot_type": "outpatient_registration",
+            "department_id": "DEPT-CARDIO",
+            "doctor_id": "DOC-002",
+            "location_id": "LOC-MAIN-OPD",
+            "location": {"id": "LOC-MAIN-OPD", "display": LOCATION_DISPLAYS["LOC-MAIN-OPD"]},
+            "start": start,
+            "end": end,
+            "capacity": 1,
+            "remaining": 1,
+            "session": "afternoon",
+        })
+    return result
+
+
 def _dated_slots(templates: list[dict], now: datetime | None) -> list[dict]:
     if now is None:
         return deepcopy(templates)
@@ -72,14 +108,34 @@ def _dated_slots(templates: list[dict], now: datetime | None) -> list[dict]:
             result.setdefault(item["id"], item)
     return list(result.values())
 
+def registration_slots(demo_date: date | None = None, *, now: datetime | None = None) -> list[dict]:
+    if isinstance(demo_date, datetime):
+        now, demo_date = demo_date, None
+    slots = _dated_slots(REGISTRATION_SLOTS, now)
+    if demo_date is not None:
+        slots.extend(cardiology_demo_slots(demo_date))
+    return slots
 
-def registration_slots(now: datetime | None = None) -> list[dict]:
-    return _dated_slots(REGISTRATION_SLOTS, now)
+
+def _with_locations(records: list[dict]) -> list[dict]:
+    result = deepcopy(records)
+    for item in result:
+        location_id = item["location_id"]
+        item["location"] = {"id": location_id, "display": LOCATION_DISPLAYS[location_id]}
+    return result
 
 
 def appointment_services() -> list[dict]:
-    return deepcopy(APPOINTMENT_SERVICES)
+    return _with_locations(APPOINTMENT_SERVICES)
 
 
-def appointment_slots(now: datetime | None = None) -> list[dict]:
-    return _dated_slots(APPOINTMENT_SLOTS, now)
+def appointment_slots(reference_date: date | None = None, *, now: datetime | None = None) -> list[dict]:
+    if isinstance(reference_date, datetime):
+        now, reference_date = reference_date, None
+    slots = _with_locations(_dated_slots(APPOINTMENT_SLOTS, now))
+    if reference_date is not None:
+        shift = reference_date - date(2026, 8, 12)
+        for slot in slots:
+            for field in ("start", "end"):
+                slot[field] = (datetime.fromisoformat(slot[field]) + shift).isoformat()
+    return slots

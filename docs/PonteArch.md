@@ -4,6 +4,8 @@
 
 ## 1. 文檔目的
 
+目前七輪心臟科流程亦已整合至相同互動入口及新 UI，與通用 `AgentOrchestrator` 並存。領域流程、啟動旗標及中英文示範見 [心臟科 Demo](CARDIOLOGY_DEMO.md)；補充圖解：[中文 SVG](architecture/Ponte_Demo_Architecture.svg) · [English SVG](architecture/Ponte_Demo_Architecture.en.svg)。
+
 本文定義 Ponte 比賽 Demo 的系統邊界、核心架構、模組責任、任務流程及實作優先級。
 
 本 Demo 的目標不是完整接入澳門政府、醫療及社福生產系統，而是透過 Mock API、模擬 RPA 及簡化 FHIR 資源，展示以下技術與產品命題：

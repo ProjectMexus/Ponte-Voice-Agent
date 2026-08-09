@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+<title id="title">Ponte medical demo architecture</title>
+<desc id="desc">Browser requests and explicit approvals enter InteractionCore and DemoMedicalWorkflow. The workflow owns approval and receipt verification. ExecutionPipeline dispatches via MCP to the medical mock backend. Tool results return to the workflow. Task and approval state are in memory; synthetic backend records use JSON Lines.</desc>
+<defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#183342" flood-opacity=".045"/></filter>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="context-stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="1920" height="1080" fill="#F8FAFB"/>
+<text x="64" y="52" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="20" font-weight="600" fill="#637D8A" text-anchor="start">PONTE  /  SYSTEM DESIGN</text>
+<text x="64" y="112" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="50" font-weight="650" fill="#193745" text-anchor="start">From a request to a verified booking</text>
+<text x="64" y="157" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="25" font-weight="400" fill="#687F8B" text-anchor="start">Conversation, task state and controlled execution in one service flow.</text>
+<rect x="1580" y="42" width="276" height="40" rx="20" fill="#E6F3EF" stroke="#D5EAE1" stroke-width="1.5"/>
+<text x="1718" y="69" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="18" font-weight="600" fill="#247B64" text-anchor="middle">MEDICAL DEMO</text>
+<rect x="396" y="326" width="1032" height="572" rx="24" fill="#EEF3F7" stroke="#D7E2E9" stroke-width="1.5" stroke-dasharray="7 8"/>
+<text x="420" y="357" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="18" font-weight="600" fill="#627F90" text-anchor="start">PONTE · TRUSTED SERVER</text>
+<rect x="420" y="192" width="580" height="110" rx="18" fill="#F0EDFA" stroke="#DED7F0" stroke-width="1.5"/>
+<circle cx="451" cy="229" r="6" fill="#7D66B0"/>
+<text x="472" y="237" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="27" font-weight="650" fill="#584589" text-anchor="start">LLM decisions</text>
+<text x="448" y="276" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="400" fill="#786893" text-anchor="start">Choose the next tool · observe its result</text>
+<path d="M710 306 V376" fill="none" stroke="#8B76BB" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="64" y="380" width="300" height="344" rx="18" fill="#fff" stroke="#DFE6EA" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="88" y="415" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="17" font-weight="650" fill="#4779B7" text-anchor="start">01 / INTERFACE</text>
+<text x="88" y="462" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="30" font-weight="650" fill="#193745" text-anchor="start">Conversation</text>
+<text x="88" y="510" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="24" font-weight="400" fill="#617985" text-anchor="start">Voice and text</text>
+<text x="88" y="552" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="24" font-weight="400" fill="#617985" text-anchor="start">Drafts and options</text>
+<rect x="88" y="582" width="252" height="56" rx="12" fill="#FCF2E3" stroke="#EEDBB9" stroke-width="1.5"/>
+<text x="214" y="618" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="600" fill="#A16F23" text-anchor="middle">You approve</text>
+<text x="88" y="686" font-family="Consolas, monospace" font-size="18" font-weight="400" fill="#7B8D97" text-anchor="start">frontend/app.js</text>
+<rect x="420" y="380" width="580" height="344" rx="18" fill="#fff" stroke="#DFE6EA" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="448" y="415" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="17" font-weight="650" fill="#7961A3" text-anchor="start">02 / RUNTIME</text>
+<text x="448" y="462" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="30" font-weight="650" fill="#193745" text-anchor="start">Conversation &amp; task runtime</text>
+<text x="448" y="497" font-family="Consolas, monospace" font-size="19" font-weight="400" fill="#7B8D97" text-anchor="start">InteractionCore · DemoMedicalWorkflow</text>
+<text x="448" y="540" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="23" font-weight="400" fill="#617985" text-anchor="start">Update constraints · pause and resume</text>
+<rect x="444" y="575" width="532" height="124" rx="14" fill="#FCF2E3" stroke="#EEDBB9" stroke-width="1.5"/>
+<text x="466" y="615" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="25" font-weight="650" fill="#9B6B23" text-anchor="start">Approval &amp; result checks</text>
+<text x="466" y="650" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="400" fill="#9A7A4F" text-anchor="start">Valid action before write; verify the receipt</text>
+<text x="466" y="681" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="18" font-weight="400" fill="#A18B68" text-anchor="start">Proposal binding · expiry · intent revision</text>
+<rect x="1060" y="380" width="344" height="140" rx="18" fill="#fff" stroke="#DFE6EA" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1084" y="412" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="16" font-weight="650" fill="#427D91" text-anchor="start">03 / DISPATCH</text>
+<text x="1084" y="449" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="25" font-weight="650" fill="#193745" text-anchor="start">ExecutionPipeline</text>
+<text x="1084" y="482" font-family="Consolas, monospace" font-size="19" font-weight="400" fill="#7B8D97" text-anchor="start">McpExecutionStage</text>
+<text x="1084" y="505" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="19" font-weight="400" fill="#617985" text-anchor="start">Trusted context · tool dispatch</text>
+<rect x="1060" y="570" width="344" height="154" rx="18" fill="#fff" stroke="#DFE6EA" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1084" y="604" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="16" font-weight="650" fill="#427D91" text-anchor="start">04 / INTEGRATION</text>
+<text x="1084" y="644" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="27" font-weight="650" fill="#193745" text-anchor="start">MCP tool integration</text>
+<text x="1084" y="679" font-family="Consolas, monospace" font-size="19" font-weight="400" fill="#7B8D97" text-anchor="start">ToolRegistry · RestAdapter</text>
+<text x="1084" y="707" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="20" font-weight="400" fill="#617985" text-anchor="start">stdio JSON-RPC → HTTP</text>
+<rect x="1488" y="380" width="368" height="344" rx="18" fill="#fff" stroke="#DFE6EA" stroke-width="1.5" filter="url(#shadow)"/>
+<text x="1512" y="415" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="17" font-weight="650" fill="#24846A" text-anchor="start">05 / SERVICE</text>
+<text x="1512" y="462" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="30" font-weight="650" fill="#193745" text-anchor="start">Medical backend</text>
+<text x="1512" y="511" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="400" fill="#617985" text-anchor="start">Slots and existing appointments</text>
+<text x="1512" y="552" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="400" fill="#617985" text-anchor="start">Capacity and idempotency checks</text>
+<text x="1512" y="593" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="400" fill="#617985" text-anchor="start">Create bookings and receipts</text>
+<text x="1512" y="631" font-family="Consolas, monospace" font-size="19" font-weight="400" fill="#7B8D97" text-anchor="start">MedicalService</text>
+<rect x="1512" y="652" width="320" height="48" rx="11" fill="#E8F4EF" stroke="#D5E9E0" stroke-width="1.5"/>
+<text x="1672" y="683" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="20" font-weight="600" fill="#2C8069" text-anchor="middle">JSON Lines · mock data</text>
+<path d="M369 465 H414" fill="none" stroke="#547FAF" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="391" y="442" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="15" font-weight="400" fill="#688297" text-anchor="middle">HTTP</text>
+<path d="M415 670 H369" fill="none" stroke="#248A75" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1006 450 H1054" fill="none" stroke="#536D7A" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1232 526 V564" fill="none" stroke="#536D7A" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1410 621 H1482" fill="none" stroke="#536D7A" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1446" y="603" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="15" font-weight="400" fill="#688297" text-anchor="middle">HTTP</text>
+<path d="M1482 677 H1410" fill="none" stroke="#248A75" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="420" y="788" width="500" height="70" rx="12" fill="#fff" stroke="#D7E2E9" stroke-width="1.5"/>
+<text x="444" y="818" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="22" font-weight="600" fill="#627B89" text-anchor="start">Tasks &amp; approvals: process memory</text>
+<text x="444" y="843" font-family="Consolas, monospace" font-size="17" font-weight="400" fill="#81939E" text-anchor="start">SessionStore · DemoMedicalWorkflow._states</text>
+<path d="M600 730 V782" fill="none" stroke="#9BAFBB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1232 730 V874 H976 V730" fill="none" stroke="#248A75" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1104" y="847" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="21" font-weight="600" fill="#248A75" text-anchor="middle">Tool results &amp; receipt</text>
+<path d="M64 943 H1856" fill="none" stroke="#DFE7EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="70" cy="982" r="6" fill="#7D66B0"/>
+<text x="92" y="990" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="27" font-weight="600" fill="#193745" text-anchor="start">The model proposes.</text>
+<circle cx="676" cy="982" r="6" fill="#C58A34"/>
+<text x="698" y="990" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="27" font-weight="600" fill="#193745" text-anchor="start">The user approves.</text>
+<circle cx="1326" cy="982" r="6" fill="#248A75"/>
+<text x="1348" y="990" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="27" font-weight="600" fill="#193745" text-anchor="start">The runtime verifies.</text>
+<text x="64" y="1043" font-family="Segoe UI, Microsoft JhengHei, Noto Sans CJK TC, sans-serif" font-size="20" font-weight="400" fill="#8A9CA6" text-anchor="start">Synthetic service data · single-host demo · legacy workflows share the tool path</text>
+</svg>

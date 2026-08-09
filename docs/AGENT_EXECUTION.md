@@ -10,6 +10,8 @@ The new implementation reuses these components. It adds one orchestrator and pri
 
 ## Runtime architecture
 
+The optional seven-turn cardiology path is restored alongside this general runtime. With `--demo-agent scripted` or `real`, `InteractionCore` routes cardiology requests to `DemoMedicalWorkflow` under the same session transaction; other services retain the general agent or deterministic workflow. An active task retains its runtime owner. See [the cardiology runbook](CARDIOLOGY_DEMO.md) for startup flags, language scripts, isolated data and domain-specific approval semantics.
+
 ```mermaid
 flowchart TD
     T[Text or browser transcript] --> E[EventEnvelope: /api/interactions]

@@ -13,6 +13,9 @@ services:
       dockerfile: Dockerfile.middleware
     image: ponte-python:latest
     command: ["python", "-m", "mock_backends.server", "--host", "0.0.0.0", "--port", "8080", "--data-dir", "/app/database"]
+    environment:
+      PONTE_MEDICAL_DATA_PROFILE: ${PONTE_MEDICAL_DATA_PROFILE:-legacy}
+      PONTE_PATIENT_ID: ${PONTE_PATIENT_ID:-PAT-DEMO-001}
     volumes:
       - ponte-data:/app/database
     expose:
@@ -41,6 +44,7 @@ services:
       # Default-off resumable execution; the configured LLM handles agent
       # decisions when enabled and intent recognition otherwise.
       PONTE_AGENT_ENABLED: ${PONTE_AGENT_ENABLED:-false}
+      PONTE_DEMO_AGENT_MODE: ${PONTE_DEMO_AGENT_MODE:-off}
       PONTE_LLM_API_URL: ${PONTE_LLM_API_URL:-}
       PONTE_LLM_API_KEY: ${PONTE_LLM_API_KEY:-}
       PONTE_LLM_MODEL: ${PONTE_LLM_MODEL:-}
