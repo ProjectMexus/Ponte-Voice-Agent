@@ -1,3 +1,5 @@
+[繁體中文](README.md) | [English](README.en.md)
+
 <div align="center">
   <img src="background.png" alt="聆澳 Ponte — 聆聽澳門，連結每一段故事" width="100%" />
 </div>
@@ -12,7 +14,7 @@
   </p>
 </div>
 
-Ponte 是一個以粵語與繁體中文為核心的公共服務語音助理原型（Prototype）。使用者只需透過語音或文字輸入需求，系統即會透過**受控工作流（Controlled Workflows）** 協調醫療、一戶通與社會福利等模擬服務，並即時呈現處理進度、後續選項及待確認操作。
+Ponte 是一個以粵語與繁體中文為核心的公共服務 AI 助理原型。使用者可以用語音或文字表達需要，由 Ponte 透過受控工作流協調醫療、一戶通與社會福利等模擬服務。任務卡呈現處理進度、可選方案及待確認操作；介面亦可切換繁體中文與英文。
 
 > **Live Demo:** [https://ponte-8k6h.onrender.com/](https://ponte-8k6h.onrender.com/)
 
@@ -20,21 +22,21 @@ Ponte 是一個以粵語與繁體中文為核心的公共服務語音助理原�
 
 | 層級 | 技術 |
 | --- | --- |
-| **Backend / Middleware** | Python 3.13, Asyncio |
+| **Backend / Middleware** | Python 3.13+, 標準庫 HTTP Server |
 | **AI / Agent Protocol** | Model Context Protocol (MCP), OpenAI-compatible LLM API |
 | **Frontend** | Vanilla JS, Web Speech API |
 | **Infrastructure** | Docker, JSON-RPC, Render |
 
 ## 為何是 Ponte？
 
-公共服務不應要求長者先知道該用哪個平台、填哪份表格或記住哪個部門。Ponte 把複雜的服務入口轉化為一段可理解、可追蹤、且具備高度控制權的對話式流程。
+公共服務不應要求長者先知道該用哪個平台、填哪份表格或記住哪個部門。Ponte 把複雜的服務入口轉化為一段容易理解、能追蹤進度的對話流程，讓使用者核對安排、修改要求或停止操作。
 
-| 使用者體驗 (User Experience) | 系統保障機制 (System Guarantees) |
+| 使用者體驗 (User Experience) | 設計與控制機制 (Design and Controls) |
 | --- | --- |
-| **多模態輸入** — 文字 / 語音 | 前端支援大字體、高對比與語音報讀；語音轉譯結果經確認後才觸發處理。 |
+| **多模態輸入** — 文字 / 語音 | 前端支援大字體、高對比與語音報讀；語音及文字需求共用互動入口，正式提交另需明確確認。 |
 | **狀態可視化** — 即時進度追蹤 | 採用獨立任務卡（Task Cards）追蹤步驟、結果與可執行的下一步。 |
 | **人機協作確認** — Human-in-the-loop | 涉及狀態變更的關鍵操作，強制要求使用者明確確認（Explicit Confirmation）。 |
-| **抽象化工具呼叫** — 零 API 暴露 | Middleware 透過預定義的 MCP 工具與標準化工作流封裝底層邏輯。 |
+| **受控工具呼叫** — 統一服務入口 | Middleware 透過預定義的 MCP 工具與標準化工作流封裝底層邏輯。 |
 
 ## 可體驗的服務
 
@@ -43,16 +45,17 @@ Ponte 是一個以粵語與繁體中文為核心的公共服務語音助理原�
 | **醫療預約查詢** | 讀取模擬的覆診資料，顯示服務、日期、時間、地點和狀態。 |
 | **醫療服務預約** | 選擇服務與日期範圍，查看可選時段，確認後建立模擬預約。 |
 | **現金分享計劃** | 查詢模擬的一戶通計劃摘要。 |
-| **長者文娛活動** | 搜尋可參加的長者活動。 |
+| **長者文娛活動** | 啟用 agent 後，可透過查詢工具搜尋模擬活動。 |
 
-線上版可直接嘗試以下 Prompts：
+可以從以下需求開始：
 
 ```text
 我想查詢自己的醫療預約
 我想預約醫療服務
 我想查現金分享計劃
-我想找長者文娛活動
 ```
+
+介面頂部的「繁中／EN」可切換顯示及互動語言。英文文字輸入、服務回覆及任務卡共用同一互動與確認流程，例如 `I would like to see my medical appointments.` 或 `I would like to book a medical appointment.`。語音辨識及朗讀依賴瀏覽器或已設定的語音服務，實際可用聲線因環境而異。
 
 ## 架構一覽 (Architecture)
 
@@ -69,27 +72,9 @@ Frontend ──► Middleware（意圖辨識、流程、確認、任務狀態）
 Mock Backends（醫療／一戶通／社會福利）
 ```
 
-預設使用 deterministic workflow；啟用 `PONTE_AGENT_ENABLED=true` 後，LLM 可在 `/api/interactions` 中迭代選擇已授權的固定工具並讀取結果。Middleware 保存對話與工具歷史，驗證參數及醫療前置條件，並要求使用者提交 server-issued confirmation action 才能建立預約。詳見 [已實作的 Agent execution 架構](docs/AGENT_EXECUTION.md)。這是 mock-service prototype，並不代表完整自主性或生產級安全。
+LLM 負責理解需求、提出下一步並解釋結果；middleware 管理任務狀態、工具權限及確認規則。預設使用既有工作流，啟用 agent 後，模型可在相同互動入口迭代查詢工具並讀取結果。
 
-## Resumable agent execution
-
-Set `PONTE_AGENT_ENABLED=true` and configure `PONTE_LLM_API_URL`, `PONTE_LLM_MODEL`, and a local `PONTE_LLM_API_KEY`. The flag defaults to `false` for compatibility. Enabled mode requires an available configured model; provider failures pause safely rather than silently switching execution modes.
-
-The same `/api/interactions` event contract handles text, browser transcripts, voice-provider transcripts, and frontend approval buttons. The agent can choose registered read tools and propose `medical.create_appointment`. Other writes are denied until they have domain validators. Approval uses the exact action returned in `workspace.actions`; saying “yes” does not authorize a write. Changed requests withdraw pending proposals. Execution uses a server-generated idempotency key and resumes with the recorded tool result.
-
-State and replay receipts survive turns within one middleware process. They do **not** survive middleware restart and are not shared between workers. Successful approvals dispatch once in that process; an ambiguous network failure is recorded without automatic retry. Authentication, distributed durability, privacy controls, and broader write workflows remain design goals. See [runtime behavior, tests, and limitations](docs/AGENT_EXECUTION.md).
-
-Run all suites with `python -m pytest -q`, or the existing unittest discovery commands below. The scripted agent tests do not need a paid API key. `tests/test_agent_full_stack.py` exercises real HTTP, the actual chat HTTP client with a local native-function provider, the MCP subprocess, approval, backend persistence, replay, and resumed model decisions. Set `PONTE_TEST_TRACE_PATH` to an output JSON path to save its sanitized runtime trace. Task-budget exhaustion permits a fresh task, while cancellation of a later proposal preserves earlier committed receipts.
-
-### Terminal logs
-
-```bash
-PONTE_LOG_LEVEL=INFO python scripts/run_stack.py
-PONTE_LOG_LEVEL=DEBUG python scripts/run_stack.py
-rg '\[(frontend|middleware|llm|mcp|backend)\]' ponte-terminal.log
-```
-
-INFO uses `[frontend]`, `[middleware]`, `[llm]`, `[mcp]`, and `[backend]` summaries. Existing DEBUG instrumentation can show 完整 LLM prompt/response and MCP request/response, including medical data; provider error response bodies are logged when available, otherwise `response_unavailable` is recorded. JSON uses multi-line formatting, 每行 retaining its component prefix. HTTP body logging stays excluded; API key and credentials are masked. Agent execution traces record decisions, tool names, approval states, and outcomes without arguments, messages, or result payloads. Use DEBUG only with controlled mock data.
+建立預約前，server 會驗證服務、時段及必要條件，發出綁定提案的確認操作。文字「yes」或「OK」不會批准提交；需求改變會撤回待確認提案。有效批准後，server 使用 idempotency key 執行掛號，核實回執後才回報成功。具體流程及限制見 [Agent 執行架構](docs/AGENT_EXECUTION.md)。
 
 ## 快速開始 (Quick Start)
 
@@ -99,12 +84,13 @@ INFO uses `[frontend]`, `[middleware]`, `[llm]`, `[mcp]`, and `[backend]` summar
 - 現代瀏覽器（如需使用語音，請允許麥克風權限）
 - 無需額外安裝前端或 Python 依賴套件
 
-在專案根目錄建立本機設定檔：
+首次使用時，在專案根目錄複製設定範本；已有 `.env` 則保留原設定：
 
 ```powershell
 # Windows (PowerShell)
 Copy-Item .env.example .env
 ```
+
 ```bash
 # macOS / Linux
 cp .env.example .env
@@ -116,7 +102,7 @@ cp .env.example .env
 python scripts/run_stack.py
 ```
 
-當終端機輸出 `Ponte stack is ready.` 後，開啟輸出的 Frontend URL（預設為 `http://127.0.0.1:5173/`）。按 `Ctrl-C` 即可優雅地停止整個 stack。
+當終端機輸出 `Ponte stack is ready.` 後，開啟輸出的 Frontend URL（預設為 `http://127.0.0.1:5173/`）。按 `Ctrl-C` 即可停止整個服務堆疊。
 
 ### 使用 Docker Compose（可選）
 
@@ -128,15 +114,19 @@ docker compose up --build
 
 ## 設定 LLM (Configuration)
 
-未設定 LLM 時，Ponte 會以內建的 Keyword Intent Recognition 執行 Demo。若要對接 OpenAI 相容的 `chat/completions` 端點，請於本機 `.env` 設定：
+預設工作流在未設定 LLM 時使用內建關鍵字辨識。要啟用多輪 agent，請在本機 `.env` 設定下列欄位，並將範例值換成你的模型服務設定，再執行相同的啟動指令：
 
 ```dotenv
-PONTE_LLM_API_URL=https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
+PONTE_AGENT_ENABLED=true
+PONTE_LLM_API_URL=https://your-provider.example/v1/chat/completions
 PONTE_LLM_API_KEY=your-api-key
-PONTE_LLM_MODEL=gemini-2.5-flash-lite
+PONTE_LLM_MODEL=your-model-id
 ```
 
-**Task Recovery LLM：**
+`PONTE_AGENT_ENABLED` 預設為 `false`。啟用後需要完整模型設定；模型服務出錯時會暫停處理，不會自動切換執行模式。目前 agent 的寫入範圍限於經驗證的醫療預約建立。對話、待確認提案及重播紀錄保存在單一程序記憶體，服務重啟後不會恢復。
+
+**任務復原模型（Task Recovery LLM）：**
+
 系統另備有一組獨立的 `PONTE_TASK_RECOVERY_LLM_*` 設定。此模型僅接收經清理的後端／工具回傳結果，專門用於產生任務復原建議。
 
 > ⚠️ **請勿將 API Key 等敏感設定提交至版本控制系統。** 完整環境變數與行為規範請參閱 [Middleware README](middleware/README.md)。
@@ -150,6 +140,14 @@ python -m unittest discover -s middleware/tests -v
 python -m compileall -q MCP middleware mock_backends frontend scripts tests
 ```
 
+英文互動與 agent 的整合測試使用本機模擬服務，不需要付費模型 API key：
+
+```bash
+python -m unittest tests.test_english_interactions tests.test_agent_full_stack -v
+```
+
+完整驗證紀錄及執行／日誌細節見 [Agent 執行文件](docs/AGENT_EXECUTION.md)。
+
 前端靜態檢查：
 
 ```bash
@@ -162,11 +160,11 @@ node --check frontend/interaction-view.js
 
 | 目錄／檔案 | 用途 |
 | --- | --- |
-| [`frontend/`](frontend/) | 無 build dependency 的語音優先網頁介面與 middleware client。 |
+| [`frontend/`](frontend/) | 無需建置工具的語音優先網頁介面與 middleware client。 |
 | [`middleware/`](middleware/) | 互動控制器、workflow、確認機制、session 和 MCP process 管理。 |
 | [`MCP/`](MCP/) | 固定的工具註冊表、stdio JSON-RPC server 和 REST adapter。 |
 | [`mock_backends/`](mock_backends/) | 醫療、一戶通及社會福利的模擬服務。 |
-| [`database/`](database/) | 本機 Demo 的 JSON Lines mock state（⚠️ 不應提交至版本控制）。 |
+| [`database/`](database/) | 本機 Demo 的 JSON Lines 模擬資料；執行時產生的資料不應提交至版本控制。 |
 | [`scripts/run_stack.py`](scripts/run_stack.py) | 一鍵啟動 backend、middleware、MCP 和 frontend 的本機 runner。 |
 | [`render.yaml`](render.yaml) | Render 單容器部署 Blueprint。 |
 
@@ -174,7 +172,8 @@ node --check frontend/interaction-view.js
 
 - [系統架構與設計原則](docs/PonteArch.md)
 - [Ponte 產品定位](docs/Ponte公共服務平台.md)
-- [語音 Agent 說明](docs/VOICE_AGENT.md)
+- [Agent 執行流程、驗證紀錄與限制](docs/AGENT_EXECUTION.md)
+- [前端互動與語言支援](frontend/README.md)
 - [Render 部署指南](docs/render-deployment.md)
 - 模組專屬文件：[Frontend](frontend/README.md) · [Middleware](middleware/README.md) · [MCP](MCP/README.md) · [Mock Backends](mock_backends/README.md)
 
@@ -184,16 +183,4 @@ Ponte 僅作為展示用途的本機／雲端原型，**不會**連接真實的�
 
 即使在 Demo 中，涉及變更的流程仍需明確確認。此設計旨在實踐 Ponte 的核心治理原則：
 
-> **AI 可以輔助操作，但使用者必須「看得見、聽得懂」，並始終保有確認、修正與終止流程的絕對權利。**
-
-## Current verification — 13 October 2026
-
-The canonical agent path now supports bounded Qwen final-response normalization. Qwen configuration opts in; generic clients remain strict. After a protocol parse failure, only an assistant message with explicit stop, absent/empty tool calls, and nonempty prose not beginning with { or [ is eligible. Exactly one additional completion receives a copied history, the prose, and a server-owned formatting instruction. It has no tools or tool choice. Only strict JSON respond/clarify with a message is accepted; native calls, operation/approval fields, repeated prose, incomplete output and malformed JSON fail closed. Repair messages never enter authoritative history. This is a text formatting step, not authorization or semantic proof of the answer.
-
-The fresh Docker Linux Python 3.13.16 run passed **362 tests and 57 subtests**, with zero failures, errors or skips (65.730 seconds). The four retained Node frontend behavior tests passed. Python compilation and git diff whitespace checks passed. Compose and Render images rebuilt locally; no cloud deployment occurred.
-
-Earlier live QwenCloud qwen3.7-plus evidence demonstrated catalog/slots/referral reads, explicit issued approval, booking commit, resume, and replay without a duplicate. That recorded run remains overall unsuccessful because its later read-only turn returned Markdown. The new repair is verified through scripted real provider HTTP and canonical /api/interactions, but has not been rerun against live Qwen. No paid provider calls were made during this continuation. The local demo remains deterministic at localhost:5173; paid agent mode is disabled pending provider capacity.
-
-The frontend now includes a collapsed, localized accessible text entry that uses the same canonical interaction route and confirmation actions. Default mock slots roll with the Macau date over today and the next three days, skipping elapsed slots; fixed-clock August fixtures remain available to retained tests. Server-owned Macau date is refreshed each turn. Native functions are serialized; protocol-only ponte__respond/ponte__clarify finalizers cannot dispatch MCP operations. Qwen thinking is disabled and completion timeout defaults to 30 seconds.
-
-Limits: history, locks, proposals, attempts and replay remain process-local without durable recovery or distributed exactly-once guarantees. Production authentication, session ownership, CSRF and IAM are not implemented. Referral observations establish an existing mock appointment, not clinical suitability. Only validated medical appointment creation is supported as an agent write. Browser speech fallback remains; no real cloud STT/TTS verification was performed. Summary correctness and universal injection resistance are not guaranteed. Persistent Compose volume was preserved; changes remain uncommitted and unpushed, with no PR.
+> **讓使用者看得見進度、聽得懂安排，並保有確認、修正與停止操作的權利。**
