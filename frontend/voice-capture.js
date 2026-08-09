@@ -50,6 +50,8 @@ export function createVoiceCapture(options = {}) {
   let chunks = [];
   let stopReason = "complete";
   let discardCapture = false;
+  let generation = 0;
+  let requestingPermission = false;
 
   function emitState(state, detail = {}) {
     onStateChange?.(state, detail);
@@ -105,6 +107,7 @@ export function createVoiceCapture(options = {}) {
       cleanup();
       return;
     }
+    const capturedGeneration = generation;
     const durationMs = Math.max(0, Math.round(now() - startedAt));
     const mimeType = recorder?.mimeType || chooseMimeType(MediaRecorderClass) || "audio/webm";
     const blob = new Blob(chunks, { type: mimeType });
@@ -115,6 +118,7 @@ export function createVoiceCapture(options = {}) {
     }
     blobToDataUrl(blob)
       .then((dataUrl) => {
+        if (capturedGeneration !== generation) return;
         emitState("captured", { reason, durationMs });
         onComplete?.({ blob, dataUrl, mimeType, durationMs, reason });
       })
@@ -132,7 +136,8 @@ export function createVoiceCapture(options = {}) {
   return {
     supported: Boolean(mediaDevices?.getUserMedia && MediaRecorderClass && AudioContextClass),
     async start(handlers = {}) {
-      if (isRecording) return true;
+      if (isRecording || requestingPermission) return true;
+      const startedGeneration = ++generation;
       onStateChange = handlers.onStateChange;
       onLevel = handlers.onLevel;
       onComplete = handlers.onComplete;
@@ -145,7 +150,14 @@ export function createVoiceCapture(options = {}) {
       }
       try {
         emitState("requesting-permission");
-        stream = await mediaDevices.getUserMedia({ audio: true });
+        requestingPermission = true;
+        const acquiredStream = await mediaDevices.getUserMedia({ audio: true });
+        if (startedGeneration !== generation) {
+          acquiredStream.getTracks?.().forEach((track) => track.stop());
+          return false;
+        }
+        requestingPermission = false;
+        stream = acquiredStream;
         audioContext = new AudioContextClass();
         const source = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
@@ -169,6 +181,8 @@ export function createVoiceCapture(options = {}) {
         monitor();
         return true;
       } catch (error) {
+        if (startedGeneration !== generation) return false;
+        requestingPermission = false;
         cleanup();
         emitState(error?.name === "NotAllowedError" ? "permission-denied" : "error");
         onFailure?.(error);
@@ -177,7 +191,9 @@ export function createVoiceCapture(options = {}) {
     },
     stop,
     cancel() {
-      if (!isRecording) return;
+      generation += 1;
+      requestingPermission = false;
+      if (!isRecording) { emitState("ready", { reason: "cancelled" }); return; }
       discardCapture = true;
       if (recorder && recorder.state !== "inactive") recorder.stop();
       else cleanup();

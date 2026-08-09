@@ -19,6 +19,7 @@ from .contracts import PendingToolProposal, ToolCall, ToolExecutionResult
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope, InteractionTask
 from .medical_workflow import MedicalWorkflow, _build_action_receipt
 from .session import SessionState
+from .service_activity import project_agent_activity
 from .task_manager.transitions import ensure_transition
 
 
@@ -368,7 +369,8 @@ class AgentOrchestrator:
         message = self._redact(message)
         state.task["current_step"] = "confirm_operation" if run.pending else "agent"
         # Public state contains server-composed facts, never the private model/tool history.
-        facts = {**copy.deepcopy(state.task["facts"]), "agent_message": message}
+        facts = {**copy.deepcopy(state.task["facts"]), "agent_message": message,
+                 "service_events": project_agent_activity(run.trace)}
         confirmation = copy.deepcopy(state.task["pending_confirmation"])
         if confirmation:
             confirmation["arguments"] = {k: v for k, v in confirmation["arguments"].items() if k != "patient_id"}

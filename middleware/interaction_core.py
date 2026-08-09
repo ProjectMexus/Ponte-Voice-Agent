@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any
 
 from .intent import IntentDecision, IntentRecognizer, build_intent_recognizer
 from .interaction_contracts import CanonicalInteractionResult, EventEnvelope
 from .medical_workflow import MedicalWorkflow, WorkflowResult
 from .session import SessionState, SessionStore
+from .service_activity import record_tool_events
 
 
 class InteractionCore:
@@ -84,6 +86,13 @@ class InteractionCore:
         task, result, log_entries = outcome
         if not isinstance(task, dict) or not isinstance(result, CanonicalInteractionResult):
             raise ValueError("workflow returned an invalid result")
+        if result.response_intent != "replayed":
+            prior = state.task.get("facts", {}).get("service_events", []) if state.task and state.active_task_id == task.get("task_id") else []
+            prior = prior if isinstance(prior, list) else []
+            events = prior + record_tool_events(log_entries, offset=len(prior))
+            if events:
+                task = {**task, "facts": {**task.get("facts", {}), "service_events": deepcopy(events)}}
+                result = replace(result, task=deepcopy(task), facts={**result.facts, "service_events": deepcopy(events)})
         state.active_task_id = task.get("task_id")
         state.task = deepcopy(task)
         state.interaction_log.extend(deepcopy(log_entries))

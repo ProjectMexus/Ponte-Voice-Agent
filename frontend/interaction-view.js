@@ -18,29 +18,49 @@ function workspaceFields(fields) {
   return Object.entries(fields).map(([label, value]) => ({ label, value }));
 }
 
+function localCopy(zh, en) {
+  return document.documentElement.lang?.startsWith("en") ? en : zh;
+}
+
 function appendWorkspaceFields(container, fields, onAction) {
   const list = createElement("dl", "workspace-fields");
+  const options = createElement("div", "workspace-options");
+  options.setAttribute("role", "group");
+  options.setAttribute("aria-label", localCopy("選擇項目", "Choose an option"));
   const embeddedActionIds = new Set();
   workspaceFields(fields).forEach((field) => {
     const label = displayValue(field?.label);
     const value = displayValue(field?.value);
     if (!label && !value) return;
-    // If field has an action, render as clickable row
-    if (field?.action?.event && typeof field.action.event === "object") {
+    if (field?.action?.event && typeof field.action.event === "object" && !Array.isArray(field.action.event)) {
       const actionId = field.action.event.action_id;
       if (actionId) embeddedActionIds.add(actionId);
       const row = createElement("button", "workspace-field workspace-field-action");
       row.type = "button";
-      row.append(createElement("span", "workspace-field-label", label), createElement("span", "workspace-field-value", value));
-      row.addEventListener("click", () => onAction?.(field.action.event));
-      list.append(row);
+      if (typeof field.key === "string") row.dataset.fieldKey = field.key;
+      const copy = createElement("span", "workspace-option-copy");
+      copy.append(createElement("span", "workspace-field-label", label));
+      if (value) copy.append(createElement("span", "workspace-field-value", value));
+      const mark = createElement("span", "workspace-option-mark", "›");
+      mark.setAttribute("aria-hidden", "true");
+      row.append(copy, mark);
+      row.addEventListener("click", () => {
+        row.classList.add("is-submitting");
+        row.setAttribute("aria-busy", "true");
+        onAction?.(field.action.event);
+      });
+      options.append(row);
     } else {
       const row = createElement("div", "workspace-field");
+      if (typeof field.key === "string") row.dataset.fieldKey = field.key;
       row.append(createElement("dt", "", label), createElement("dd", "", value));
       list.append(row);
     }
   });
   if (list.children.length) container.append(list);
+  if (options.children.length) {
+    container.append(options);
+  }
   return embeddedActionIds;
 }
 
@@ -70,26 +90,51 @@ function renderReceiptContent(container, receipt) {
   container.append(list, createElement("p", "artifact-reference", `Reference: ${receipt.receipt_id || "—"}`));
 }
 
-export function renderWorkspace(container, workspace, onAction) {
+export function renderWorkspace(container, workspace, onAction, { headingId } = {}) {
   if (!container || !workspace || typeof workspace !== "object") return false;
   const card = createElement("article", "workspace-card");
   if (workspace.view) card.dataset.view = String(workspace.view);
-  if (workspace.title) card.append(createElement("h2", "workspace-title", String(workspace.title)));
-  if (workspace.view) card.append(createElement("p", "workspace-view", String(workspace.view)));
+  if (headingId) {
+    card.setAttribute("aria-labelledby", headingId);
+  } else {
+    const header = createElement("header", "workspace-header");
+    header.append(createElement("h2", "workspace-title", workspace.title ? String(workspace.title) : localCopy("服務資料", "Service details")));
+    card.append(header);
+  }
+  if (Array.isArray(workspace.context) && workspace.context.length) {
+    const context = createElement("dl", "agent-context");
+    workspace.context.forEach((field) => {
+      if (typeof field?.label !== "string" || typeof field?.value !== "string") return;
+      const row = createElement("div", "agent-context-row");
+      row.append(createElement("dt", "", field.label), createElement("dd", "", field.value));
+      context.append(row);
+    });
+    if (context.children.length) card.append(context);
+  }
   const embeddedActionIds = appendWorkspaceFields(card, workspace.fields, onAction);
 
   const actions = createElement("div", "action-list");
+  actions.setAttribute("role", "group");
+  actions.setAttribute("aria-label", localCopy("下一步", "Next action"));
   (Array.isArray(workspace.actions) ? workspace.actions : []).forEach((action) => {
-    if (!action || typeof action !== "object" || !action.event || typeof action.event !== "object") return;
-    // Skip actions already embedded in field rows
+    if (!action || typeof action !== "object" || !action.event || typeof action.event !== "object" || Array.isArray(action.event)) return;
     if (embeddedActionIds.has(action.event.action_id)) return;
-    const button = createElement("button", "action-button", action.label || "Continue");
+    const button = createElement("button", "action-button", action.label || localCopy("繼續", "Continue"));
     button.type = "button";
+    // Style explicit server decisions without deriving or changing their events.
+    if (action.event.decision === "approve") button.classList.add("is-primary");
+    if (action.event.decision === "reject") button.classList.add("is-destructive");
     // Preserve the complete event issued by the server, including identifiers.
-    button.addEventListener("click", () => onAction?.(action.event));
+    button.addEventListener("click", () => {
+      button.classList.add("is-submitting");
+      button.setAttribute("aria-busy", "true");
+      onAction?.(action.event);
+    });
     actions.append(button);
   });
-  if (actions.children.length) card.append(actions);
+  if (actions.children.length) {
+    card.append(actions);
+  }
   if (workspace.artifact && typeof workspace.artifact === "object" && workspace.artifact.title) {
     card.append(createElement("p", "workspace-artifact", String(workspace.artifact.title)));
   }

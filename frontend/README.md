@@ -1,48 +1,38 @@
 # Ponte Frontend
 
-這是 Ponte 的零 build dependency 前端。它只負責畫面、文字輸入、瀏覽器語音能力及 middleware HTTP client；不直接呼叫 MCP 或 mock backend。
+這是零 build dependency 的前端，使用 main 的 canonical interaction API、agent、工具驗證及確認流程。
 
-## 啟動前端
+## 啟動
+
+從 repository 根目錄啟動完整 stack：
 
 ```bash
-python -m frontend.server --host 127.0.0.1 --port 5173
+python scripts/run_stack.py --backend-port 18187 --middleware-port 18197 --frontend-port 16177 --data-dir .demo-data-ui-main
 ```
 
-開啟 [http://127.0.0.1:5173](http://127.0.0.1:5173)。前端預設連接 `http://127.0.0.1:8090` 的 middleware；middleware 尚未啟動時，頁面仍然可以載入，並會顯示可理解的連線錯誤，文字輸入仍保持可用。
+開啟 `http://127.0.0.1:16177/?middleware=http://127.0.0.1:18197`。
+也可單獨啟動前端：`python -m frontend.server --host 127.0.0.1 --port 5173`。
+前端預設連接 `http://127.0.0.1:8090`；query 的 `middleware` 可指定其他位置。
+Agent 與模型設定沿用根目錄 README 和 `docs/AGENT_EXECUTION.md`，本版不依賴舊的 scripted cardiology runtime。
+預約與福利服務是本機模擬資料。
 
-完整 stack runner 會列出可直接開啟的 URL；若 middleware 使用其他 port，也可以使用 query override：
+## 介面與互動
 
-```text
-http://127.0.0.1:15173/?middleware=http://127.0.0.1:18090
-```
-
-如需更換 middleware 位置，可在載入 `app.js` 前設定：
-
-```html
-<script>
-  window.PONTE_MIDDLEWARE_URL = "http://127.0.0.1:8090";
-</script>
-```
-
-## 已實現的互動
-
-- 大字、高對比、適合長者閱讀的對話與服務工作區。
-- 文字輸入及快捷需求按鈕。
-- 支援 `SpeechRecognition` / `webkitSpeechRecognition` 時，以 `zh-HK` 取得粵語 transcript；transcript 會先回填文字框，使用者按送出後才傳給 middleware。
-- 對話框保留助手的書面語 `assistant_message`；支援 `speechSynthesis` 時，會以粵語口語 `assistant_speech_message` 自動朗讀，預設開啟。按「自動朗讀：開／關」即可切換；關閉時會立即停止目前朗讀。瀏覽器不支援語音時，文字對話及其他操作仍然可用。
-- Middleware response 會以獨立任務卡顯示；進行中的任務展開顯示 steps、服務資料和下一步操作，完成、取消或不可恢復失敗的任務會收合但可重新展開。已完成或已處理的步驟會自動收合，目前步驟和需要 recovery 的步驟保持展開；重試後的同名步驟會各自保留，使用者可以重新展開舊步驟查看當時的 user-safe 摘要。可恢復的 backend error（例如缺少資料、暫時 timeout 或目前沒有可預約時段）會留在同一張展開的任務卡，顯示原因、需要補充的資料和 retry／替代方案；按下方案後仍沿用同一 task。醫療查詢會顯示每筆預約的服務、日期、時間、地點和狀態；一般使用者不會看到 API 工具名稱、請求編號或原始 backend JSON。Intent LLM 只負責理解使用者需求，Task Recovery LLM 只負責理解 backend 結果並產生下一步方案；兩者分開管理。未來可讓文字／語音確認繼續同一任務。
-- 可用文字輸入測試自然語言 workflow：`我想查詢自己的醫療預約` 是只讀查詢，會建立一張查詢任務卡；`我想預約醫療服務` 會建立另一張進行中的任務卡，讓使用者選擇服務和日期範圍，展示可預約時段，再經確認建立 mock 預約。預約後再次輸入前一個查詢即可建立新的查詢任務並讀回記錄；另外也可測試 `我想查現金分享計劃` 和 `我想找長者文娛活動`。
-- 開發者整合測試仍保留固定 MCP tool 的 `confirm_tool` 確認 action 和既有 `sendAction` contract；這些技術細節不會出現在一般服務工作區。
-- middleware 連線錯誤不會清空既有對話或停用文字輸入。
+- 淡藍漸變、半透明面板與 SVG 圖示。文字與按鈕維持清晰對比；無背景模糊支援或啟用 reduce-transparency 時使用實色面板。
+- 對話保留每輪文字；常用服務按鈕只填入需求，仍需自行送出。編輯需求會同步更新選取狀態，空白需求不能送出。
+- 錄音與請求處理期間阻止重複送出；語音辨識結束但沒有文字時恢復輸入。失敗時保留需求，方便重試。
+- 右側顯示伺服器投影的服務資料與原封不動的 action event。點選項目有處理回饋，關鍵操作仍需自行確認。
+- 操作回放只呈現實際執行紀錄，不發出工具要求、不點按按鈕、不移動鍵盤焦點。可略過或從處理紀錄重播；操作、語言切換及重新開始會停止回放。
+- 回放是 HTTP 完成一輪後的紀錄展示，不代表即時工具耗時或重建歷史畫面。只投影允許的服務事件，不公開模型訊息、工具參數、憑證或原始回覆。
+- 小澳的光環隨聆聽、處理、朗讀狀態變化；朗讀可立即靜音。繁中／EN 切換介面文字，服務內容沿用伺服器提供的文字。
+- 手機上下排列，短螢幕收緊間距；支援鍵盤焦點、reduce-motion、回執列印，以及錯誤提示和重設對話框。
+- 重新開始只清除本輪對話與未提交選項，已保存的模擬預約保留。
 
 ## 驗證
 
 ```bash
-python -m unittest tests.test_frontend_static -v
-node --check frontend/app.js
-node --check frontend/mcp-client.js
-node --check frontend/interaction-view.js
-node --check frontend/speech.js
+node --test tests/frontend_text_input.test.mjs tests/frontend_demo_console.test.mjs tests/frontend_workspace_behavior.test.mjs tests/frontend_agent_motion.test.mjs tests/frontend_voice_cancel.test.mjs
+python -m unittest tests.test_frontend_static tests.test_frontend_interaction_contract tests.test_agent_full_stack -q
 ```
 
-完整驗收流程請參考 repo 根目錄的 `README.md`：輸入上述任一需求並送出，畫面應顯示 middleware 已連線、對應進度，以及可讀的服務資料摘要。
+`middleware/service_activity.py` 是 main execution trace 的只讀顯示轉換；工具選擇、授權、確認、提交與回執驗證仍由 main 的 runtime 管理。

@@ -148,7 +148,8 @@ class FullStackIntegrationTests(unittest.TestCase):
             ),
         )
 
-        self.assertIn("Ponte 語音服務", html)
+        self.assertIn('id="message-form"', html)
+        self.assertIn('id="service-workspace"', html)
         self.assertIn("MiddlewareClient", client_js)
         self.assertTrue(health["backend_reachable"])
         self.assertEqual(response["task"]["status"], "completed")

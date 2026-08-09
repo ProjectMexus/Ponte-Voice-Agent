@@ -14,6 +14,7 @@ from typing import Any
 from .interaction_contracts import CanonicalInteractionResult
 from .medical_workflow import _today, _date_plus
 from .speech import to_cantonese_spoken
+from .service_activity import public_activity
 
 
 _VIEW_TITLES = {
@@ -479,12 +480,14 @@ class WorkspaceProjector:
                 for key, value in _as_mapping(confirmation.get("arguments")).items():
                     fields.append(_field(f"argument_{key}", labels.get(key, key), value))
             return {"view": "agent_task", "title": "Service task", "fields": fields,
+                    "activity": public_activity(_facts(result)),
                     "actions": _project_actions(result),
                     "artifact": deepcopy(dict(result.receipt)) if isinstance(result.receipt, Mapping) else None}
         view = _view_for(result)
         return {
             "view": view,
             "title": _VIEW_TITLES[view],
+            "activity": public_activity(_facts(result)),
             "fields": _fields_for(result, view),
             "actions": _project_actions(result),
             "artifact": deepcopy(dict(result.receipt)) if isinstance(result.receipt, Mapping) else None,

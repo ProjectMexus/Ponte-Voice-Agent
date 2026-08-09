@@ -135,6 +135,28 @@ class AgentHttpTests(unittest.TestCase):
         self.assertEqual(self.post(event, interaction="I-3")[1]["receipt"], done["receipt"])
         self.assertEqual(len(self.mcp.calls), 4)
 
+    def test_ui_activity_uses_real_main_operations_and_never_exposes_private_trace(self):
+        pending = self.propose()
+        activity = pending["workspace"]["activity"]
+        self.assertEqual([e.get("operation") for e in activity], ["services", "slots", None])
+        self.assertEqual(activity[-1]["kind"], "confirmation_ready")
+        self.assertEqual(len(self.mcp.calls), 2, "rendering does not submit a write")
+        public = json.dumps(activity)
+        for private in ("server-secret", "model_decision", "tool_validated", "proposal_id", "STEP-", "arguments", "messages"):
+            self.assertNotIn(private, public)
+        self.assertEqual(self.post({"type": "user_utterance", "content": "Book therapy"})[1], pending)
+        self.assertEqual(len(self.mcp.calls), 2)
+        self.model.responses = [{"action": "respond", "message": "Booking recorded."}]
+        event = self.action(pending)
+        status, done = self.post(event, interaction="ACTIVITY-APPROVE")
+        self.assertEqual(status, 200)
+        kinds = [e["kind"] for e in done["workspace"]["activity"]]
+        self.assertEqual(kinds[:3], [e["kind"] for e in activity])
+        self.assertIn("booking_submitted", kinds)
+        self.assertIn("receipt_verified", kinds)
+        self.assertEqual(len([c for c in self.mcp.calls if c[0] == "medical.create_appointment"]), 1)
+        self.assertEqual(self.post(event, interaction="ACTIVITY-REPLAY")[1]["workspace"]["activity"], done["workspace"]["activity"])
+
     def test_plain_yes_does_not_authorize_and_changed_utterance_invalidates(self):
         pending = self.propose()
         self.utter("yes", interaction="I-2")
