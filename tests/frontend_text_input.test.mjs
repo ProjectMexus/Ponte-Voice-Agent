@@ -11,7 +11,7 @@ const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
 const realSetTimeout = globalThis.setTimeout;
 globalThis.setTimeout = (...args) => realSetTimeout(...args).unref();
 
-function setup(requestHandler) {
+function setup(requestHandler, { guided = false, demoMode = "off" } = {}) {
   const fixture = createDOM();
   const document = fixture.document;
   const elements = new Map();
@@ -38,12 +38,14 @@ function setup(requestHandler) {
     elements.set(`locale:${locale}`, button);
   }
   globalThis.document = document;
-  globalThis.window = { location: { search: "", origin: "http://localhost" } };
+  globalThis.window = { location: { search: guided ? "?guide=medical" : "", origin: "http://localhost" } };
+  elements.get("reset-dialog").showModal = () => { elements.get("reset-dialog").open = true; };
+  elements.get("reset-dialog").close = () => { elements.get("reset-dialog").open = false; };
   globalThis.fetch = async (url, options) => {
-    if (url === "/api/health") return Response.json({ backend_reachable: true, voice_ready: false });
+    if (url === "/api/health") return Response.json({ backend_reachable: true, voice_ready: false, demo_agent_mode: demoMode });
     return requestHandler(url, options);
   };
-  startPonteApp();
+  elements.app = startPonteApp();
   return elements;
 }
 
@@ -154,4 +156,62 @@ test("English input carries a language preference outside the authoritative even
   await settle();
   assert.equal(requests[0].audit.locale,"en");
   assert.deepEqual(requests[0].event,{type:"user_utterance",task_id:null,content:"Book a medical appointment"});
+});
+
+
+test("guided URL starts English, previews without sending, and holds progress on HTTP errors", async () => {
+  const requests = [];
+  let release;
+  const elements = setup((url, options) => {
+    requests.push(JSON.parse(options.body));
+    return new Promise((resolve) => { release = resolve; });
+  }, { guided: true, demoMode: "real" });
+  await settle();
+  assert.equal(document.documentElement.lang, "en");
+  assert.equal(elements.get("language-toggle").hidden, true);
+  assert.equal(elements.get("guided-demo").hidden, false);
+  assert.equal(elements.get("guide-mode").textContent, "Guided demo · Live LLM");
+  elements.get("locale:zh-Hant").click();
+  assert.equal(document.documentElement.lang, "en", "guided messages stay English");
+  elements.get("guide-use").click();
+  assert.equal(elements.get("message-input").value, "Book a cardiology appointment next Tuesday afternoon");
+  assert.equal(requests.length, 0);
+  elements.get("message-form").dispatchEvent(createEvent("submit"));
+  assert.equal(requests[0].audit.locale, "en");
+  assert.equal(elements.get("guide-use").disabled, true);
+  elements.get("guide-use").click();
+  assert.equal(requests.length, 1);
+  release(Response.json({ error: { code: "UNAVAILABLE", message: "Try again" } }, { status: 503 }));
+  await settle();
+  assert.equal(elements.app.guidedDemo.step, 0);
+  assert.match(elements.get("guide-notice").textContent, /did not finish/);
+  assert.equal(elements.get("guide-use").disabled, false);
+  elements.get("guide-exit").click();
+  assert.equal(elements.get("guided-demo").hidden, true);
+  assert.equal(elements.get("language-toggle").hidden, false);
+  assert.equal(elements.get("conversation-log").children.length, 1, "exit preserves conversation");
+});
+
+test("starting the guide from a conversation waits for reset approval; cancel and Escape preserve it", async () => {
+  const elements = setup(() => Response.json({ response: { display_text: "Which service?", speech_text: "" } }), { demoMode: "scripted" });
+  elements.get("message-input").value = "Hello";
+  elements.get("message-form").dispatchEvent(createEvent("submit"));
+  await settle();
+  const oldSession = elements.app.sessionId;
+  elements.get("guide-start").click();
+  assert.equal(elements.get("reset-dialog").open, true);
+  assert.equal(elements.app.guidedDemo.active, false);
+  elements.get("reset-cancel").click();
+  assert.equal(elements.app.sessionId, oldSession);
+  elements.get("guide-start").click();
+  elements.get("reset-dialog").dispatchEvent(createEvent("cancel"));
+  elements.get("reset-dialog").close();
+  elements.get("new-session").click();
+  elements.get("reset-confirm").click();
+  assert.equal(elements.app.guidedDemo.active, false, "Escape clears the pending guide start");
+  elements.get("guide-start").click();
+  assert.equal(elements.app.guidedDemo.active, true);
+  assert.equal(document.documentElement.lang, "en");
+  elements.get("new-session").click(); elements.get("reset-confirm").click();
+  assert.equal(elements.app.guidedDemo.step, 0, "reset keeps an active guide at step one");
 });

@@ -4,6 +4,7 @@ import { createVoiceCapture } from "./voice-capture.js";
 import { createVoiceExceptions } from "./voice-exceptions.js";
 import { createDemoConsole } from "./demo-console.js";
 import { createAgentMotion } from "./agent-motion.js";
+import { createGuidedDemo } from "./guided-demo.js";
 
 function makeSessionId() {
   return `S-${Date.now().toString(36)}`;
@@ -171,6 +172,8 @@ export function startPonteApp() {
   let healthSnapshot = { reachable: null, voiceReady: null, demoMode: "off" };
   let lastResponse = null;
   let resetPrompt = null;
+  let pendingGuideStart = false;
+  let guidedDemo = null;
 
   function copy() {
     return DISPLAY_COPY[displayLocale];
@@ -257,7 +260,10 @@ export function startPonteApp() {
   function syncComposerAvailability() {
     const recording = ["requesting-permission", "listening", "speaking", "stopping", "captured"].includes(currentState)
       || (recognitionOnly && currentState === "unsupported");
-    consoleView.setBusy(Boolean(activeRequest) || recording);
+    const busy = Boolean(activeRequest) || recording;
+    consoleView.setBusy(busy);
+    guidedDemo?.setBusy(busy);
+    if (byId("guide-start")) byId("guide-start").disabled = busy;
   }
 
   function setState(state, { level = null } = {}) {
@@ -274,7 +280,7 @@ export function startPonteApp() {
   }
 
   function setDisplayLocale(locale) {
-    if (!DISPLAY_COPY[locale]) return;
+    if (!DISPLAY_COPY[locale] || (guidedDemo?.active && locale !== "en")) return;
     displayLocale = locale;
     document.documentElement.lang = locale;
     byId("language-toggle").setAttribute("aria-label", copy().system.languageControl);
@@ -301,6 +307,7 @@ export function startPonteApp() {
     if (currentState === "speaking-response") setState("ready");
     consoleView.setLocale(locale);
     if (lastResponse) exceptions.renderResponse(lastResponse);
+    if (guidedDemo?.active) byId("language-toggle").hidden = true;
   }
 
   function stopPlayback() {
@@ -422,10 +429,11 @@ export function startPonteApp() {
         await submitTranscript(transcript);
         return;
       }
+      guidedDemo?.reportError();
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "語音傳送未完成，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
+      if (turn === latestTurn) { activeRequest = null; syncComposerAvailability(); }
     }
   }
 
@@ -459,10 +467,11 @@ export function startPonteApp() {
       return true;
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
+      guidedDemo?.reportError();
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "未能送出這次需求，請再試一次。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
+      if (turn === latestTurn) { activeRequest = null; syncComposerAvailability(); }
     }
   }
 
@@ -503,10 +512,11 @@ export function startPonteApp() {
       }
     } catch (error) {
       if (turn !== latestTurn || isAbort(error)) return;
+      guidedDemo?.reportError();
       exceptions.renderError(error instanceof MiddlewareError ? error : { message: "暫時未能完成這項服務，請重試。" });
       setState("error");
     } finally {
-      if (turn === latestTurn) { activeRequest = null; consoleView.setBusy(false); }
+      if (turn === latestTurn) { activeRequest = null; syncComposerAvailability(); }
     }
   }
 
@@ -556,6 +566,12 @@ export function startPonteApp() {
 
   function renderDelivery(payload) {
     lastResponse = interactionPayload(payload);
+    const deliveredMode = lastResponse.task?.facts?.model_mode;
+    if (["scripted", "real"].includes(deliveredMode)) {
+      healthSnapshot.demoMode = deliveredMode;
+      guidedDemo?.setConnection(true, deliveredMode);
+    }
+    guidedDemo?.observe(lastResponse);
     exceptions.renderResponse(lastResponse);
     consoleView.updateWorkspace(lastResponse);
     consoleView.setBusy(true);
@@ -580,7 +596,36 @@ export function startPonteApp() {
     },
     onReset: requestNewSession,
   });
-  byId("reset-cancel").addEventListener("click", () => { resetPrompt = null; byId("reset-dialog").close(); });
+  function activateGuide() {
+    guidedDemo.start();
+    document.body.dataset.guidedDemo = "true";
+    setDisplayLocale("en");
+    byId("language-toggle").hidden = true;
+  }
+
+  guidedDemo = createGuidedDemo({
+    root: byId("guided-demo"),
+    onPreview: (text) => consoleView.preview(text),
+    onReview() {
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      byId("workspace-heading")?.scrollIntoView?.({ block: "center", behavior: reducedMotion ? "auto" : "smooth" });
+      byId("workspace-heading")?.focus();
+    },
+    onExit() {
+      document.body.dataset.guidedDemo = "false";
+      byId("language-toggle").hidden = false;
+      byId("message-input")?.focus();
+    },
+  });
+  byId("guide-start")?.addEventListener("click", () => {
+    if (activeRequest) return;
+    if (lastResponse || byId("conversation-log")?.querySelector(".message")) {
+      pendingGuideStart = true;
+      requestNewSession();
+    } else activateGuide();
+  });
+  byId("reset-dialog").addEventListener("cancel", () => { pendingGuideStart = false; resetPrompt = null; });
+  byId("reset-cancel").addEventListener("click", () => { pendingGuideStart = false; resetPrompt = null; byId("reset-dialog").close(); });
   byId("reset-confirm").addEventListener("click", () => {
     latestTurn += 1;
     recognitionOnly = false;
@@ -591,6 +636,9 @@ export function startPonteApp() {
     lastResponse = null;
     exceptions.reset();
     consoleView.reset();
+    guidedDemo.reset();
+    if (pendingGuideStart) activateGuide();
+    pendingGuideStart = false;
     agentMotion.reset();
     setCaption(null, "");
     setState("ready");
@@ -673,15 +721,18 @@ export function startPonteApp() {
       backendVoiceReady = payload.voice_ready !== false;
       healthSnapshot = { reachable, voiceReady: backendVoiceReady, demoMode: payload.demo_agent_mode || "off" };
       renderSystemStatus();
+      guidedDemo.setConnection(reachable, healthSnapshot.demoMode);
     })
     .catch(() => {
       backendVoiceReady = false;
       healthSnapshot = { reachable: false, voiceReady: false };
       renderSystemStatus();
+      guidedDemo.setConnection(false, "off");
     });
 
-  setDisplayLocale("zh-Hant");
-  return { client, get sessionId() { return sessionId; }, capture, speech, consoleView, submitTranscript, submitVoice, handleAction, interruptCurrentTurn };
+  if (new URLSearchParams(window.location.search).get("guide") === "medical") activateGuide();
+  else setDisplayLocale("zh-Hant");
+  return { guidedDemo, client, get sessionId() { return sessionId; }, capture, speech, consoleView, submitTranscript, submitVoice, handleAction, interruptCurrentTurn };
 }
 
 if (typeof document !== "undefined") {

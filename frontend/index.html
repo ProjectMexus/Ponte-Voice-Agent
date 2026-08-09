@@ -25,7 +25,7 @@
     <div class="header-controls"><div class="connection-stack sr-only"><span id="health-status" class="health-status" role="status" aria-live="polite">正在連線</span><span id="connection-label" class="connection-label">正在檢查語音服務</span></div><div id="language-toggle" class="language-toggle" role="group" aria-label="顯示語言"><button class="language-option is-active" type="button" data-locale="zh-Hant" aria-pressed="true">繁中</button><button class="language-option" type="button" data-locale="en" aria-pressed="false">EN</button></div><button id="new-session" class="quiet-button" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-refresh" /></svg><span data-copy="newSession">重新開始</span></button></div>
   </header>
   <main class="voice-shell">
-    <section class="page-intro" aria-labelledby="voice-title"><h1 id="voice-title" data-copy="greeting">今天想辦甚麼？</h1></section>
+    <section class="page-intro" aria-labelledby="voice-title"><h1 id="voice-title" data-copy="greeting">今天想辦甚麼？</h1><button id="guide-start" class="text-button" type="button">Try the 7-step demo <span aria-hidden="true">→</span></button></section>
     <div class="demo-layout">
       <section class="conversation-panel panel" aria-labelledby="companion-heading">
         <header class="panel-heading"><h2 id="companion-heading"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-conversation" /></svg><span data-copy="companion">對話</span></h2><button id="speech-toggle" class="sound-toggle" type="button" aria-pressed="true" aria-label="關閉自動朗讀"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-sound" /></svg><span data-copy="soundOn">朗讀開啟</span></button></header>
@@ -42,6 +42,14 @@
         <details class="connection-details"><summary><span data-copy="connectionInfo">連線與語音</span><span id="service-status-value">連線中</span></summary><div id="operational-status" class="operational-status"><span id="service-status-label" class="sr-only">服務</span><span class="status-chip"><span id="voice-path-label" class="status-chip-label">語音</span><strong id="voice-path-value">檢查中</strong></span><span class="status-chip"><span id="microphone-status-label" class="status-chip-label">麥克風</span><strong id="microphone-status-value">待命</strong></span></div></details>
       </section>
       <div class="workspace-column">
+        <section id="guided-demo" class="guided-demo panel" aria-labelledby="guide-heading" hidden>
+          <header class="guide-header"><div><p id="guide-mode" class="guide-mode">Guided demo</p><h2 id="guide-heading">A booking, in seven steps.</h2></div><button id="guide-exit" class="text-button" type="button">Exit guide</button></header>
+          <ol id="guide-steps" class="guide-steps" aria-label="Booking demo progress"></ol>
+          <div class="guide-current" aria-live="polite" aria-atomic="true"><p id="guide-count" class="guide-count"></p><h3 id="guide-title"></h3><p id="guide-hint"></p><blockquote id="guide-message"></blockquote></div>
+          <div class="guide-actions"><button id="guide-use" class="primary-button" type="button">Use this message <span aria-hidden="true">↗</span></button><button id="guide-review" class="primary-button" type="button" hidden>Review confirmation</button><span id="guide-edit-hint">Edit it or press Send. You can also speak.</span></div>
+          <p id="guide-notice" class="guide-notice" role="status" hidden></p>
+          <p class="guide-footnote">A suggested route using simulated appointments. You stay in control.</p>
+        </section>
 
         <section id="voice-exceptions" class="voice-exceptions" aria-label="服務選項、結果與提示">
           <div id="workspace-loading" class="workspace-loading" role="status" hidden><span class="loading-spinner"></span><span data-copy="loading">處理中…</span></div>

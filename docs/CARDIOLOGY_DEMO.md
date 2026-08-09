@@ -70,3 +70,9 @@ An isolated English rehearsal is also available locally: `python scripts/rehears
 The eight-case runner makes billable provider calls for the real-model track. Each run creates a new directory. The original eight cases and historical records are retained; scripted, live-model, calibration and failed attempts remain separate. A passing single rehearsal is not a reliability estimate.
 
 Supplementary diagrams of the bounded cardiology path: [Chinese SVG](architecture/Ponte_Demo_Architecture.svg) · [English SVG](architecture/Ponte_Demo_Architecture.en.svg). These describe that domain path, not the entire general-agent capability set. General runtime details remain in [AGENT_EXECUTION.md](AGENT_EXECUTION.md).
+
+## Guided English presentation
+
+Use **Try the 7-step demo**, or append `&guide=medical` to the frontend URL.
+See [Guided English demo](demo/Guided_English_Demo.md) for the seven messages,
+progress checks, and confirmation behavior.

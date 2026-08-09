@@ -288,6 +288,7 @@ class DemoMedicalWorkflow:
             try:
                 control = self._control(state)
                 action = control["action"]
+                logs.append({"type": "demo_control", "action": action})
                 if action == "clarify":
                     return self._pause(state, envelope, logs, "needs_clarification", control["message"])
                 if action == "query_appointments":
@@ -335,6 +336,7 @@ class DemoMedicalWorkflow:
             if self._patient_blocked():
                 return self._uncertain(state, envelope, logs, "patient_blocked")
             if state.phase == "inquiry" and state.resume_action and dict(event) == state.resume_action:
+                logs.append({"type": "demo_control", "action": "resume_booking"})
                 state.resume_action = None
                 self._resume_booking(state, logs)
                 return self._draft_outcome(state, envelope, logs)
@@ -887,6 +889,16 @@ class DemoMedicalWorkflow:
             state.task["facts"].update(phase="cancelled", response_kind="cancelled", response_reason=None, response_message=None, clarification_message=None)
             state.task["facts"].pop("round2_message", None)
         task = deepcopy(state.task)
+        # Per-response UI evidence only. It grants no permission and is never
+        # read by the model, approval checks, or tool dispatch.
+        task["facts"]["demo_observation"] = {
+            "version": 1,
+            "control_action": next((item["action"] for item in reversed(logs)
+                                    if item.get("type") == "demo_control"), None),
+            "successful_reads": [item["tool"] for item in logs
+                                 if item.get("type") == "tool_execution" and item.get("ok") is True
+                                 and item.get("tool") != CREATE],
+        }
         actions: list[dict[str, Any]] = []
         if state.phase == "inquiry" and state.resume_action:
             actions = [{"label": "返回原預約", "event": deepcopy(state.resume_action)}]
