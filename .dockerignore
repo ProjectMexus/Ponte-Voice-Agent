@@ -19,3 +19,8 @@ frontend/README.md
 background.png
 ponte.png
 README.md
+README.en.md
+.tmp/
+.demo-data*/
+outputs/
+evals/

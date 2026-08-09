@@ -14,6 +14,26 @@ class PilotRegressionTests(unittest.TestCase):
     approval = staticmethod(harness.DemoMedicalWorkflowTests.approval)
     writes = harness.DemoMedicalWorkflowTests.writes
 
+    def test_published_second_option_can_be_selected_without_an_automatic_draft(self):
+        task, _, _ = self.workflow.start(envelope({"type": "user_utterance", "content": REQUEST}))
+        state = self.workflow._states[task["task_id"]]
+        self.workflow._clear_candidate(state)
+        self.assertIsNotNone(state.presentation)
+        task, selected, _ = self.say(task, "選第二個")
+        self.assertIsNotNone(selected.confirmation)
+        self.assertEqual(selected.confirmation["appointment"]["time"], "15:30")
+        self.assertEqual(self.writes(), [])
+
+    def test_selection_without_published_options_cannot_issue_confirmation(self):
+        task, _, _ = self.workflow.start(envelope({"type": "user_utterance", "content": REQUEST}))
+        state = self.workflow._states[task["task_id"]]
+        self.workflow._clear_candidate(state)
+        self.workflow._clear_options(state)
+        task, selected, _ = self.say(task, "選第二個")
+        self.assertIsNone(selected.confirmation)
+        self.assertFalse(selected.allowed_actions)
+        self.assertEqual(self.writes(), [])
+
     def test_model_cannot_weaken_explicit_english_after_boundary(self):
         from types import SimpleNamespace
         task, _, _ = self.workflow.start(envelope({"type": "user_utterance", "content": REQUEST}))

@@ -303,7 +303,7 @@ class DemoMedicalWorkflow:
                 if action == "resume_booking" and state.candidate:
                     self._resume_booking(state, logs)
                     return self._draft_outcome(state, envelope, logs)
-                if action == "select_slot" and state.candidate:
+                if action == "select_slot":
                     try:
                         slot_id = self._resolve_target(state, control["target"])
                     except ValueError:
@@ -573,7 +573,8 @@ class DemoMedicalWorkflow:
                         raise ValueError("time_constraint conflicts with the explicit user boundary; use " + json.dumps(explicit))
                 if action == "select_slot": validate_target(control["target"])
                 if action == "clarify": _required(control["message"], "message")
-                if action in {"select_slot","resume_booking"} and not state.candidate: raise ValueError("candidate required; use clarify")
+                if action == "resume_booking" and not state.candidate: raise ValueError("candidate required; use clarify")
+                if action == "select_slot" and not state.presentation: raise ValueError("published options required; use clarify")
                 if action == "answer_question" and state.phase != "inquiry": raise ValueError("answer_question needs inquiry; use query_appointments for retrieval")
                 state.transcript.append({"role":"assistant","content":json.dumps(control,ensure_ascii=False)})
                 return control
