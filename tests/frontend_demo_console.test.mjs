@@ -314,3 +314,16 @@ test("one task status follows processing, confirmation and recovery without repe
   ui.reset();
   assert.equal(nodes["task-status"].hidden,true);
 });
+
+
+test("English quick requests send English while language changes preserve custom text", () => {
+  ui.setLocale("en");
+  nodes["medical-scenario"].click();
+  assert.equal(nodes["message-input"].value,"I would like to book a medical appointment.");
+  assert.equal(nodes["medical-scenario"].getAttribute("aria-pressed"),"true");
+  ui.setLocale("zh-Hant");
+  assert.equal(nodes["message-input"].value,"我想預約醫療服務");
+  nodes["message-input"].value="My own request";
+  ui.setLocale("en");
+  assert.equal(nodes["message-input"].value,"My own request");
+});

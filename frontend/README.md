@@ -24,7 +24,7 @@ Agent 與模型設定沿用根目錄 README 和 `docs/AGENT_EXECUTION.md`，本�
 - 右側顯示伺服器投影的服務資料與原封不動的 action event。點選項目有處理回饋，關鍵操作仍需自行確認。
 - 操作回放只呈現實際執行紀錄，不發出工具要求、不點按按鈕、不移動鍵盤焦點。可略過或從處理紀錄重播；操作、語言切換及重新開始會停止回放。
 - 回放是 HTTP 完成一輪後的紀錄展示，不代表即時工具耗時或重建歷史畫面。只投影允許的服務事件，不公開模型訊息、工具參數、憑證或原始回覆。
-- 小澳的光環隨聆聽、處理、朗讀狀態變化；朗讀可立即靜音。繁中／EN 切換介面文字，服務內容沿用伺服器提供的文字。
+- 小澳的光環隨聆聽、處理、朗讀狀態變化；朗讀可立即靜音。繁中／EN 同步切換快捷需求、互動回覆、語音辨識與朗讀語系；既有對話紀錄保留原文。
 - 手機上下排列，短螢幕收緊間距；支援鍵盤焦點、reduce-motion、回執列印，以及錯誤提示和重設對話框。
 - 重新開始只清除本輪對話與未提交選項，已保存的模擬預約保留。
 
@@ -36,3 +36,19 @@ python -m unittest tests.test_frontend_static tests.test_frontend_interaction_co
 ```
 
 `middleware/service_activity.py` 是 main execution trace 的只讀顯示轉換；工具選擇、授權、確認、提交與回執驗證仍由 main 的 runtime 管理。
+
+## Interaction languages
+
+The selected language is sent as an allowlisted presentation preference in
+`audit.locale`, outside authoritative action events. Sessions retain it across
+issued actions. English requests work in the local keyword fallback as well as
+the main agent; the agent receives a server-composed reply-language instruction.
+English service copy and workspace labels are projected on copies; confirmation
+IDs, action events, backend facts and receipts remain unchanged. Switching during
+recording stops that recording; a reply requested in an earlier language is kept
+as text without being read in the newly selected voice.
+
+Browser recognition and speech use en-US for English and zh-HK/Cantonese for
+Chinese. Missing voices show a notice instead of selecting an unrelated language.
+Cloud English TTS can be configured with `PONTE_VOICE_TTS_VOICE_EN`; without it,
+English uses browser speech. Cloud STT receives the requested language.

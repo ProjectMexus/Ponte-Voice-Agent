@@ -4,7 +4,7 @@ export const UI_COPY = {
     operationReplay: "操作回放", skipReplay: "略過", replayOperations: "重播本輪操作", newSession: "重新開始", connectionInfo: "連線與語音", greeting: "今天想辦甚麼？", companion: "對話", soundOn: "朗讀開啟", soundOff: "朗讀關閉", conversation: "對話紀錄", inputLabel: "輸入你的需求", inputPlaceholder: "例如：我想預約醫療服務", inputHint: "Enter 送出 · Shift + Enter 換行", send: "送出", services: "常用服務", medical: "醫療預約", cash: "現金分享", appointments: "我的預約", loading: "處理中…", mockNote: "使用模擬資料。", lastReceipt: "查看回執", activity: "處理紀錄", resetHeading: "開始新的對話？", resetBody: "畫面上的對話和服務足跡會清除。已提交的模擬預約會保留；未提交的選項不會執行。", resetCancel: "繼續這次對話", resetConfirm: "開始新對話", receiptEyebrow: "服務回執", receiptHeading: "預約回執", print: "列印", download: "下載", user: "你", assistant: "小澳", count: "則訊息", awaitingInput: "待選擇", awaitingConfirmation: "待確認", completed: "已完成", cancelled: "已取消", failed: "需要處理", processing: "正在處理", recovery: "請補充資料", turnOffSound: "關閉自動朗讀", turnOnSound: "開啟自動朗讀",
   },
   en: {
-    operationReplay: "Operation replay", skipReplay: "Skip", replayOperations: "Replay this turn", newSession: "Start over", connectionInfo: "Connection and voice", greeting: "What do you need today?", companion: "Conversation", soundOn: "Voice on", soundOff: "Voice off", conversation: "Conversation", inputLabel: "Describe what you need", inputPlaceholder: "For example: 我想預約醫療服務", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "Quick requests", medical: "Book a visit", cash: "Cash sharing", appointments: "My appointments", loading: "Processing…", mockNote: "Uses simulated data.", lastReceipt: "View receipt", activity: "Activity", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Appointment receipt", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Awaiting selection", awaitingConfirmation: "Awaiting confirmation", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "More information needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
+    operationReplay: "Operation replay", skipReplay: "Skip", replayOperations: "Replay this turn", newSession: "Start over", connectionInfo: "Connection and voice", greeting: "What do you need today?", companion: "Conversation", soundOn: "Voice on", soundOff: "Voice off", conversation: "Conversation", inputLabel: "Describe what you need", inputPlaceholder: "For example: I would like to book a medical appointment", inputHint: "Enter to send · Shift + Enter for a new line", send: "Send", services: "Quick requests", medical: "Book a visit", cash: "Cash sharing", appointments: "My appointments", loading: "Processing…", mockNote: "Uses simulated data.", lastReceipt: "View receipt", activity: "Activity", resetHeading: "Start a new conversation?", resetBody: "The conversation and service trail will be cleared. Submitted simulated bookings remain; unsubmitted options will not run.", resetCancel: "Keep this conversation", resetConfirm: "Start new conversation", receiptEyebrow: "Service receipt", receiptHeading: "Appointment receipt", print: "Print", download: "Download", user: "You", assistant: "Ponte", count: "messages", awaitingInput: "Awaiting selection", awaitingConfirmation: "Awaiting confirmation", completed: "Completed", cancelled: "Cancelled", failed: "Needs attention", processing: "Processing", recovery: "More information needed", turnOffSound: "Turn voice off", turnOnSound: "Turn voice on",
   },
 };
 
@@ -23,6 +23,12 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
   let lastActivityKey = null;
   const observedEvents = new Set();
   const copy = () => UI_COPY[locale];
+  const englishPrompts = {
+    "我想預約醫療服務": "I would like to book a medical appointment.",
+    "我想查現金分享計劃": "I would like to check the cash sharing scheme.",
+    "我想查詢已有預約": "I would like to see my medical appointments.",
+  };
+  const promptFor = (prompt) => locale === "en" ? englishPrompts[prompt] || prompt : prompt;
 
   function renderMute() {
     const button = byId("speech-toggle");
@@ -45,7 +51,7 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
     const send = byId("send-button");
     if (send) send.disabled = busy || !hasContent;
     document.querySelectorAll("[data-prompt]").forEach((node) => {
-      const selected = value === node.dataset.prompt;
+      const selected = value === promptFor(node.dataset.prompt);
       node.classList.toggle("is-selected", selected);
       node.setAttribute("aria-pressed", String(selected));
     });
@@ -53,7 +59,9 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
 
   function setLocale(value) {
     if (!UI_COPY[value]) return;
+    const selectedPrompt = Array.from(document.querySelectorAll("[data-prompt]")).find((node) => input?.value === promptFor(node.dataset.prompt));
     locale = value;
+    if (selectedPrompt && input) input.value = promptFor(selectedPrompt.dataset.prompt);
     document.querySelectorAll("[data-copy]").forEach((node) => {
       const text = copy()[node.dataset.copy];
       if (text) node.textContent = text;
@@ -219,7 +227,7 @@ export function createDemoConsole({ onSubmit, onMute, onReset } = {}) {
   input?.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing) submit(event);
   });
-  document.querySelectorAll("[data-prompt]").forEach((node) => node.addEventListener("click", () => preview(node.dataset.prompt)));
+  document.querySelectorAll("[data-prompt]").forEach((node) => node.addEventListener("click", () => preview(promptFor(node.dataset.prompt))));
   byId("new-session")?.addEventListener("click", () => { if (!busy) onReset?.(); });
   byId("speech-toggle")?.addEventListener("click", () => {
     muted = !muted;

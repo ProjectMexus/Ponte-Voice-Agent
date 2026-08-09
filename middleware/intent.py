@@ -117,6 +117,13 @@ class KeywordIntentRecognizer(IntentRecognizer):
     def recognize(self, message: str) -> IntentDecision:
         if not isinstance(message, str):
             raise ValueError("message must be a string")
+        english = message.casefold()
+        if any(term in english for term in ("cash sharing", "cash-sharing", "wealth sharing")):
+            return IntentDecision("cash_sharing", "keyword", 1.0, "cash sharing")
+        if any(term in english for term in ("my appointments", "my medical appointments", "my appointment", "existing appointment", "existing medical appointment", "appointment records", "appointment history", "upcoming appointments", "appointment list")):
+            return IntentDecision("medical_query", "keyword", 1.0, "appointments")
+        if any(term in english for term in ("medical appointment", "medical service", "book a visit", "book an appointment", "cardiology appointment", "see a doctor")):
+            return IntentDecision("medical_booking", "keyword", 1.0, "medical")
         for term in self.cash_sharing_terms:
             if term in message:
                 return IntentDecision("cash_sharing", "keyword", 1.0, term)

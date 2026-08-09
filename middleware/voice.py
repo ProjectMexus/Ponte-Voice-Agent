@@ -53,6 +53,8 @@ class VoiceProviderSettings:
     tts_api_key: str | None = None
     tts_model: str | None = None
     tts_voice: str | None = None
+    tts_voice_en: str | None = None
+    locale: str = "zh-HK"
 
     @classmethod
     def from_env(cls, environment: Mapping[str, str] | None = None) -> "VoiceProviderSettings":
@@ -65,6 +67,7 @@ class VoiceProviderSettings:
             tts_api_key=_optional_value(values.get("PONTE_VOICE_TTS_API_KEY")),
             tts_model=_optional_value(values.get("PONTE_VOICE_TTS_MODEL")),
             tts_voice=_optional_value(values.get("PONTE_VOICE_TTS_VOICE")),
+            tts_voice_en=_optional_value(values.get("PONTE_VOICE_TTS_VOICE_EN")),
         )
 
 

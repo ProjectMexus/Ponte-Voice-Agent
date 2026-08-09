@@ -290,6 +290,15 @@ export function startPonteApp() {
     renderSystemStatus();
     renderCaption();
     agentMotion.cancel();
+    stopPlayback();
+    if (["requesting-permission", "listening", "speaking"].includes(currentState)) {
+      recognitionOnly = false;
+      capture.cancel();
+      speech.stop();
+      setState("ready");
+    }
+    speech.setLanguage(locale);
+    if (currentState === "speaking-response") setState("ready");
     consoleView.setLocale(locale);
     if (lastResponse) exceptions.renderResponse(lastResponse);
   }
@@ -317,7 +326,8 @@ export function startPonteApp() {
     const speechText = typeof response.speech_text === "string" ? response.speech_text.trim() : "";
     showPonteReply(displayText);
     consoleView.appendMessage("assistant", displayText);
-    if (consoleView.muted || !speechText) {
+    const deliveredLocale = interaction.locale || response.locale || displayLocale;
+    if (consoleView.muted || !speechText || deliveredLocale !== displayLocale) {
       setState("ready");
       return;
     }
@@ -396,6 +406,7 @@ export function startPonteApp() {
         sessionId,
         turnId: makeTurnId(),
         audio: clip.blob,
+        locale: displayLocale === "en" ? "en-US" : "zh-HK",
         signal: controller.signal,
       });
       if (turn !== latestTurn) return;
@@ -438,6 +449,7 @@ export function startPonteApp() {
     try {
       const payload = await client.sendInteraction({
         routing: { interaction_id: makeInteractionId(), session_id: sessionId },
+        audit: { locale: displayLocale },
         event: { type: "user_utterance", task_id: null, content: transcript },
       }, { signal: controller.signal });
       if (turn !== latestTurn) return;
@@ -476,6 +488,7 @@ export function startPonteApp() {
     try {
       const payload = await client.sendInteraction({
         routing: { interaction_id: makeInteractionId(), session_id: sessionId },
+        audit: { locale: displayLocale },
         event,
       }, { signal: controller.signal });
       if (turn !== latestTurn) return;
@@ -526,6 +539,12 @@ export function startPonteApp() {
       if (recognitionOnly && state === "permission-denied") setState("permission-denied");
       if (recognitionOnly && state === "error") setState("error");
       if (recognitionOnly && state === "idle" && !activeRequest && ["unsupported", "listening", "speaking"].includes(currentState)) setState("ready");
+      if (["cantonese-unavailable", "english-unavailable"].includes(state) && activeSpeechTurn === latestTurn) {
+        exceptions.renderError({ message: displayLocale === "en"
+          ? "The requested speech voice is unavailable in this browser. Reading is paused; you can continue using text."
+          : "此瀏覽器暫未提供粵語聲線，已暫停朗讀。你可以繼續使用文字。" });
+        setState("audio-error");
+      }
       if (state === "audio-error" && activeSpeechTurn === latestTurn && document.body.dataset.voiceState === "speaking-response") {
         exceptions.renderError({ message: "瀏覽器未能播放聲音。請檢查系統輸出裝置與音量，然後再試一次。" });
         setState("audio-error");

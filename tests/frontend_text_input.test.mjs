@@ -139,3 +139,19 @@ test("ending browser recognition without a transcript restores the text fallback
     delete globalThis.SpeechRecognition;
   }
 });
+
+
+test("English input carries a language preference outside the authoritative event", async () => {
+  const requests=[];
+  const elements=setup((url, options) => {
+    requests.push(JSON.parse(options.body));
+    return Response.json({response:{display_text:"Choose a service.",speech_text:""}});
+  });
+  elements.get("locale:en").dispatchEvent(createEvent("click"));
+  elements.get("message-input").value="Book a medical appointment";
+  elements.get("message-input").dispatchEvent(createEvent("input"));
+  elements.get("message-form").dispatchEvent(createEvent("submit"));
+  await settle();
+  assert.equal(requests[0].audit.locale,"en");
+  assert.deepEqual(requests[0].event,{type:"user_utterance",task_id:null,content:"Book a medical appointment"});
+});

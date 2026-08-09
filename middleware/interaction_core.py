@@ -40,16 +40,20 @@ class InteractionCore:
 
     def _handle_locked(self, envelope: EventEnvelope) -> CanonicalInteractionResult:
         state = self.sessions.get_or_create(envelope.session_id)
+        requested_locale = envelope.audit.get("locale")
+        if isinstance(requested_locale, str) and requested_locale in {"en", "en-US", "en-GB", "zh-Hant", "zh-HK", "zh-TW"}:
+            state.response_locale = "en" if requested_locale.startswith("en") else "zh-Hant"
         if self.agent_orchestrator is not None:
             result = self.agent_orchestrator.handle(state, envelope)
             self.sessions.save(state)
-            return result
+            return replace(result, facts={**result.facts, "response_locale": state.response_locale})
         if envelope.event.get("type") == "user_utterance":
             outcome = self._handle_utterance(state, envelope)
         else:
             task = self._active_task(state)
             outcome = self._workflow_for_task(task).handle(deepcopy(task), envelope)
-        return self._save(state, outcome)
+        result = self._save(state, outcome)
+        return replace(result, facts={**result.facts, "response_locale": state.response_locale})
 
     def _handle_utterance(self, state: SessionState, envelope: EventEnvelope) -> WorkflowResult:
         task = state.task

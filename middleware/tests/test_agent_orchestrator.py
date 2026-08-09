@@ -55,6 +55,16 @@ class FakeMcp:
 
 
 class AgentHttpTests(unittest.TestCase):
+    def test_allowlisted_locale_controls_agent_reply_language_not_authorization(self):
+        self.model.responses = [{"action":"respond", "message":"Ready."}, {"action":"respond", "message":"繼續。"}]
+        status, english = self.utter("Help me", audit={"locale":"en"})
+        self.assertEqual(status,200)
+        self.assertIn("Respond and clarify in English",self.model.requests[-1][0][0]["content"])
+        self.assertEqual(english["response"]["speech_locale"],"en-US")
+        self.utter("繼續",interaction="LOCALE-2",audit={"locale":"zh-Hant"})
+        self.assertIn("Respond and clarify in Traditional Chinese",self.model.requests[-1][0][0]["content"])
+        self.assertEqual(self.mcp.calls,[])
+
     def test_model_date_comes_from_server_clock_and_refreshes_across_turns(self):
         from datetime import datetime, timezone
         orchestrator = self.app.interaction_core.agent_orchestrator

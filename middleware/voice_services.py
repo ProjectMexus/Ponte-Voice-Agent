@@ -54,7 +54,7 @@ class OpenAICompatibleSpeechToText:
     def transcribe(self, audio: UploadedAudio, settings: VoiceProviderSettings) -> str:
         if not settings.stt_url or not settings.stt_model:
             raise VoiceProviderError("STT_NOT_CONFIGURED", "Speech recognition is not configured.")
-        body, content_type = _multipart({"model": settings.stt_model, "language": "zh-HK"}, audio.filename or "audio.webm", audio.content_type, audio.content)
+        body, content_type = _multipart({"model": settings.stt_model, "language": "en" if settings.locale == "en-US" else settings.locale}, audio.filename or "audio.webm", audio.content_type, audio.content)
         headers = {"Content-Type": content_type, "Accept": "application/json"}
         if settings.stt_api_key:
             headers["Authorization"] = f"Bearer {settings.stt_api_key}"

@@ -30,6 +30,7 @@ class SessionState:
     task: dict[str, Any] | None = None
     interaction_log: list[dict[str, Any]] = field(default_factory=list)
     agent_execution: Any | None = None
+    response_locale: str = "zh-Hant"
 
     def reset_for_new_task(self) -> None:
         """Clear the current workflow before handling a new high-level request."""

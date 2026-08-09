@@ -49,6 +49,24 @@ class CoreVoiceTurnProviderTests(unittest.TestCase):
         state = core.sessions.get_or_create("S-VOICE-CORE")
         self.assertEqual(state.task["type"], "medical_appointment")
 
+    def test_english_audio_uses_english_recognition_and_does_not_use_cantonese_tts(self):
+        class EnglishSpeechToText:
+            locale = None
+            def transcribe(self, audio, settings):
+                self.locale = settings.locale
+                return "I would like to book a medical appointment."
+        class CantoneseOnlySpeech:
+            def synthesize(self, text, settings):
+                raise AssertionError("Cantonese-only cloud voice must not be used for English")
+        stt = EnglishSpeechToText()
+        core = InteractionCore(SessionStore(), MedicalWorkflow(FakePipeline(), "PAT-DEMO-001", "Bearer demo"), intent_recognizer=FakeIntentRecognizer())
+        provider = CoreVoiceTurnProvider(core, DeliveryOrchestrator(), stt=stt, tts=CantoneseOnlySpeech(), settings=VoiceProviderSettings(tts_voice="cantonese"))
+        result = provider.handle_turn(VoiceTurn("EN-VOICE", "EN-1", UploadedAudio(b"audio", "audio/webm"), locale="en-US"))
+        self.assertEqual(stt.locale,"en-US")
+        self.assertEqual(result.metadata["locale"],"en")
+        self.assertIn("medical services",result.metadata["response"]["display_text"])
+        self.assertEqual(result.metadata["speech_audio"]["status"],"unavailable")
+
     def test_tts_failure_does_not_fail_the_interaction(self):
         core = InteractionCore(
             SessionStore(),

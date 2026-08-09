@@ -98,11 +98,11 @@ export class MiddlewareClient {
     return new URL(path, window.location.origin).toString();
   }
 
-  sendVoiceTurn({ sessionId, turnId, audio, signal }) {
+  sendVoiceTurn({ sessionId, turnId, audio, signal, locale = "zh-HK" }) {
     const form = new FormData();
     form.append("session_id", sessionId);
     form.append("turn_id", turnId);
-    form.append("locale", "zh-HK");
+    form.append("locale", locale === "en-US" ? "en-US" : "zh-HK");
     form.append("audio", audio, `ponte-${turnId}.${audio?.type?.includes("ogg") ? "ogg" : "webm"}`);
     return this.request("/api/voice/turn", { method: "POST", body: form, signal });
   }

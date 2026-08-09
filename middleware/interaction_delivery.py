@@ -15,6 +15,7 @@ from .interaction_contracts import CanonicalInteractionResult
 from .medical_workflow import _today, _date_plus
 from .speech import to_cantonese_spoken
 from .service_activity import public_activity
+from .interaction_locale import english_response, workspace_in_locale
 
 
 _VIEW_TITLES = {
@@ -146,6 +147,8 @@ class ResponseComposer:
         intent = _normalised(result.response_intent)
         task = _task(result)
         facts = _facts(result)
+        if facts.get("response_locale") == "en":
+            return english_response(result)
         status = _normalised(task.get("status"))
         details = _appointment_details(result)
 
@@ -466,6 +469,21 @@ class WorkspaceProjector:
 
     @staticmethod
     def project(result: CanonicalInteractionResult) -> dict[str, Any]:
+        workspace = WorkspaceProjector._project(result)
+        for field in workspace.get("fields", []):
+            event = _as_mapping(_as_mapping(field.get("action")).get("event"))
+            key = {"service_selected": "service_id", "slot_selected": "slot_id"}.get(event.get("type"))
+            if not key:
+                continue
+            issued = next((action for action in result.allowed_actions
+                if isinstance(action, Mapping) and isinstance(action.get("event"), Mapping)
+                and action["event"].get("type") == event.get("type") and action["event"].get(key) == event.get(key)), None)
+            if issued is not None:
+                field["action"] = deepcopy(dict(issued))
+        return workspace_in_locale(workspace, _facts(result).get("response_locale"))
+
+    @staticmethod
+    def _project(result: CanonicalInteractionResult) -> dict[str, Any]:
         if result.response_intent == "agent_response":
             confirmation = _as_mapping(result.confirmation)
             fields = []
@@ -533,6 +551,7 @@ class DeliveryOrchestrator:
 
         return {
             "interaction_id": _text(result.interaction_id),
+            "locale": "en" if _facts(result).get("response_locale") == "en" else "zh-Hant",
             "task": deepcopy(dict(result.task)) if isinstance(result.task, Mapping) else {},
             "response": response,
             "workspace": workspace,
